@@ -5,7 +5,7 @@
 struct uart {
 	//0x0
 	unsigned int dr;			//data reg
-	unsigned int rsrecr;		//receive status register/error clear reg
+	unsigned int rsrecr;			//RX status reg/error clear reg
 	unsigned int unused0[4];
 	unsigned int fr;			//flag reg
 	unsigned int unused1;
@@ -22,7 +22,7 @@ struct uart {
 	//0x40
 	unsigned int mis; 			//masked interrupt status reg
 	unsigned int icr; 			//interrupt clear reg
-	unsigned int dmacr; 		//masked interrupt status reg
+	unsigned int dmacr; 			//masked interrupt status reg
 	unsigned int unused2[13];
 	//0x80
 	unsigned int itcr;			//test control reg
@@ -31,15 +31,28 @@ struct uart {
 	unsigned int tdr;			//test data reg
 };
 
-static volatile
-struct gpio * const gpio_port = (struct gpio *)GPIO_BASE;
+static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
+/* 
+   fr: flag reg
+   3 BUSY ..... the UART is busy transmitting data
+-> 4 RXFE ..... receive FIFO is empty
+-> 5 TXFF ..... transmit FIFO is full
+   6 RXFF ..... receive FIFO is full
+   7 TXFE ..... transmit FIFO is empty.
+*/
 
-void yellow_on(void)
+char uart_read(void)
 {
-	/* Initialisieren */
-	gpio_port->func[0] = gpio_output << (YELLOW_LED * GPF_BITS);
-
-	/* Anschalten */
-	gpio_port->set[0] = 1 << YELLOW_LED;
+	while(uart_port->fr & (1 << 4))
+	{}
+	return (uart_port->dr & 255);
 }
+
+void uart_write(char data)
+{
+	while(uart_port->fr & (1 << 5))
+	{}
+	uart_port->dr = data;
+}
+
 
