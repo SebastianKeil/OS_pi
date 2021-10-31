@@ -19,6 +19,12 @@ void start_kernel(){
 		
 		receive_buffer = uart_read();
 		uart_write(receive_buffer);
+		uart_write(80);
+		uart_write(69);
+		uart_write(78);
+		uart_write(73);
+		uart_write(83);
+		
 		uart_write(10);
 	}
 
