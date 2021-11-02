@@ -1,5 +1,6 @@
 #include <arch/bsp/yellow_led.h>
 #include <arch/bsp/uart.h>
+#include <lib/kprintf.h>
 
 volatile unsigned int counter = 0;
 volatile char receive_buffer;
@@ -17,15 +18,21 @@ void start_kernel(){
 	for (;;) {
 		increment_counter();
 		
-		receive_buffer = uart_read();
-		uart_write(receive_buffer);
-		uart_write(80);
-		uart_write(69);
-		uart_write(78);
-		uart_write(73);
-		uart_write(83);
+		if(counter > 3){
+			kprintf("Da kommt nichts neues!");
+			uart_write(10);
+			
+		}
+		//c, s, x, i, u, p
+		//receive_buffer = uart_read();
+		int i = uart_read() - 48;
+		int n = 9;
+		char str[] = "jaschas";
 		
+		kprintf("%s penis ist %i/%i mm lang.", str, i, n);
 		uart_write(10);
+		
+		
 	}
 
 
