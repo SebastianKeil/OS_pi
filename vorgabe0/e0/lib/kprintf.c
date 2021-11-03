@@ -7,11 +7,11 @@ void print_integer(int i, int base, char *c){
 
 	const char *symbols = "0123456789abcdef";
 	char output_buffer[10];
-	//if(*c != 'x'){
+	if(*c != 'x'){
 		for(int j = 0; j < 10; j++){
 			output_buffer[j] = *c;
 		}
-	//}
+	}
 	int slot = 0;
 	
 	if(i == 0){
@@ -25,6 +25,7 @@ void print_integer(int i, int base, char *c){
 		
 		i = i / base;
 	}
+	slot --;
 	if((slot < 8) && (*c != 'x')){
 		slot = 7;
 	}
@@ -115,6 +116,7 @@ void kprintf(char *fmt, ...){
 					fmt = fmt + 3;
 				}else{
 					replace_and_write(fmt, &ap, "x");
+					fmt = fmt + 1;
 				}
 				//fmt = fmt + 2;
 				

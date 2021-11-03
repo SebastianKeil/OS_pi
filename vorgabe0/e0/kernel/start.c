@@ -39,10 +39,10 @@ void start_kernel(){
 		
 		receive_buffer = uart_read();
 		
-		kprintf("%s %c, In Hexadezimal: %8x, In Dezimal: %8i", str2, 
+		kprintf("%s %c, In Hexadezimal: %x, In Dezimal: %i", str2, 
 					receive_buffer, receive_buffer, receive_buffer);
 		uart_write(10);
-		kprintf("test for negative: %08x", -269);
+		//kprintf("test for negative: %8x", 269);
 		uart_write(10);
 		
 		
