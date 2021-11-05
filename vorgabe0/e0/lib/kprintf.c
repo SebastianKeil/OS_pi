@@ -49,10 +49,14 @@ void print_integer(int i, int base, char *c, int prefix){
 			output_buffer[j] = *c;
 		}
 	}
-		
-	int slot = 0;
-	int neg = 0;
 	
+	if((i > 2147483647) || (i < -2147483648)){
+		kprintf("ERROR: number too large!");  //DAS wertet immer zu false aus, wie kann man dafür checken?
+		return;
+	}
+
+	int slot = 0; //slot in Buffer
+	int neg = 0;  //FLAG for negative number
 	if(i < 0){
 		i = i * -1;
 		neg = 1;
@@ -78,7 +82,6 @@ void print_integer(int i, int base, char *c, int prefix){
 			}
 		} else {
 			output_buffer[slot] = nega[0];
-			slot++;
 		}
 	}
 	if((slot < (8)) && (*c != 'x')){

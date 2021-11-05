@@ -42,7 +42,7 @@ void start_kernel(){
 	%% – Ein einfaches %-Zeichen wird ausgegeben
 
 	*/
-	const int i = 3456;
+	const int i = 2147483649;
 	int i_neg = - i;
 	kprintf("Negativer Zahlentest: \n");
 	//kprintf("Minus%i DEC: \nMinus%i DEC mit Spaces: \nMinus%i DEC: \n",i ,i ,i);
