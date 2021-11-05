@@ -39,31 +39,49 @@ return(fmt);
 }
 
 
-void print_integer(int i, int base, char *c){
-
+void print_integer(int i, int base, char *c, int prefix){
 	const char *symbols = "0123456789abcdef";
+	const char *pre = "0x";
+	const char *nega = "-";
 	char output_buffer[11];
 	if(*c != 'x'){
 		for(int j = 0; j < 11; j++){
 			output_buffer[j] = *c;
 		}
 	}
+		
 	int slot = 0;
+	int neg = 0;
 	
-	if(i == 0){
-		uart_write('0');
-		return;
+	if(i < 0){
+		i = i * -1;
+		neg = 1;
 	}
-															//TODO when negative
 	
 	while(i > 0){
 		output_buffer[slot] = symbols[(i%base)];
 		slot++;
-		
 		i = i / base;
 	}
-	slot --;
-	if((slot < 8) && (*c != 'x')){
+	if(prefix){
+		output_buffer[slot] = pre[1];
+		slot++;
+		output_buffer[slot] = pre[0];
+		slot++;
+	}
+	if(neg){
+		if(*c == '0'){
+			if(slot < 8){
+				output_buffer[7] = nega[0];
+			} else {
+				output_buffer[slot] = nega[0];
+			}
+		} else {
+			output_buffer[slot] = nega[0];
+			slot++;
+		}
+	}
+	if((slot < (8)) && (*c != 'x')){
 		slot = 7;
 	}
 	while(slot > -1){
@@ -76,7 +94,7 @@ void print_integer(int i, int base, char *c){
 
 void replace_and_write(char *fmt, va_list *ap, char *c){
 	int i;
-	const char *string;
+	const char *string;		//TODO change name of string to something more descriptive
 	unsigned int u_int;
 	void* ptr;
 
@@ -86,7 +104,7 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 		uart_write(i);
 		break;
 		
-	case 's': //all the string
+	case 's': //whole string
 		string = va_arg(*ap, const char *);
 		while(*string){
 			uart_write(*string);
@@ -94,31 +112,33 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 		}
 		break;
 		
-	case 'x': //unsigned int -> in hex
+	case 'x': //unsigned int -> hex
 		u_int = va_arg(*ap, unsigned int);
-		print_integer(u_int, 16, c);
+		print_integer(u_int, 16, c, 0);
 		break;
 		
-	case 'i': //int in dezimal
+	case 'i': //signed int -> decimal
 		i = va_arg(*ap, int);
-		if(i < 0){
-			kprintf("-");							//TODO Vorzeichen integrieren
-			print_integer(i*-1, 10, c);
-		}else{
-			print_integer(i, 10, c);
-		}
+		print_integer(i, 10, c, 0);
 		break;
 		
-	case 'u': //unsigned int in dezimal
+	case 'u': //unsigned int -> decimal
 		u_int = va_arg(*ap, unsigned int);
-		print_integer(u_int, 10, c);
+		print_integer(u_int, 10, c, 0);
 		break;
 		
-	case 'p': // pointer in hex mit prefix 0x
-													//TODO
+	case 'p': // pointer -> hex with prefix 0x
+		u_int = va_arg(*ap, unsigned int);
+		if(*c == 'x'){
+			uart_write(48);
+			uart_write(120);
+			print_integer(u_int, 16, c, 0);
+		} else {
+			print_integer(u_int, 16, c, 2);
+			}
 		break;
 		
-	case '%': // einfaches %
+	case '%': // single %
 		uart_write(37);
 		break;
 	}
@@ -136,7 +156,6 @@ void kprintf(char* fmt, ...){
 		case '%':
 			fmt++;
 			fmt = prepare_for_print(fmt, &ap);
-			//if(fmt == NULL)
 			break;
 		
 		case '\\':
