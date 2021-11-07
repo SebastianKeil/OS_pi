@@ -43,7 +43,7 @@ void print_integer(int i, int base, char *c, int prefix){
 	const char *symbols = "0123456789abcdef";
 	const char *pre = "0x";
 	const char *nega = "-";
-	char output_buffer[11];
+	char output_buffer[12];
 	if(*c != 'x'){
 		for(int j = 0; j < 11; j++){
 			output_buffer[j] = *c;
