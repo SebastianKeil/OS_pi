@@ -56,7 +56,10 @@ void print_integer(int i, int base, char *c, int prefix){
 		i = i * -1;
 		neg = 1;
 	}
-	
+	if (i == 0){
+		output_buffer[slot] = symbols[0];
+		slot++;
+	}
 	while(i > 0){
 		output_buffer[slot] = symbols[(i%base)];
 		slot++;
@@ -96,8 +99,6 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 	int i;
 	const char *string;		//TODO change name of string to something more descriptive
 	unsigned int u_int;
-	void* ptr;				//TODO wofür ist der nochmal???
-
 	switch(*fmt){
 	case 'c': //int -> unsigned char
 		i = va_arg(*ap, int);

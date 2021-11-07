@@ -46,16 +46,16 @@ void start_kernel(){
 	//TODO
 
 
-	int a = 34;
+	int a = 0;
 	int b = 67;
-	int c = 427;
+	int c = 427412349;
 	int a_neg =  - a;
 	int b_neg =  - b;
 	int c_neg =  - c;
 	kprintf("Negativer Zahlentest: \n");
-	kprintf("Minus*%c* DEC mit Spaces: *%c* \n",a ,a_neg);
-	kprintf("Minus*%c* DEC mit Nullen: *%c*\n",b ,b_neg);
-	kprintf("Minus*%c* DEC: *%c* \n",c ,c_neg);
+	kprintf("Minus*%x* DEC mit Spaces: *%x* \n",a ,a_neg);
+	kprintf("Minus*%x* DEC mit Nullen: *%x*\n",b ,b_neg);
+	kprintf("Minus*%x* DEC: *%x* \n",c ,c_neg);
 	kprintf("Negativer Zahlentest: \n");
 	
 	uart_write(10);
