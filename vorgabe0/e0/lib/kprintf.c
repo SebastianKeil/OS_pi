@@ -49,11 +49,6 @@ void print_integer(int i, int base, char *c, int prefix){
 			output_buffer[j] = *c;
 		}
 	}
-	
-	if((i > 2147483647) || (i < -2147483648)){
-		kprintf("ERROR: number too large!");  	//TODO das wertet immer zu false aus, wie kann man dafür checken?
-		return;									// soll dafür sorgen, dass wir keinen overflow bekommen
-	}
 
 	int slot = 0; //position in Buffer
 	int neg = 0;  //FLAG for negative number
@@ -83,7 +78,9 @@ void print_integer(int i, int base, char *c, int prefix){
 		} else {
 			output_buffer[slot] = nega[0];
 		}
+		slot++;
 	}
+	slot--;
 	if((slot < (8)) && (*c != 'x')){
 		slot = 7;
 	}
@@ -104,6 +101,7 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 	switch(*fmt){
 	case 'c': //int -> unsigned char
 		i = va_arg(*ap, int);
+		//TODO BOUNDS CHECKEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		uart_write(i);
 		break;
 		
