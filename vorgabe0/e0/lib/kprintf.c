@@ -51,11 +51,11 @@ void print_integer(int i, int base, char *c, int prefix){
 	}
 	
 	if((i > 2147483647) || (i < -2147483648)){
-		kprintf("ERROR: number too large!");  //DAS wertet immer zu false aus, wie kann man dafür checken?
-		return;
+		kprintf("ERROR: number too large!");  	//TODO das wertet immer zu false aus, wie kann man dafür checken?
+		return;									// soll dafür sorgen, dass wir keinen overflow bekommen
 	}
 
-	int slot = 0; //slot in Buffer
+	int slot = 0; //position in Buffer
 	int neg = 0;  //FLAG for negative number
 	if(i < 0){
 		i = i * -1;
@@ -99,7 +99,7 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 	int i;
 	const char *string;		//TODO change name of string to something more descriptive
 	unsigned int u_int;
-	void* ptr;
+	void* ptr;				//TODO wofür ist der nochmal???
 
 	switch(*fmt){
 	case 'c': //int -> unsigned char

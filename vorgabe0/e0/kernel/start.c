@@ -32,7 +32,6 @@ void start_kernel(){
 	
 
 	/*Functions to test for
-
 	%c – int Argument wird nach unsigned char umgewandelt und als einzelnes Zeichen ausgegeben
 	%s – durch const char * Argument referenzierte null-terminierte Zeichenkette wird ausgegeben
 	%x – unsigned int Argument wird in hexadezimaler Darstellung ausgegeben
@@ -40,17 +39,28 @@ void start_kernel(){
 	%u – unsigned int Argument wird in dezimaler Darstellung ausgegeben
 	%p – void * Argument wird in hexadezimaler Darstellung mit dem Prefix 0x ausgegeben
 	%% – Ein einfaches %-Zeichen wird ausgegeben
-
 	*/
-	const int i = 2147483649;
-	int i_neg = - i;
+
+	//TODO
+	//test_kprintf(); TODO wieder einfügen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//TODO
+
+
+	int a = 123;
+	int b = 55;
+	int c = 3;
+	int a_neg = - a;
+	int b_neg = - b;
+	int c_neg = - c;
 	kprintf("Negativer Zahlentest: \n");
-	//kprintf("Minus%i DEC: \nMinus%i DEC mit Spaces: \nMinus%i DEC: \n",i ,i ,i);
+	//kprintf("Minus%i DEC mit Spaces: %8i \n",a ,a_neg);
+	kprintf("Minus*%i* DEC mit Nullen: *%08i*\n",b ,b_neg);
+	kprintf("Minus*%i* DEC: *%i* \n",c ,c_neg);
+	kprintf("Negativer Zahlentest: \n");
+	kprintf("Minus%i DEC mit Nullen: %08i \n",b ,b_neg);
+	kprintf("Minus%i DEC: %i \n",c ,c_neg);
+	kprintf("Minus%i DEC mit Spaces: %8i \n",a ,a_neg);
 	
-	kprintf("Minus%i DEC: %i \nMinus%i DEC mit Spaces: %8i \nMinus%i DEC mit Nullen: %08i \n",i ,i_neg ,i , i_neg ,i ,i_neg);
-	
-	//kprintf("Minus%i DEC: \nMinus%i DEC mit Spaces: \nMinus%i DEC: \n",i ,i ,i);
-	//kprintf("Minus%i DEC: \nMinus%i DEC mit Spaces: \nMinus%i DEC: ",i ,i ,i);
 	uart_write(10);
 	uart_write(10);
 
@@ -58,7 +68,7 @@ void start_kernel(){
 	for (;;) {
 		increment_counter();
 		
-		//c, s, x, i, u, p
+		//c, s, x, i, u, p 
 		
 		receive_buffer = uart_read();
 		
