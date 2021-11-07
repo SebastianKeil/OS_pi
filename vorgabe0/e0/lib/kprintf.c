@@ -3,30 +3,88 @@
 #include <arch/bsp/uart.h>
 
 
-void print_integer(int i, int base, char *c){
+char* prepare_for_print(char *fmt, va_list *ap){
+	if(*fmt == '8'){ 
+		fmt++;
+		if(*fmt == 'i' || *fmt == 'u' || *fmt == 'x' || *fmt == 'p'){	
+			replace_and_write(fmt, ap, " ");
+			fmt++;
+			return(fmt);
+		}else{
+			kprintf("\nERROR conversion with %c not available\n", *fmt); return(fmt+1);
+		}
+		
+	}else if(*fmt == '0'){ 
+		fmt++;
+		if(*fmt == '8'){
+			fmt++;
+			if(*fmt == 'i' || *fmt == 'u' || *fmt == 'x'){	
+				replace_and_write(fmt, ap, "0");
+				fmt++;
+				return(fmt);
+			}else{
+			kprintf("\nERROR conversion with %c not available\n", *fmt); return(fmt+1);
+			}
+		}else{
+			kprintf("\nERROR padding only available with eight zeros\n"); return(fmt+1);
+		}
+	}else if(*fmt == 'c' || *fmt == 's' || *fmt == 'x' || *fmt == 'i' || *fmt == 'u' || *fmt == 'p' || *fmt == '%'){	
+				replace_and_write(fmt, ap, "x");
+				fmt++;
+				return(fmt);
+	}else{
+		kprintf("\nERROR unknown format: %c\n", *fmt); return(fmt+1);
+	}
+return(fmt);
+}
 
+
+void print_integer(int i, int base, char *c, int prefix){
 	const char *symbols = "0123456789abcdef";
-	char output_buffer[10];
+	const char *pre = "0x";
+	const char *nega = "-";
+	char output_buffer[12];
 	if(*c != 'x'){
-		for(int j = 0; j < 10; j++){
+		for(int j = 0; j < 11; j++){
 			output_buffer[j] = *c;
 		}
 	}
-	int slot = 0;
-	
-	if(i == 0){
-		uart_write('0');
-		return;
+
+	int slot = 0; //position in Buffer
+	int neg = 0;  //FLAG for negative number
+	if(i < 0){
+		i = i * -1;
+		neg = 1;
 	}
-	
+	if (i == 0){
+		output_buffer[slot] = symbols[0];
+		slot++;
+	}
 	while(i > 0){
 		output_buffer[slot] = symbols[(i%base)];
 		slot++;
-		
 		i = i / base;
 	}
-	slot --;
-	if((slot < 8) && (*c != 'x')){
+	if(prefix){
+		output_buffer[slot] = pre[1];
+		slot++;
+		output_buffer[slot] = pre[0];
+		slot++;
+	}
+	if(neg){
+		if(*c == '0'){
+			if(slot < 8){
+				output_buffer[7] = nega[0];
+			} else {
+				output_buffer[slot] = nega[0];
+			}
+		} else {
+			output_buffer[slot] = nega[0];
+		}
+		slot++;
+	}
+	slot--;
+	if((slot < (8)) && (*c != 'x')){
 		slot = 7;
 	}
 	while(slot > -1){
@@ -39,17 +97,16 @@ void print_integer(int i, int base, char *c){
 
 void replace_and_write(char *fmt, va_list *ap, char *c){
 	int i;
-	const char *string;
+	const char *string;		//TODO change name of string to something more descriptive
 	unsigned int u_int;
-	void* ptr;
-
 	switch(*fmt){
 	case 'c': //int -> unsigned char
 		i = va_arg(*ap, int);
+		//TODO BOUNDS CHECKEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		uart_write(i);
 		break;
 		
-	case 's': //all the string
+	case 's': //whole string
 		string = va_arg(*ap, const char *);
 		while(*string){
 			uart_write(*string);
@@ -57,71 +114,63 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 		}
 		break;
 		
-	case 'x': //unsigned int -> in hex
+	case 'x': //unsigned int -> hex
 		u_int = va_arg(*ap, unsigned int);
-		print_integer(u_int, 16, c);
+		print_integer(u_int, 16, c, 0);
 		break;
 		
-	case 'i': //int in dezimal
+	case 'i': //signed int -> decimal
 		i = va_arg(*ap, int);
-		if(i < 0){
-			kprintf("-");						//TODO Vorzeichen integrieren
-			print_integer(i*-1, 10, c);
-		}else{
-			print_integer(i, 10, c);
-		}
+		print_integer(i, 10, c, 0);
 		break;
 		
-	case 'u': //unsigned int in dezimal
+	case 'u': //unsigned int -> decimal
 		u_int = va_arg(*ap, unsigned int);
-		print_integer(u_int, 10, c);
+		print_integer(u_int, 10, c, 0);
 		break;
 		
-	case 'p': // pointer in hex mit prefix 0x
-		//TODO
+	case 'p': // pointer -> hex with prefix 0x
+		u_int = va_arg(*ap, unsigned int);
+		if(*c == 'x'){
+			uart_write(48);
+			uart_write(120);
+			print_integer(u_int, 16, c, 0);
+		} else {
+			print_integer(u_int, 16, c, 2);
+			}
 		break;
 		
-	case '%': // einfaches %
+	case '%': // single %
 		uart_write(37);
 		break;
-		
-	case '0': // padding with 0
-		fmt = fmt + 2;
-		replace_and_write(fmt, ap, "0");
-		break;
-		
-	case '8': // field width
-		fmt = fmt + 1;
-		replace_and_write(fmt, ap, " ");
-		break;
 	}
-	va_end(*ap);
+	//va_end(*ap);
 	return;
 }
 
-void kprintf(char *fmt, ...){
+
+void kprintf(char* fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
 	
 	while(*fmt){
 		switch(*fmt){
 		case '%':
-			if(fmt+1){
-				fmt++;
-				if(*fmt == '8'){ 
-					replace_and_write(fmt, &ap, "x");
-					fmt = fmt + 2;
-				}else if(*fmt == '0'){ 
-					replace_and_write(fmt, &ap, "x");
-					fmt = fmt + 3;
-				}else{
-					replace_and_write(fmt, &ap, "x");
-					fmt = fmt + 1;
-				}
-				//fmt = fmt + 2;
-				
-			}
+			fmt++;
+			fmt = prepare_for_print(fmt, &ap);
 			break;
+		
+		case '\\':
+			fmt++;
+			if(*fmt == 'n'){
+				uart_write(10);
+				fmt ++;
+				break;
+			} else {
+				uart_write(92);
+				break;
+			}
+			
 		default:
 			uart_write(*fmt);
 			fmt++;
