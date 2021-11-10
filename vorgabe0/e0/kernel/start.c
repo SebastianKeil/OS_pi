@@ -12,8 +12,18 @@ void increment_counter() {
 
 
 void start_kernel(){
-	//char *str1 = "Es wurde folgender Charakter eingegeben: ";
-	//char *str2 = "ASCII:";
+
+	//TODO "kernel richtet sich ein" 
+	//	- Speicherlayout überlegen
+	//	- IVT an bestimmte Stelle (Linker)
+	//	- auf CoProzessor VBAR einstellen (CP15)
+	// 	- dann Assembler Trampolin mit Store Memory und Load Memory
+	//	- dann C-Handler
+	
+	//	- dann System timer einstellen für intervall interrupts
+	//	- dann Uart read in einen Buffer und 
+	//		alle lesenden zugriffe auf uart in diesen buffer umleiten
+	//	- dann interrupts über tastendruck einrichten
 
 	yellow_on();
 	
@@ -29,33 +39,10 @@ void start_kernel(){
 	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: ");
 	uart_write(10);
 	uart_write(10);
-	
 
-	/*Functions to test for
-	%c – int Argument wird nach unsigned char umgewandelt und als einzelnes Zeichen ausgegeben
-	%s – durch const char * Argument referenzierte null-terminierte Zeichenkette wird ausgegeben
-	%x – unsigned int Argument wird in hexadezimaler Darstellung ausgegeben
-	%i – int Argument wird in dezimaler Darstellung ausgegeben
-	%u – unsigned int Argument wird in dezimaler Darstellung ausgegeben
-	%p – void * Argument wird in hexadezimaler Darstellung mit dem Prefix 0x ausgegeben
-	%% – Ein einfaches %-Zeichen wird ausgegeben
-	*/
 
 	test_kprintf();
 
-	// int a = 0;
-	// int b = 67;
-	// int c = 427412349;
-	// int a_neg =  - a;
-	// int b_neg =  - b;
-	// int c_neg =  - c;
-	// kprintf("Negativer Zahlentest: \n");
-	// kprintf("Minus*%p* DEC mit Spaces: *%8p* \n",a ,a_neg);
-	// kprintf("Minus*%8p* DEC mit Nullen: *%p*\n",b ,b_neg);
-	// kprintf("Minus*%i* DEC: *%08i* \n",c ,c_neg);
-	// kprintf("Negativer Zahlentest: \n");
-	// uart_write(10);
-	// uart_write(10);
 
 	// Endless counter
 	for (;;) {
@@ -64,4 +51,6 @@ void start_kernel(){
 		kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
 
 	}
+	
+	
 }
