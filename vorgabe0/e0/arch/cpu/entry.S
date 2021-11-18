@@ -32,6 +32,10 @@ _enableAlignCheck:
 	/* neues SCTLR speichern */
 	mcr p15, 0, r0, c1, c0, 0
 
+/*TODO VBAR im CoProzessor setzten!
+adr r0, _ivt
+mcr p15, 0, r0, c12, c0, 0
+*/
 
 _bsprak:
 	/* Validen Stack Pointer setzten */
