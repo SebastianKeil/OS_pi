@@ -15,9 +15,13 @@ void start_kernel(){
 
 	//TODO "kernel richtet sich ein" 
 	//	- Speicherlayout überlegen
+	
+	// entry.S:
 	//	- IVT an bestimmte Stelle (Linker)
 	//	- auf CoProzessor VBAR einstellen (CP15)
 	// 	- dann Assembler Trampolin mit Store Memory und Load Memory
+	
+	// eigene .c Datei:
 	//	- dann C-Handler
 	
 	//	- dann System timer einstellen für intervall interrupts
