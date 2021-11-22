@@ -13,22 +13,6 @@ void increment_counter() {
 
 void start_kernel(){
 
-	//TODO "kernel richtet sich ein" 
-	//	- Speicherlayout überlegen
-	
-	// entry.S:
-	//	- IVT an bestimmte Stelle (Linker)
-	//	- auf CoProzessor VBAR einstellen (CP15)
-	// 	- dann Assembler Trampolin mit Store Memory und Load Memory
-	
-	// eigene .c Datei:
-	//	- dann C-Handler
-	
-	//	- dann System timer einstellen für intervall interrupts
-	//	- dann Uart read in einen Buffer und 
-	//		alle lesenden zugriffe auf uart in diesen buffer umleiten
-	//	- dann interrupts über tastendruck einrichten
-
 	yellow_on();
 	
 	uart_write(10);
@@ -51,7 +35,10 @@ void start_kernel(){
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		receive_buffer = uart_read();		
+		receive_buffer = uart_read();	
+		
+		//TODO create Interrupts 
+			
 		kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
 
 	}
