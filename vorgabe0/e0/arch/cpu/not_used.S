@@ -1,5 +1,4 @@
-.global _not_used
+.global not_used
 
-_not_used:
+not_used:
 
-TODO

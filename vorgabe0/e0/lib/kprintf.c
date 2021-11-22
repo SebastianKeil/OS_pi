@@ -152,7 +152,6 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 void kprintf(char* fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
-	
 	while(*fmt){
 		switch(*fmt){
 		case '%':

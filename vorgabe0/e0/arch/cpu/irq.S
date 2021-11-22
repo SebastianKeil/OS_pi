@@ -1,5 +1,5 @@
-.global _irq
+.global irq
 
-_irq:
+irq:
 
-TODO
+

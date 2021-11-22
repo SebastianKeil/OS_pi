@@ -1,6 +1,7 @@
 .section .init
 
 .global _start
+
 _start:
 	/* Erkennen ob Hypervisor Mode aktiv */
 	mrs r0, cpsr
@@ -32,33 +33,26 @@ _enableAlignCheck:
 	/* neues SCTLR speichern */
 	mcr p15, 0, r0, c1, c0, 0
 
-/*TODO VBAR im CoProzessor setzten!
-adr r0, _ivt
-mcr p15, 0, r0, c12, c0, 0
-*/
 
 _bsprak:
 	/* Validen Stack Pointer setzten */
 	ldr sp,=0x20000
-
-	size_of_interrupt_stack	.word   256
-	interrupt_stack_base	.word	0x23E80
 	
-    LDR     R0, stack_base ;
-    ; Enter each mode in turn and set up the stack pointer
-    MSR     CPSR_c, #Mode_FIQ:OR:I_Bit:OR:F_Bit    ; Interrupts disabled
-    MOV     sp, R0
-    SUB     R0, R0, #Len_FIQ_Stack
-    MSR     CPSR_c, #Mode_IRQ:OR:I_Bit:OR:F_Bit    ; Interrupts disabled
-    MOV     sp, R0
-    SUB     R0, R0, #Len_IRQ_Stack
-    MSR     CPSR_c, #Mode_SVC:OR:I_Bit:OR:F_Bit    ; Interrupts disabled
-    MOV     sp, R0
-    ; Leave processor in SVC mode
+	ldr     r0,=0x22000
+	msr 	sp_und, r0
+	add		r0, r0, #0x1000
+	msr 	sp_svc, r0
+	add		r0, r0, #0x1000
+	msr 	sp_abt, r0
+	add		r0, r0, #0x1000
+	msr 	sp_irq, r0
+	add		r0, r0, #0x1000 
+	msr 	sp_fiq, r0 
 
-
-/*Code stark angelehnt an: https://developer.arm.com/documentation/dui0471/m/embedded-software-development/stack-pointer-initialization*/
-
+	//ldr r0, =_ivt
+	//mcr p15, 0, r0, c12, c0, 0
+	
+	
 
 	/* Zu c Code springen */
 	bl  start_kernel

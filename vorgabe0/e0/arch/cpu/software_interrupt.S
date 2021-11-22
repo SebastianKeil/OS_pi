@@ -1,5 +1,3 @@
-.global _software_interrupt
+.global software_interrupt
 
-_software_interrupt:
-
-TODO
+software_interrupt:

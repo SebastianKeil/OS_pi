@@ -45,7 +45,7 @@
 BIN_LSG = 
 
 # Hier eure source files hinzufügen
-SRC = arch/cpu/entry.S kernel/start.c arch/bsp/yellow_led.c arch/bsp/uart.c lib/kprintf.c arch/cpu/ivt.S arch/cpu/data_abort.S arch/cpu/fiq.S arch/cpu/irq.S arch/cpu/not_used.S arch/cpu/prefetch_abort.S arch/cpu/software_interrupt.S arch/cpu/undefined_instruction.S
+SRC = arch/cpu/entry.S kernel/start.c arch/bsp/yellow_led.c arch/bsp/uart.c lib/kprintf.c arch/cpu/abort.S arch/cpu/fiq.S arch/cpu/irq.S arch/cpu/not_used.S arch/cpu/software_interrupt.S arch/cpu/undefined_instruction.S arch/cpu/ivt.S
 
 # Hier separate user files hinzufügen
 USRC = user/main.c

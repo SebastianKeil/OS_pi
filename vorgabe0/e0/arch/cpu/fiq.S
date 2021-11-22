@@ -1,15 +1,6 @@
-.global _fiq
+.global fiq
 
-_fiq:
+fiq:
 
-stmdb sp!, {r0-r7}
-
-
-
-TODO C Handler aufrufen
-
-
-
-
-
-ldm
+//stmdb sp!, {r0-r7}
+//ldm

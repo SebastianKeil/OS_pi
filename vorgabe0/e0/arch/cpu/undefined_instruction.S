@@ -1,5 +1,4 @@
-.global _undefined_instruction
+.global undefined_instruction
 
-_undefined_instruction:
+undefined_instruction:
 
-TODO
