@@ -38,19 +38,20 @@ _bsprak:
 	/* Validen Stack Pointer setzten */
 	ldr sp,=0x20000
 	
-	ldr     r0,=0x22000
+	ldr     r0,=0x21000
 	msr 	sp_und, r0
-	add		r0, r0, #0x1000
-	msr 	sp_svc, r0
-	add		r0, r0, #0x1000
+	ldr     r0,=0x22000
+	msr 	sp_usr, r0
+	ldr     r0,=0x24000 //user has more stack space
 	msr 	sp_abt, r0
-	add		r0, r0, #0x1000
+	ldr     r0,=0x25000
 	msr 	sp_irq, r0
-	add		r0, r0, #0x1000 
+	ldr     r0,=0x26000
 	msr 	sp_fiq, r0 
+	
 
-	//ldr r0, =_ivt
-	//mcr p15, 0, r0, c12, c0, 0
+	ldr r0, =_ivt
+	mcr p15, 0, r0, c12, c0, 0
 	
 	
 
