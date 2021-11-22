@@ -40,6 +40,26 @@ mcr p15, 0, r0, c12, c0, 0
 _bsprak:
 	/* Validen Stack Pointer setzten */
 	ldr sp,=0x20000
+
+	size_of_interrupt_stack	.word   256
+	interrupt_stack_base	.word	0x23E80
+	
+    LDR     R0, stack_base ;
+    ; Enter each mode in turn and set up the stack pointer
+    MSR     CPSR_c, #Mode_FIQ:OR:I_Bit:OR:F_Bit    ; Interrupts disabled
+    MOV     sp, R0
+    SUB     R0, R0, #Len_FIQ_Stack
+    MSR     CPSR_c, #Mode_IRQ:OR:I_Bit:OR:F_Bit    ; Interrupts disabled
+    MOV     sp, R0
+    SUB     R0, R0, #Len_IRQ_Stack
+    MSR     CPSR_c, #Mode_SVC:OR:I_Bit:OR:F_Bit    ; Interrupts disabled
+    MOV     sp, R0
+    ; Leave processor in SVC mode
+
+
+/*Code stark angelehnt an: https://developer.arm.com/documentation/dui0471/m/embedded-software-development/stack-pointer-initialization*/
+
+
 	/* Zu c Code springen */
 	bl  start_kernel
 .Lend:

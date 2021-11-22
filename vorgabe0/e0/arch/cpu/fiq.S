@@ -2,4 +2,14 @@
 
 _fiq:
 
-TODO
+stmdb sp!, {r0-r7}
+
+
+
+TODO C Handler aufrufen
+
+
+
+
+
+ldm

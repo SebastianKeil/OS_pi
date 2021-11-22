@@ -11,11 +11,12 @@ _ivt:
 	ldr pc, _fiq
 _undefined_instruction: .word undefined_instruction
 _software_interrupt: 	.word software_interrupt
-_prefetch_abort: 	.word prefetch_abort
-_data_abort: 		.word data_abort
-_not_used: 		.word not_used
-_irq: 			.word irq
-_fiq: 			.word fiq
+_prefetch_abort: 		.word prefetch_abort
+_data_abort: 			.word data_abort
+_not_used: 				.word not_used
+_irq: 					.word irq
+_fiq: 					.word fiq
 
+/*Code übernommen aus https://isis.tu-berlin.de/pluginfile.php/2119612/mod_resource/content/2/02-arm-debugging.pdf von S.Bauroth*/
 
-/*Code übernommen aus https://isis.tu-berlin.de/pluginfile.php/2119612/mod_resource/content/2/02-arm-debugging.pdf von S.Bauroth/*
+;_reset:
