@@ -2,9 +2,11 @@
 
 undefined_instruction_asm:
 
-//stmda 	sp!, {r0-r12}
+//Undef/SVC in Decode erkannt also auslösende Instruktion + 4, 
+//aber Instruktion soll übersprungen werden => keine Manipulation vom PC notwendig
+stmda 	sp!, {r0-r12}
 
-//bl 		data_abort
-//bl		prefetch_abort
+bl 		undefined_instruction
 
-//ldmda	sp!, {r0-r12}
+mov 	sp, r14
+ldmib	sp!, {r0-r12,r15}^

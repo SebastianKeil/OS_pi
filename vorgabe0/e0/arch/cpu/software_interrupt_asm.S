@@ -2,6 +2,8 @@
 
 software_interrupt_asm:
 
+//Undef/SVC in Decode erkannt also auslösende Instruktion + 4, 
+//aber Instruktion soll übersprungen werden => keine Manipulation vom PC notwendig
 stmda 	sp!, {r0-r12}
 
 //evtl mov ldr statt bl
