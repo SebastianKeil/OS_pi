@@ -37,16 +37,29 @@ _enableAlignCheck:
 _bsprak:
 	/* Validen Stack Pointer setzten */
 	ldr 	sp,	=0x20000
-	msr 	sp_und, #0x21000
+	
+	ldr	r0, =0x21000
+	msr 	sp_und, r0
+	
 	/* user mode gets more space*/
-	msr 	sp_usr, #0x22000    
-	msr 	sp_abt, #0x24000 
-	msr 	sp_irq, #0x25000
-	msr 	sp_fiq, #0x26000
+	ldr	r0, =0x22000
+	msr 	sp_usr, r0  
+	
+	ldr	r0, =0x24000
+	msr 	sp_abt, r0 
+	
+	ldr	r0, =0x25000
+	msr 	sp_irq, r0
+	
+	ldr	r0, =0x26000
+	msr 	sp_fiq, r0
 
 	/* set VBAR in CP15 */
 	ldr r0, =_ivt
 	mcr p15, 0, r0, c12, c0, 0
+	
+	/* change to user mode */
+	cps #0x10
 	
 	/* Zu c Code springen */
 	bl  start_kernel
