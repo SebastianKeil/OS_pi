@@ -5,15 +5,13 @@ _ivt:
 	ldr pc, _undefined_instruction
 	ldr pc, _software_interrupt
 	ldr pc, _abort
-	ldr pc, _not_used
 	ldr pc, _irq
 	ldr pc, _fiq
-_undefined_instruction: .word undefined_instruction
-_software_interrupt: 	.word software_interrupt
-_abort: 				.word abort
-_not_used: 				.word not_used
-_irq: 					.word irq
-_fiq: 					.word fiq
+_undefined_instruction: .word undefined_instruction_asm
+_software_interrupt: 	.word software_interrupt_asm
+_abort: 				.word abort_asm
+_irq: 					.word irq_asm
+_fiq: 					.word fiq_asm
 
 
 /*Code übernommen aus https://isis.tu-berlin.de/pluginfile.php/2119612/mod_resource/content/2/02-arm-debugging.pdf von S.Bauroth*/

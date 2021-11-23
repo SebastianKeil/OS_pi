@@ -1,6 +1,6 @@
-.global fiq
+.global fiq_asm
 
-fiq:
+fiq_asm:
 
 //stmdb sp!, {r0-r7}
 //ldm

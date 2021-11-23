@@ -1,6 +1,6 @@
-.global abort
+.global abort_asm
 
-abort:
+abort_asm:
 
 //TODO sofort unterscheiden zwischen prefetch und dataabort
 //Dementsprechend springen
@@ -8,6 +8,8 @@ abort:
 //stmda 	sp!, {r0-r12}
 
 //bl 		data_abort
+//sub 	r14, r14, #8
 //bl		prefetch_abort
+//sub 	r14, r14, #4
 
 //ldmda	sp!, {r0-r12}
