@@ -1,5 +1,6 @@
 #include <arch/bsp/yellow_led.h>
 #include <arch/bsp/uart.h>
+#include <arch/cpu/check_interrupts.h>
 #include <kernel/kprintf.h>
 #include <config.h>
 
@@ -38,6 +39,7 @@ void start_kernel(){
 		receive_buffer = uart_read();	
 		
 		//TODO create Interrupts 
+		check_for_interrupts(receive_buffer);
 			
 		kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
 
