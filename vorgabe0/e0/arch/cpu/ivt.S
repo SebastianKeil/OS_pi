@@ -17,4 +17,4 @@ _fiq: 					.word fiq_asm
 /*Code übernommen aus https://isis.tu-berlin.de/pluginfile.php/2119612/mod_resource/content/2/02-arm-debugging.pdf von S.Bauroth*/
 
 reset:
-
+//inactiv irq and fiq, switch to svc mode and jump to _start
