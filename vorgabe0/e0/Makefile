@@ -45,13 +45,7 @@
 BIN_LSG = 
 
 # Hier eure source files hinzufügen
-<<<<<<< Updated upstream
-SRC = arch/cpu/entry.S 																			kernel/start.c 																					arch/bsp/yellow_led.c 																			arch/bsp/uart.c 																				kernel/kprintf.c  																					arch/cpu/data_abort_asm.S 																		arch/cpu/prefetch_abort_asm.S 																	arch/cpu/fiq_asm.S 																				arch/cpu/irq_asm.S 																				arch/cpu/software_interrupt_asm.S 																arch/cpu/undefined_instruction_asm.S 															arch/cpu/ivt.S 																					arch/cpu/check_interrupts.c 																	arch/cpu/software_interrupt.c 																	arch/cpu/undefined_instruction.c 																arch/cpu/prefetch_abort.c 																		arch/cpu/data_abort.c 																			arch/cpu/irq.c 																					arch/cpu/fiq.c
-=======
-<<<<<<< HEAD
-#wrap width auf 100 oder kleiner, dann ist es übersichtlich
-SRC = arch/cpu/entry.S 																			kernel/start.c 																					arch/bsp/yellow_led.c 																			arch/bsp/uart.c 																				lib/kprintf.c  																					arch/cpu/data_abort_asm.S 																		arch/cpu/prefetch_abort_asm.S 																	arch/cpu/fiq_asm.S 																				arch/cpu/irq_asm.S 																				arch/cpu/software_interrupt_asm.S 																arch/cpu/undefined_instruction_asm.S 															arch/cpu/ivt.S 																					arch/cpu/check_interrupts.c 																	arch/cpu/software_interrupt.c 																	arch/cpu/undefined_instruction.c 																arch/cpu/prefetch_abort.c 																		arch/cpu/data_abort.c 																			arch/cpu/irq.c 																					arch/cpu/fiq.c
->>>>>>> Stashed changes
+SRC = arch/cpu/entry.S 																			kernel/start.c 																					arch/bsp/yellow_led.c 																			arch/bsp/uart.c 																				kernel/kprintf.c  																					arch/cpu/data_abort_asm.S 																		arch/cpu/prefetch_abort_asm.S 																	arch/cpu/fiq_asm.S 																				arch/cpu/irq_asm.S 																				arch/cpu/software_interrupt_asm.S 																arch/cpu/undefined_instruction_asm.S 															arch/cpu/ivt.S 																					arch/cpu/check_interrupts.c 																	arch/cpu/software_interrupt.c 																	arch/cpu/undefined_instruction.c 																arch/cpu/prefetch_abort.c 																		arch/cpu/data_abort.c 																			arch/cpu/irq.c 																					arch/cpu/fiq.c lib/regcheck.c lib/regcheck_asm.S
 
 # Hier separate user files hinzufügen
 USRC = user/main.c
