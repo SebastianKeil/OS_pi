@@ -14,6 +14,7 @@ void increment_counter() {
 
 void start_kernel(){
 
+	disable_uart_fifo();
 	yellow_on();
 	
 	uart_write(10);
@@ -29,8 +30,6 @@ void start_kernel(){
 	uart_write(10);
 	uart_write(10);
 
-
-	//test_kprintf();
 
 
 	// Endless counter
