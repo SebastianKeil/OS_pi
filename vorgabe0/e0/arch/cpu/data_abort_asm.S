@@ -1,6 +1,6 @@
-.global abort_asm
+.global data_abort_asm
 
-abort_asm:
+data_abort_asm:
 
 //TODO sofort unterscheiden zwischen prefetch und dataabort
 //Dementsprechend springen
