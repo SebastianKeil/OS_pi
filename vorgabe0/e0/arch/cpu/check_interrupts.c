@@ -36,6 +36,7 @@ void check_for_interrupts(char receive_buffer){
 		case 'e':
 			//interaktive unterprogram
 			kprintf("unterprogram\n");
+			//register_checker();
 			break;
 		case 'c':
 			//register checker ausführen
