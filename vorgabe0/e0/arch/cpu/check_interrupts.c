@@ -14,7 +14,7 @@ void check_for_interrupts(char receive_buffer){
 		case 'a':
 			//data abort
 			kprintf("data\n");
-			asm volatile("bkpt #0")
+			asm volatile("bkpt #0");
 			break;
 		case 'u':
 			//undefined instruction
