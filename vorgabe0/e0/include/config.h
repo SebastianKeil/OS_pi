@@ -17,6 +17,7 @@
  */
 
 /* Include-Pfad bitte gegenfalls anpassen */
+
 //#include <kernel/kprintf.h>
 //static inline void test_kprintf(void) {
 	/* Nur für Aufgabenblatt 1

@@ -1,4 +1,5 @@
 #include <kernel/kprintf.h>
+#include <lib/regcheck.h>
 #include "arch/cpu/shared.h"
 
 int print_register_dump;
@@ -30,10 +31,10 @@ void check_for_interrupts(char receive_buffer){
 			//set global variable 
 			if(print_register_dump == 0){ 
 				print_register_dump = 1;
-				kprintf("register checker on\n");
+				kprintf("register dump on\n");
 			}else{ 
 				print_register_dump = 0;
-				kprintf("register checker off\n");
+				kprintf("register dump off\n");
 			}
 			break;
 		case 'e':
@@ -44,6 +45,7 @@ void check_for_interrupts(char receive_buffer){
 		case 'c':
 			//register checker ausführen
 			kprintf("register checker\n");
+			register_checker();
 			break;
 	}
 }
