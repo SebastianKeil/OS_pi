@@ -30,7 +30,7 @@ void start_kernel(){
 	uart_write(10);
 
 
-	test_kprintf();
+	//test_kprintf();
 
 
 	// Endless counter

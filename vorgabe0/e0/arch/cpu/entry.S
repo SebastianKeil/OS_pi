@@ -35,7 +35,14 @@ _enableAlignCheck:
 
 
 _bsprak:
-	/* Validen Stack Pointer setzten */
+/* 	MEMORY LAYOUT
+	sp_svc 0x20000 #131072
+	sp_und 0x21000   +4096
+	sp_usr 0x22000   +4096 
+	sp_abt 0x24000   +8192
+	sp_irq 0x25000   +4096
+	sp_fiq 0x26000   +4096*/
+		
 	ldr 	sp,	=0x20000
 	ldr	r0, =0x21000
 	msr 	sp_und, r0

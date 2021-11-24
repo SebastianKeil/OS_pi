@@ -41,6 +41,12 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
    7 TXFE ..... transmit FIFO is empty.
 */
 
+void disable_uart_fifo(){
+	unsigned int reg_copy = uart_port->lcrh;
+	reg_copy &= ~(1UL << 4);
+	uart_port->lcrh = reg_copy;
+}
+
 char uart_read(void)
 {
 	while(uart_port->fr & (1 << 4))

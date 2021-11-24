@@ -3,7 +3,7 @@
 #define undefne .word 0x17ffffff
 #define undefeq .word 0x07ffffff
 
-#include <config.h>
+//#include <config.h>
 
 /* Kann als backup genutzt werden, falls Qemu undefne/undefeq nicht
  * wie erwartet emuliert, da diese laut Arm undefiniert sind
@@ -35,6 +35,7 @@ _check_throw_undef:
 .global _check_return_jump
 _check_return_jump:
 	/*mov	r0, #0x08000000*/
+
 #ifdef __QEMU__
 	mov	r0, #0x80000000
 #else

@@ -8,15 +8,18 @@ void check_for_interrupts(char receive_buffer){
 		case 's':
 			//supervisor call
 			kprintf("supervisor\n");
+			asm volatile("svc 0");
 					 
 			break;
 		case 'a':
 			//data abort
 			kprintf("data\n");
+			asm volatile("bkpt #0")
 			break;
 		case 'u':
 			//undefined instruction
 			kprintf("undefined\n");
+			asm volatile("udf");
 			break;
 		case 'p':
 			//prefetch abort
@@ -36,7 +39,7 @@ void check_for_interrupts(char receive_buffer){
 		case 'e':
 			//interaktive unterprogram
 			kprintf("unterprogram\n");
-			//register_checker();
+			register_checker();
 			break;
 		case 'c':
 			//register checker ausführen
