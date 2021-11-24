@@ -6,6 +6,7 @@ undefined_instruction_asm:
 //aber Instruktion soll übersprungen werden => keine Manipulation vom PC notwendig
 stmda 	sp!, {r0-r12}
 
+//evtl move ldr statt bl
 bl 		undefined_instruction
 
 mov 	sp, r14
