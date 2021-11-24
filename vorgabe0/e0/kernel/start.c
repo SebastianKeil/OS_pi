@@ -1,7 +1,7 @@
 #include <arch/bsp/yellow_led.h>
 #include <arch/bsp/uart.h>
 #include <arch/cpu/check_interrupts.h>
-#include <lib/kprintf.h>
+#include <kernel/kprintf.h>
 #include <config.h>
 
 volatile unsigned int counter = 0;

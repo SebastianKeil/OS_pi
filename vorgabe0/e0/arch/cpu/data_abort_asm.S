@@ -14,4 +14,4 @@ data_abort_asm:
 //bl		prefetch_abort
 //sub 	r14, r14, #4
 
-//ldmda	sp!, {r0-r12}
+//ldmda	sp, {r0-r12}

@@ -10,7 +10,7 @@ bl 		irq
 
 //TODO irq Leitung zurücksetzen
 mov 	sp, r14
-ldmib	sp!, {r0-r12,r15}^
+ldmib	sp, {r0-r12,r15}^
 
 
 

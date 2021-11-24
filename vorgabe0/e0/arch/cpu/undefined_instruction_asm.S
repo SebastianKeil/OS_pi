@@ -10,4 +10,4 @@ stmda 	sp!, {r0-r12}
 bl 		undefined_instruction
 
 mov 	sp, r14
-ldmib	sp!, {r0-r12,r15}^
+ldmib	sp, {r0-r12,r15}^
