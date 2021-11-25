@@ -25,9 +25,9 @@ void start_kernel(){
 	/* KERNEL SETUP */
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
-	//enable_interrupts_timer();
+	enable_interrupts_timer();
 	enable_interrupts_uart();
-	set_timing(TIMER_INTERVAL);
+	set_timing(5000000);
 	
 	
 	yellow_on();
