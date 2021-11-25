@@ -1,7 +1,7 @@
 #include <kernel/kprintf.h>
 
 #define INTERRUPT_CTRL_BASE (0x7E00B000 - 0x3F000000)
-#define SYS_TIMER_ON 7
+#define SYS_TIMER_ON 15
 #define UART_INT 25
 
 struct interrupt_ctrl {
@@ -25,10 +25,10 @@ static volatile struct interrupt_ctrl * const interrupt_ctrl_port = (struct inte
 
 
 
-void enable_timer_and_uart(){
+void enable_interrupts_timer_and_uart(){
 	interrupt_ctrl_port->enable_irq_1 = SYS_TIMER_ON;
 	interrupt_ctrl_port->enable_irq_2 = (1 << UART_INT);
-	kprintf("\n\nINTERRUPTS FROM SYSTEM TIMER AND UART ARE ENABLED\n");
+	kprintf("\n\nINTERRUPTS FROM SYSTEM_TIMER AND UART ARE ENABLED\n");
 }
 
 
