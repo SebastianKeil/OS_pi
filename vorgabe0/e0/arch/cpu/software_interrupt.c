@@ -6,8 +6,8 @@ void software_interrupt(unsigned int regs[18]){
 	kprintf("###########################################################################\n");
 	
 		
-	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<");
-	kprintf("R0:\t%08xR8:\t%08x\n"
+	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<\n");
+	kprintf("R0:\t%08x\tR8:\t%08x\n"
 			"R1:\t%08x\tR9:\t%08x\n"
 			"R2:\t%08x\tR10:\t%08x\n"
 			"R3:\t%08x\tR11:\t%08x\n"
