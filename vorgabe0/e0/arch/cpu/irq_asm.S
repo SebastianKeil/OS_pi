@@ -3,7 +3,6 @@
 irq_asm:
 
 stmda 	sp!, {r0-r12}
-//TODO irq ausschalten
 sub r14, r14, #8  //Offset abziehen für nahtlose Fortführung
 //TODO evtl mov ldr statt bl
 bl 		irq

@@ -21,4 +21,9 @@ void set_timing(int time){
 	kprintf("SYSTEM TIMER SET TO %i\n", time);
 }
 
+void print_timer_setting(){
+	kprintf("sys_timer_c1 set to: %i\n", sys_timer_port->c1);
+	kprintf("sys_timer cs: %i\n", sys_timer_port->cs);
+}
+
 

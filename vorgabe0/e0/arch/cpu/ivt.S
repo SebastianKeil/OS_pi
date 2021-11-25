@@ -13,7 +13,7 @@ _undefined_instruction: .word undefined_instruction_asm
 _software_interrupt: 	.word software_interrupt_asm
 _prefetch_abort:		.word prefetch_abort_asm
 _data_abort: 			.word data_abort_asm
-_unused:
+_unused:				.word 0xFFFF //platzhalter
 _irq: 					.word irq_asm
 _fiq: 					.word fiq_asm
 

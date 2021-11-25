@@ -9,6 +9,7 @@
 
 
 
+
 volatile unsigned int counter = 0;
 volatile char receive_buffer;
 
@@ -20,9 +21,12 @@ void increment_counter() {
 void start_kernel(){
 	
 	kprintf("\n\n");
+	
+	/* KERNEL SETUP */
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
-	enable_interrupts_timer_and_uart();
+	//enable_interrupts_timer();
+	enable_interrupts_uart();
 	set_timing(TIMER_INTERVAL);
 	
 	
@@ -36,18 +40,22 @@ void start_kernel(){
 	kprintf("********** d switches print ON/OFF ******************\n");
 	kprintf("*****************************************************\n\n");
 	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: \n\n");
+	kprintf("\n");
+	
+	
+	
 
 
 
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		receive_buffer = uart_read();	
+		//receive_buffer = uart_read();	
 		
-		//TODO create Interrupts 
-		check_for_interrupts(receive_buffer);
-			
-		kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
+		//print_timer_setting(); 
+		//check_for_interrupts(receive_buffer);
+		
+		//kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
 
 	}
 	

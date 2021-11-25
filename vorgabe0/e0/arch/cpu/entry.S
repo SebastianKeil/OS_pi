@@ -61,7 +61,8 @@ _bsprak:
 	mcr p15, 0, r0, c12, c0, 0
 	
 	/* change to user mode */
-	cps #0x10
+	//cps #0x10	//nicht in den usermode!
+	cpsie i 	//erlaubt interrupts!!!
 	
 	/* Zu c Code springen */
 	bl  start_kernel

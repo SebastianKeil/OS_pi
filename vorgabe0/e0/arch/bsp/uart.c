@@ -47,7 +47,7 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
 */
 void set_uart_receive_interrupt(int mask){
 	unsigned int reg_copy = uart_port->imsc;
-	reg_copy |= (mask << RXIM);
+	reg_copy |= (1 << RXIM);
 	uart_port->imsc = reg_copy;
 	kprintf("UART RECEIVE INTERRUPT SET TO %i\n", mask);
 }
