@@ -1,6 +1,9 @@
 #include <arch/bsp/yellow_led.h>
 
 #define UART_BASE (0x7E201000 - 0x3F000000)
+#define RXFE 4
+#define TXFE 5
+#define FEN 4
 
 struct uart {
 	//0x0
@@ -43,20 +46,20 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
 
 void disable_uart_fifo(){
 	unsigned int reg_copy = uart_port->lcrh;
-	reg_copy &= ~(1UL << 4);
+	reg_copy &= ~(1UL << FEN);
 	uart_port->lcrh = reg_copy;
 }
 
 char uart_read(void)
 {
-	while(uart_port->fr & (1 << 4))
+	while(uart_port->fr & (1 << RXFE))
 	{}
 	return (uart_port->dr & 255);
 }
 
 void uart_write(char data)
 {
-	while(uart_port->fr & (1 << 5))
+	while(uart_port->fr & (1 << TXFE))
 	{}
 	uart_port->dr = data;
 }

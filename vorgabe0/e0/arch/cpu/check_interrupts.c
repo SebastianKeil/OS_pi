@@ -25,6 +25,7 @@ void check_for_interrupts(char receive_buffer){
 		case 'p':
 			//prefetch abort
 			kprintf("test: prefetch\n");
+			asm volatile("bkpt #1");
 			break;
 		case 'd':
 			//register dump on-off-switch

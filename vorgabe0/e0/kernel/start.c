@@ -1,5 +1,6 @@
 #include <arch/bsp/yellow_led.h>
 #include <arch/bsp/uart.h>
+#include <arch/bsp/interrupt_ctrl.h>
 #include <arch/cpu/check_interrupts.h>
 #include <kernel/kprintf.h>
 #include <config.h>
@@ -15,6 +16,9 @@ void increment_counter() {
 void start_kernel(){
 
 	disable_uart_fifo();
+	enable_timer_and_uart();
+	
+	
 	yellow_on();
 	
 	uart_write(10);
