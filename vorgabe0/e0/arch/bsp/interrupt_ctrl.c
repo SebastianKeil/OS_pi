@@ -28,7 +28,7 @@ static volatile struct interrupt_ctrl * const interrupt_ctrl_port = (struct inte
 void enable_interrupts_timer_and_uart(){
 	interrupt_ctrl_port->enable_irq_1 = SYS_TIMER_ON;
 	interrupt_ctrl_port->enable_irq_2 = (1 << UART_INT);
-	kprintf("\n\nINTERRUPTS FROM SYSTEM_TIMER AND UART ARE ENABLED\n");
+	kprintf("INTERRUPTS FROM SYSTEM_TIMER AND UART ARE ENABLED\n");
 }
 
 

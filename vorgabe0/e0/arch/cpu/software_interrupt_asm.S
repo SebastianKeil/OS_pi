@@ -6,10 +6,10 @@ software_interrupt_asm:
 //aber Instruktion soll übersprungen werden => keine Manipulation vom PC notwendig
 stmdb 	sp!, {r0-r12} 
 
-ldr		r0, cpsr
+//ldr		r0, cpsr
 mrs		r1, spsr_und
 stmdb	sp!, {r0, r1} //store cpsr and spsr_und on stack
-ldr		r0, sp //give sp to c function
+//ldr		r0, sp //give sp to c function
 
 bl 		software_interrupt //evtl mov ldr statt bl
 	

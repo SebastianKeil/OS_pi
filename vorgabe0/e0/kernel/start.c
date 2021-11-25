@@ -18,26 +18,24 @@ void increment_counter() {
 
 
 void start_kernel(){
-
+	
+	kprintf("\n\n");
 	disable_uart_fifo();
+	set_uart_receive_interrupt(1);
 	enable_interrupts_timer_and_uart();
 	set_timing(TIMER_INTERVAL);
 	
 	
 	yellow_on();
-	
-	uart_write(10);
-	uart_write(10);
-	kprintf("*****************************************************");
-	uart_write(10);
-	kprintf("********** zum beenden: erst str+a, dann x **********");
-	uart_write(10);
-	kprintf("*****************************************************");
-	uart_write(10);
-	uart_write(10);
-	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: ");
-	uart_write(10);
-	uart_write(10);
+	kprintf("\n\n*****************************************************\n");
+	kprintf("********** zum beenden: erst str+a, dann x **********\n");
+	kprintf("********** s for svc ********************************\n");
+	kprintf("********** a for data_abort *************************\n");
+	kprintf("********** u for undefined **************************\n");
+	kprintf("********** p for prefetch_abort *********************\n");
+	kprintf("********** d switches print ON/OFF ******************\n");
+	kprintf("*****************************************************\n\n");
+	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: \n\n");
 
 
 

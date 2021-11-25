@@ -1,9 +1,11 @@
 #include <arch/bsp/yellow_led.h>
+#include <kernel/kprintf.h>
 
 #define UART_BASE (0x7E201000 - 0x3F000000)
 #define RXFE 4
 #define TXFE 5
 #define FEN 4
+#define RXIM 4
 
 struct uart {
 	//0x0
@@ -43,7 +45,12 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
    6 RXFF ..... receive FIFO is full
    7 TXFE ..... transmit FIFO is empty.
 */
-
+void set_uart_receive_interrupt(int mask){
+	unsigned int reg_copy = uart_port->imsc;
+	reg_copy |= (mask << RXIM);
+	uart_port->imsc = reg_copy;
+	kprintf("UART RECEIVE INTERRUPT SET TO %i\n", mask);
+}
 void disable_uart_fifo(){
 	unsigned int reg_copy = uart_port->lcrh;
 	reg_copy &= ~(1UL << FEN);
