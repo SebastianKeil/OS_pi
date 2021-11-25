@@ -1,23 +1,23 @@
 #include <kernel/kprintf.h>
 
-//Argumente unsigned int regs[16], unsigned int status_flags[10], unsigned int data, unsigned int prefetch
-void software_interrupt(){
+//Argumente unsigned int regs[18], unsigned int status_flags[10], unsigned int data, unsigned int prefetch
+void software_interrupt(unsigned int regs[18]){
 	
-	kprintf("###########################################################################");
-	// if(status_flags[8]){
-	// 	kprintf("Data Abort an Adresse %08x", regs[14]);
-	// 	kprintf("Zugriff: lesend auf Adresse %08x", data);
-	// 	kprintf("Fehler: Alignment fault")
-	// }
-	// kprintf(">>> Registerschnappschuss (aktueller Modus) <<<");
-	// kprintf("R0:\t%08xR8:\t%08x\n
-	// 		R1:\t%08x\tR9:\t%08x\n
-	// 		R2:\t%08x\tR10:\t%08x\n
-	// 		R3:\t%08x\tR11:\t%08x\n
-	// 		R4:\t%08x\tR12:\t%08x\n
-	// 		R5:\t%08x\tSP:\t%08x\n
-	// 		R6:\t%08x\tLR:\t%08x\n
-	// 		R7:\t%08x\tPC:\t%08x\n", regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6], regs[7], regs[8], regs[9], regs[10], regs[11], regs[12], regs[13], regs[14], regs[15]);
+	kprintf("###########################################################################\n");
+	if(status_flags[8]){
+		kprintf("Data Abort an Adresse %08x", regs[14]);
+		kprintf("Zugriff: lesend auf Adresse %08x", data);
+		kprintf("Fehler: Alignment fault")
+	}
+	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<");
+	kprintf("R0:\t%08xR8:\t%08x\n
+			R1:\t%08x\tR9:\t%08x\n
+			R2:\t%08x\tR10:\t%08x\n
+			R3:\t%08x\tR11:\t%08x\n
+			R4:\t%08x\tR12:\t%08x\n
+			R5:\t%08x\tSP:\t%08x\n
+			R6:\t%08x\tLR:\t%08x\n
+			R7:\t%08x\tPC:\t%08x\n", regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6], regs[7], regs[8], regs[9], regs[10], regs[11], regs[12], regs[13], regs[14], regs[15]);
 }
 
 /*
