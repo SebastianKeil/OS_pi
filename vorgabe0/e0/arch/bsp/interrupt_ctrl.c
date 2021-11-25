@@ -2,7 +2,7 @@
 
 #define INTERRUPT_CTRL_BASE (0x7E00B000 - 0x3F000000)
 #define SYS_TIMER_ON 7
-#define UART_INT 57
+#define UART_INT 25
 
 struct interrupt_ctrl {
 	//0x0
