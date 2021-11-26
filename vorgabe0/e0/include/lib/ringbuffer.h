@@ -1,8 +1,17 @@
+#include <config.h>
+
 #ifndef _RINGBUFFER_H
 #define _RINGBUFFER_H
 
-void initialize_buffer(input_buffer *buffer);
-void buffer_push(unsigned char *input_byte, input_buffer *buffer);
-unsigned char buffer_pull(input_buffer *buffer);
+struct input_buffer {
+  unsigned char data[UART_INPUT_BUFFER_SIZE];
+  unsigned int count; 	
+  unsigned int read; 	
+  unsigned int write; 	
+};
+
+void initialize_buffer(struct input_buffer *buffer);
+void buffer_push(unsigned char *input_byte, struct input_buffer *buffer);
+unsigned char buffer_pull(struct input_buffer *buffer);
 
 #endif

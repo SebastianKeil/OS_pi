@@ -68,7 +68,8 @@ arch/cpu/fiq.c \
 lib/regcheck.c \
 lib/regcheck_asm.S \
 arch/bsp/interrupt_ctrl.c \
-arch/bsp/sys_timer.c
+arch/bsp/sys_timer.c \
+lib/ringbuffer.c
 
 
 # Hier separate user files hinzufügen

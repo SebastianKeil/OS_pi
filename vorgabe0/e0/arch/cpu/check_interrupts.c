@@ -1,6 +1,6 @@
 #include <kernel/kprintf.h>
 #include <lib/regcheck.h>
-#include "arch/cpu/shared.h"
+#include <arch/cpu/shared.h>
 
 int print_register_dump;
 

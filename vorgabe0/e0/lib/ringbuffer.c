@@ -1,4 +1,4 @@
-#include <kernel/kprintf>
+#include <kernel/kprintf.h>
 #include <config.h>
 
 struct input_buffer {
@@ -11,13 +11,13 @@ struct input_buffer {
 static volatile struct input_buffer * const buffer;
 
 
-void initialize_buffer(input_buffer *buffer){
+void initialize_buffer(struct input_buffer *buffer){
 	buffer->count = 0;
 	buffer->read = 0;
 	buffer->write = 0;
 }
 
-void buffer_push(unsigned char *input_byte, input_buffer *buffer){
+void buffer_push(unsigned char *input_byte, struct input_buffer *buffer){
 
 	buffer->data[buffer->write] = *input_byte;
 	if(buffer->count < UART_INPUT_BUFFER_SIZE){
@@ -40,7 +40,7 @@ void buffer_push(unsigned char *input_byte, input_buffer *buffer){
 	
 }
 
-unsigned char buffer_pull(input_buffer *buffer){
+unsigned char buffer_pull(struct input_buffer *buffer){
 	if(buffer->count > 0){
 		return buffer->data[buffer->read];
 		buffer->count --;
