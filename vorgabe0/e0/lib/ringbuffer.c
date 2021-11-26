@@ -1,62 +1,56 @@
-/*
-************* from: https://www.mikrocontroller.net/articles/FIFO#Code-Beispiel****************
-
-fifo_init(): FIFO initialisieren
-fifo_write_busy(): wartet bis mindesten 1 Element im FIFO frei ist und schreibt es in den FIFO
-fifo_write(): schreibt ein Element in den FIFO, ohne Prüfung ob genügend Platz vorhanden ist
-fifo_read_busy(): wartet bis mindesten 1 Element im FIFO vorhanden ist und liest es aus dem FIFO
-fifo_read(): liest ein Element es aus dem FIFO, ohne Prüfung ob Daten vorhanden sind
-fifo_get_level(): liefert die Anzahl der Elemente im FIFO zurück
-fifo_get_free(): liefert die Anzahl der noch frei verfügbaren Elemente im FIFO zurück
-*/
-
 #include <kernel/kprintf>
+#include <config.h>
 
-#define BUFFER_FAIL     0
-#define BUFFER_SUCCESS  1
-#define BUFFER_SIZE 23
+struct input_buffer {
+  unsigned char data[UART_INPUT_BUFFER_SIZE];
+  unsigned int count; 	
+  unsigned int read; 	
+  unsigned int write; 	
+};
 
-struct Buffer {
-  unsigned char data[BUFFER_SIZE];
-  unsigned int read; // zeigt auf das Feld mit dem ältesten Inhalt
-  unsigned int write; // zeigt immer auf leeres Feld
-} 
-buffer = {{}, 0, 0};
+static volatile struct input_buffer * const buffer;
 
-unsigned int BufferIn(uint8_t byte){
-  //if (buffer.write >= BUFFER_SIZE)
-  //  buffer.write = 0; // erhöht sicherheit
 
-  if ( ( buffer.write + 1 == buffer.read ) ||
-       ( buffer.read == 0 && buffer.write + 1 == BUFFER_SIZE ) )
-    return BUFFER_FAIL; // voll
-
-  buffer.data[buffer.write] = byte;
-
-  buffer.write++;
-  if (buffer.write >= BUFFER_SIZE)
-    buffer.write = 0;
-
-  return BUFFER_SUCCESS;
+void initialize_buffer(input_buffer *buffer){
+	buffer->count = 0;
+	buffer->read = 0;
+	buffer->write = 0;
 }
 
-//
-// Holt 1 Byte aus dem Ringbuffer, sofern mindestens eines abholbereit ist
-//
-// Returns:
-//     BUFFER_FAIL       der Ringbuffer ist leer. Es kann kein Byte geliefert werden.
-//     BUFFER_SUCCESS    1 Byte wurde geliefert
-//    
-uint8_t BufferOut(uint8_t *pByte)
-{
-  if (buffer.read == buffer.write)
-    return BUFFER_FAIL;
+void buffer_push(unsigned char *input_byte, input_buffer *buffer){
 
-  *pByte = buffer.data[buffer.read];
+	buffer->data[buffer->write] = *input_byte;
+	if(buffer->count < UART_INPUT_BUFFER_SIZE){
+		buffer->count ++;
+		kprintf("buffer count after push: %i/%i", buffer->count, UART_INPUT_BUFFER_SIZE);
+	}
+	if(buffer->write == UART_INPUT_BUFFER_SIZE - 1){
+		buffer->write = 0; //start from 0 when at the end
+		if(buffer->read == UART_INPUT_BUFFER_SIZE - 1){
+			buffer->read = 0; //start from 0 when at the end
+		}
+	}else{
+		buffer->write ++;
+		if(buffer->write == buffer->read + 1 
+		   && buffer->count == UART_INPUT_BUFFER_SIZE){
+			buffer->read ++;
+		}
+	}
+	
+	
+}
 
-  buffer.read++;
-  if (buffer.read >= BUFFER_SIZE)
-    buffer.read = 0;
-
-  return BUFFER_SUCCESS;
+unsigned char buffer_pull(input_buffer *buffer){
+	if(buffer->count > 0){
+		return buffer->data[buffer->read];
+		buffer->count --;
+		kprintf("buffer count after pull: %i/%i", buffer->count, UART_INPUT_BUFFER_SIZE);
+		if(buffer->read == UART_INPUT_BUFFER_SIZE - 1){
+			buffer->read = 0; //start from 0 when at the end
+		}else{
+			buffer->read ++;
+		}
+	}else{
+		kprintf("cant pull: input_buffer empty!\n");
+	}
 }
