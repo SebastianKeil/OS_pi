@@ -8,7 +8,8 @@ struct input_buffer {
   unsigned int write; 	
 };
 
-static volatile struct input_buffer * const buffer;
+struct input_buffer * const buffer;
+unsigned char pulled_char;
 
 
 void initialize_buffer(struct input_buffer *buffer){
@@ -42,7 +43,7 @@ void buffer_push(unsigned char *input_byte, struct input_buffer *buffer){
 
 unsigned char buffer_pull(struct input_buffer *buffer){
 	if(buffer->count > 0){
-		return buffer->data[buffer->read];
+		pulled_char = buffer->data[buffer->read];
 		buffer->count --;
 		kprintf("buffer count after pull: %i/%i", buffer->count, UART_INPUT_BUFFER_SIZE);
 		if(buffer->read == UART_INPUT_BUFFER_SIZE - 1){
@@ -53,4 +54,5 @@ unsigned char buffer_pull(struct input_buffer *buffer){
 	}else{
 		kprintf("cant pull: input_buffer empty!\n");
 	}
+	return pulled_char;
 }

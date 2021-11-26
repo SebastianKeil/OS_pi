@@ -21,12 +21,13 @@ void irq(){
 	
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
-		kprintf("uart is pending\n");
+		kprintf("uart is pending, push char to buffer\n");
+		
 		//put uart_port->uart_port->dr & 255 in ringbuffer
 	}
 	
 	if(sys_timer_pending){
-		kprintf("!\n");
+		kprintf("!%i\n", print_register_dump);
 	}
 	//eigentlich RÜCKSPRUNG
 	while(1);
