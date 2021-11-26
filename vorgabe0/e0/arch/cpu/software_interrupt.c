@@ -1,20 +1,32 @@
 #include <kernel/kprintf.h>
 
 //Argumente unsigned int regs[18], unsigned int status_flags[10], unsigned int data, unsigned int prefetch
-void software_interrupt(unsigned int regs[18]){
-	
+void software_interrupt(unsigned int regs[35]){
+
 	kprintf("###########################################################################\n");
-	
-		
 	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<\n");
-	kprintf("R0:\t%08x\tR8:\t%08x\n"
-			"R1:\t%08x\tR9:\t%08x\n"
-			"R2:\t%08x\tR10:\t%08x\n"
-			"R3:\t%08x\tR11:\t%08x\n"
-			"R4:\t%08x\tR12:\t%08x\n"
-			"R5:\t%08x\tSP:\t%08x\n"
-			"R6:\t%08x\tLR:\t%08x\n"
-			"R7:\t%08x\tPC:\t%08x\n", regs[2], regs[10], regs[3], regs[11], regs[4], regs[12], regs[5], regs[13], regs[6], regs[14], regs[7], regs[15], regs[8], regs[16], regs[9], regs[17]);
+	kprintf("R0:\t0x%08x\tR8:\t0x%08x\n"
+			"R1:\t0x%08x\tR9:\t0x%08x\n"
+			"R2:\t0x%08x\tR10:\t0x%08x\n"
+			"R3:\t0x%08x\tR11:\t0x%08x\n"
+			"R4:\t0x%08x\tR12:\t0x%08x\n"
+			"R5:\t0x%08x\tSP:\t0x%08x\n"
+			"R6:\t0x%08x\tLR:\t0x%08x\n"
+			"R7:\t0x%08x\tPC:\t0x%08x\n", regs[19], regs[27], regs[20], regs[28], regs[21], regs[29], regs[22], regs[30], regs[23], regs[31], regs[24], regs[32], regs[25], regs[33], regs[26], regs[34]);
+	kprintf(">>> Aktuelle Statusregister (SPSR des aktuellen Modus) <<<\n");
+	kprintf("CPSR: %08x\n", regs[18]);
+	kprintf("SPSR: %08x\n", regs[17]);
+	kprintf(">>> Aktuelle modusspezifische Register <<<\n");
+	kprintf("\t\tLR\t\tSP\t\tSPSR\n");
+	kprintf("User/System:\t%08x,\t%08x\n", regs[16], regs[15]);
+	kprintf("Supervisor:\t%08x,\t%08x\t%08x\n", regs[14], regs[13], regs[12]);
+	kprintf("Abort:\t\t%08x,\t%08x\t%08x\n", regs[11], regs[10], regs[9]);
+	kprintf("FIQ:\t\t%08x,\t%08x\t%08x\n", regs[8], regs[7], regs[6]);
+	kprintf("IRQ:\t\t%08x,\t%08x\t%08x\n", regs[5], regs[4], regs[3]);
+	kprintf("Undefined:\t%08x,\t%08x\t%08x\n", regs[2], regs[1], regs[0]);
+	kprintf("System angehalten.");
+
+	while(1);
 }
 
 /*

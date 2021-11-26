@@ -26,8 +26,8 @@ void start_kernel(){
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
 	//enable_interrupts_timer();
-	enable_interrupts_uart();
-	set_timing(5000000);
+	//enable_interrupts_uart();
+	//set_timing(5000000);
 	
 	
 	yellow_on();
@@ -43,7 +43,11 @@ void start_kernel(){
 	kprintf("\n");
 	
 	
-	
+	int a = 0xFFFFFFFF;
+	unsigned int b = 0xABCDEFFF;
+
+	kprintf("%p erste \n%p zweite\n", a, b);
+	kprintf("%8p erste \n%8p zweite\n", a, b);
 
 
 

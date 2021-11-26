@@ -116,6 +116,8 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 	case 'i': //signed int -> decimal
 		i = va_arg(*ap, int);
 		if(i < 0){
+			i ^= 4294967295;
+			i++;
 			print_integer(i, 10, c, 0, 1);
 		}else{
 			print_integer(i, 10, c, 0, 0);

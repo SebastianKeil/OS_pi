@@ -44,16 +44,16 @@ _bsprak:
 	sp_fiq 0x26000   +4096*/
 		
 	ldr 	sp,	=0x20000
-	ldr	r0, =0x21000
+	ldr		r0, =0x21000
 	msr 	sp_und, r0
 	/* user mode gets more space*/
-	ldr	r0, =0x22000
+	ldr		r0, =0x22000
 	msr 	sp_usr, r0 
-	ldr	r0, =0x24000
+	ldr		r0, =0x24000
 	msr 	sp_abt, r0 
-	ldr	r0, =0x25000
+	ldr		r0, =0x25000
 	msr 	sp_irq, r0
-	ldr	r0, =0x26000
+	ldr		r0, =0x26000
 	msr 	sp_fiq, r0
 
 	/* set VBAR in CP15 */
