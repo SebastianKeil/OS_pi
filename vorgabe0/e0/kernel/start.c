@@ -26,7 +26,7 @@ void start_kernel(){
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
 	//enable_interrupts_timer();
-	//enable_interrupts_uart();
+	enable_interrupts_uart();
 	set_timing(5000000);
 	
 	
