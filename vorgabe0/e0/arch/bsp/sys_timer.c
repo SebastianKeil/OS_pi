@@ -26,4 +26,10 @@ void print_timer_setting(){
 	kprintf("sys_timer cs: %i\n", sys_timer_port->cs);
 }
 
+void reset_sys_timer(){
+	sys_timer_port->cs = 0; 		//reset interrupt
+	sys_timer_port->c1 += TIMER_INTERVAL;	//reset for next tick
+	kprintf("SYS_TIMER RESET\n");
+}
+
 

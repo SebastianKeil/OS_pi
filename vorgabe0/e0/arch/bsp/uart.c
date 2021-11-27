@@ -45,12 +45,20 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
    6 RXFF ..... receive FIFO is full
    7 TXFE ..... transmit FIFO is empty.
 */
+
+
+void reset_uart_interrupt(){
+	//uart_port->imsc = ... 
+	kprintf("UART_RECEIVE_INTERRUPT CLEARED\n");
+}
+
 void set_uart_receive_interrupt(){
 	unsigned int reg_copy = uart_port->imsc;
 	reg_copy |= (1 << RXIM);
 	uart_port->imsc = reg_copy;
 	kprintf("UART RECEIVE INTERRUPT ENABLED\n");
 }
+
 void disable_uart_fifo(){
 	unsigned int reg_copy = uart_port->lcrh;
 	reg_copy &= ~(1UL << FEN);
@@ -58,19 +66,19 @@ void disable_uart_fifo(){
 	kprintf("UART FIFO DISABLED\n");
 }
 
-unsigned char uart_read(void)
-{
+unsigned char uart_read(void){
 	//while(uart_port->fr & (1 << RXFE)){}
 	unsigned char data;
 	data = (uart_port->dr & 255);
 	return data;
 }
 
-void uart_write(char data)
-{
+void uart_write(char data){
 	while(uart_port->fr & (1 << TXFE))
 	{}
 	uart_port->dr = data;
 }
+
+
 
 
