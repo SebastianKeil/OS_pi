@@ -1,6 +1,52 @@
 #include <kernel/kprintf.h>
 
 //Argumente unsigned int regs[18], unsigned int status_flags[10], unsigned int data, unsigned int prefetch
+
+#define N_BIT 31
+#define Z_BIT 30
+#define C_BIT 29
+#define V_BIT 28
+#define E_BIT 8
+#define I_BIT 6
+#define F_BIT 5
+#define T_BIT 4
+
+
+char* translate_to_bitmask(unsigned int reg){
+	char output[10];
+	for(int i = 0; i < 9; i++){
+		output[i] = "_";
+	}
+	
+	if(reg &= (1<<N_BIT)){
+		output[0] = 'N';
+	}
+	if(reg &= (1<<Z_BIT)){
+		output[1] = 'Z';
+	}
+	if(reg &= (1<<C_BIT)){
+		output[2] = 'Z';
+	}
+	if(reg &= (1<<V_BIT)){
+		output[3] = 'Z';
+	}
+	if(reg &= (1<<E_BIT)){
+		output[4] = 'Z';
+	}
+	if(reg &= (1<<I_BIT)){
+		output[5] = 'Z';
+	}
+	if(reg &= (1<<F_BIT)){
+		output[6] = 'Z';
+	}
+	if(reg &= (1<<T_BIT)){
+		output[7] = 'Z';
+	}
+	output[8] = '\\';
+	output[9] = '0';
+	return output;
+}
+
 void software_interrupt(unsigned int regs[35]){
 
 	kprintf("###########################################################################\n");
@@ -14,7 +60,7 @@ void software_interrupt(unsigned int regs[35]){
 			"R6:\t0x%08x\tLR:\t0x%08x\n"
 			"R7:\t0x%08x\tPC:\t0x%08x\n", regs[19], regs[27], regs[20], regs[28], regs[21], regs[29], regs[22], regs[30], regs[23], regs[31], regs[24], regs[32], regs[25], regs[33], regs[26], regs[34]);
 	kprintf(">>> Aktuelle Statusregister (SPSR des aktuellen Modus) <<<\n");
-	kprintf("CPSR: %08x\n", regs[18]);
+	kprintf("CPSR: %s\n", translate_to_bitmask(regs[18]));
 	kprintf("SPSR: %08x\n", regs[17]);
 	kprintf(">>> Aktuelle modusspezifische Register <<<\n");
 	kprintf("\t\tLR\t\tSP\t\tSPSR\n");
@@ -26,7 +72,7 @@ void software_interrupt(unsigned int regs[35]){
 	kprintf("Undefined:\t%08x,\t%08x\t%08x\n", regs[2], regs[1], regs[0]);
 	kprintf("System angehalten.");
 
-	while(1);
+	//while(1);
 }
 
 /*

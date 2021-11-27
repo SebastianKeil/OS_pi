@@ -2,23 +2,53 @@
 
 irq_asm:
 
-stmdb	sp!, {r13-r15} //Print I Reglist, Index 19-34
-stmdb 	sp!, {r0-r12}
+sub 	r14, r14, #12  //Offset abziehen für nahtlose Fortführung
+	
+//getrenntes storen sonst writebackkomplikationen, falls sp nicht niedrigstes reg in target list
+stmfd	sp!, {r13-r15} //Print I Reglist, Index 19-34
+stmfd 	sp!, {r0-r12}
 
-//stmda 	sp!, {r0-r12}
-//sub r14, r14, #8  //Offset abziehen für nahtlose Fortführung
-//TODO evtl mov ldr statt bl
+mrs		r12, cpsr //Print II aktuell, Index 17-18
+mrs		r11, spsr
+mrs		r10, lr_usr //Print III Modusspez., Index 0-16
+mrs		r9, sp_usr
+mrs		r8, lr_svc
+mrs		r7, sp_svc
+mrs		r6, spsr_svc 
+mrs		r5, lr_abt
+mrs		r4, sp_abt
+mrs		r3, spsr_abt
+mrs		r2, lr_fiq
+mrs		r1, sp_fiq
+mrs		r0, spsr_fiq
 
+stmfd	sp!, {r0-r12}
+
+mov		r5, r14
+mov		r4, r13
+mrs		r3, spsr //für ein einheitliches in anderen Modi ausprinten wiederholt
+mrs		r2, lr_und
+mrs		r1, sp_und
+mrs		r0, spsr_und
+
+stmfd	sp!, {r0-r5}
 
 mov		r0, sp //give sp to c function
-bl 		irq
 
-//stmdb 	sp!, {r14} //load LR to stack 
-//ldmib	sp, {r0-r12,r15}^
+bl 		irq //evtl mov ldr statt bl	
 
-//TODO irq Leitung zurücksetzen
-mov 	sp, r14
-ldmib	sp, {r0-r12,r15}^
+ldmfd	sp!, {r0 - r5} //remove unnecessary items from stack
+ldmfd	sp!, {r0- r12} //remove unnecessary items from stack
+mov		r0, sp //give sp to c function
+bl 		irq_test
+ldmfd	sp!, {r0- r12} //load necesessary registers before mode change
+mov		r0, sp //give sp to c function
+bl 		irq_test
+
+
+add		sp, #8
+movs	pc, sp
+
 
 
 

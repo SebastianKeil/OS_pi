@@ -1,6 +1,7 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-void irq();
+void irq_test(unsigned int regs[16]);
+void irq(unsigned int regs[35]);
 
 #endif
