@@ -5,6 +5,7 @@
 #include <arch/bsp/interrupt_ctrl.h>
 #include <arch/bsp/sys_timer.h>
 #include <arch/cpu/check_interrupts.h>
+#include <lib/ringbuffer.h>
 
 
 
@@ -29,6 +30,7 @@ void start_kernel(){
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
 	//enable_interrupts_timer();
+	initialize_buffer(input_buffer);
 	enable_interrupts_uart();
 	set_timing(5000000);
 	

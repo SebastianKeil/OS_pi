@@ -8,7 +8,7 @@ struct input_buffer {
   unsigned int write; 	
 };
 
-struct input_buffer * const buffer;
+struct input_buffer * const input_buffer;
 unsigned char pulled_char;
 
 
@@ -16,6 +16,7 @@ void initialize_buffer(struct input_buffer *buffer){
 	buffer->count = 0;
 	buffer->read = 0;
 	buffer->write = 0;
+	kprintf("UART_INPUT_BUFFER INITIALIZED\n");
 }
 
 void buffer_push(unsigned char *input_byte, struct input_buffer *buffer){

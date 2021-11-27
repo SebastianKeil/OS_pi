@@ -24,7 +24,7 @@ void irq(){
 	if(uart_pending){
 		kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
-		buffer_push(&uart_data, buffer);
+		buffer_push(&uart_data, input_buffer);
 		//put uart_port->uart_port->dr & 255 in ringbuffer
 	}
 	
@@ -32,5 +32,5 @@ void irq(){
 		kprintf("!%i\n", print_register_dump);
 	}
 	//eigentlich RÜCKSPRUNG
-	while(1);
+	//while(1);
 }

@@ -10,7 +10,7 @@ struct input_buffer {
   unsigned int write; 	
 };
 
-extern struct input_buffer * const buffer;
+extern struct input_buffer * const input_buffer;
 
 void initialize_buffer(struct input_buffer *buffer);
 void buffer_push(unsigned char *input_byte, struct input_buffer *buffer);
