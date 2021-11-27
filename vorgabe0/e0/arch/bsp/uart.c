@@ -55,14 +55,15 @@ void disable_uart_fifo(){
 	unsigned int reg_copy = uart_port->lcrh;
 	reg_copy &= ~(1UL << FEN);
 	uart_port->lcrh = reg_copy;
-	kprintf("UART FIFO DISABLED");
+	kprintf("UART FIFO DISABLED\n");
 }
 
-char uart_read(void)
+unsigned char uart_read(void)
 {
-	while(uart_port->fr & (1 << RXFE))
-	{}
-	return (uart_port->dr & 255);
+	//while(uart_port->fr & (1 << RXFE)){}
+	unsigned char data;
+	data = (uart_port->dr & 255);
+	return data;
 }
 
 void uart_write(char data)

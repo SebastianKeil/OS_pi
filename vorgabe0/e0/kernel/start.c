@@ -21,12 +21,15 @@ void increment_counter() {
 void start_kernel(){
 	
 	kprintf("\n\n");
+	kprintf("*****************************************************\n");
+	kprintf("******************** KERNEL SETUP *******************\n");
+	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
-	enable_interrupts_timer();
-	//enable_interrupts_uart();
+	//enable_interrupts_timer();
+	enable_interrupts_uart();
 	set_timing(5000000);
 	
 	
@@ -42,24 +45,25 @@ void start_kernel(){
 	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: \n\n");
 	kprintf("\n");
 	
-	
+	/*
 	int a = 0xFFFFFFFF;
 	unsigned int b = 0xABCDEFFF;
 
 	kprintf("%p erste \n%p zweite\n", a, b);
 	kprintf("%8p erste \n%8p zweite\n", a, b);
-
+	*/
 
 
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		receive_buffer = uart_read();	
-		
-		//print_timer_setting(); 
-		check_for_interrupts(receive_buffer);
-		
+		// HA 1:
 		//kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
+		
+		/* generating test interrupts:
+		receive_buffer = uart_read();
+		check_for_interrupts(receive_buffer);
+		*/
 
 	}
 	

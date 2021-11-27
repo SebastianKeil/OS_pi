@@ -11,6 +11,7 @@
 
 unsigned int sys_timer_pending;
 unsigned int uart_pending;
+unsigned char uart_data;
 
 
 void irq(){
@@ -22,7 +23,8 @@ void irq(){
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
 		kprintf("uart is pending, push char to buffer\n");
-		
+		uart_data = uart_read();
+		buffer_push(&uart_data, buffer);
 		//put uart_port->uart_port->dr & 255 in ringbuffer
 	}
 	

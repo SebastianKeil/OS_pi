@@ -3,7 +3,7 @@
 
 void set_uart_receive_interrupt();
 void disable_uart_fifo(void);
-char uart_read(void);
+unsigned char uart_read(void);
 void uart_write(char data);
 
 #endif
