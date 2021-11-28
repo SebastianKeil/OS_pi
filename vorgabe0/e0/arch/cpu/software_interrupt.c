@@ -49,8 +49,8 @@ char* translate_to_bitmask(unsigned int reg){
 
 void software_interrupt(unsigned int regs[35]){
 
-	kprintf("###########################################################################\n");
-	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<\n");
+	kprintf("###########################################################################\n"
+			">>> Registerschnappschuss (aktueller Modus) <<<\n");
 	kprintf("R0:\t0x%08x\tR8:\t0x%08x\n"
 			"R1:\t0x%08x\tR9:\t0x%08x\n"
 			"R2:\t0x%08x\tR10:\t0x%08x\n"
@@ -59,20 +59,20 @@ void software_interrupt(unsigned int regs[35]){
 			"R5:\t0x%08x\tSP:\t0x%08x\n"
 			"R6:\t0x%08x\tLR:\t0x%08x\n"
 			"R7:\t0x%08x\tPC:\t0x%08x\n", regs[19], regs[27], regs[20], regs[28], regs[21], regs[29], regs[22], regs[30], regs[23], regs[31], regs[24], regs[32], regs[25], regs[33], regs[26], regs[34]);
-	kprintf(">>> Aktuelle Statusregister (SPSR des aktuellen Modus) <<<\n");
-	kprintf("CPSR: %s\n", translate_to_bitmask(regs[18]));
+	kprintf(">>> Aktuelle Statusregister (SPSR des aktuellen Modus) <<<\n"
+			"CPSR: %s\n", translate_to_bitmask(regs[18]));
 	kprintf("SPSR: %08x\n", regs[17]);
-	kprintf(">>> Aktuelle modusspezifische Register <<<\n");
-	kprintf("\t\tLR\t\tSP\t\tSPSR\n");
-	kprintf("User/System:\t%08x,\t%08x\n", regs[16], regs[15]);
+	kprintf(">>> Aktuelle modusspezifische Register <<<\n"
+			"\t\tLR\t\tSP\t\tSPSR\n"
+			"User/System:\t%08x,\t%08x\n", regs[16], regs[15]);
 	kprintf("Supervisor:\t%08x,\t%08x\t%08x\n", regs[14], regs[13], regs[12]);
 	kprintf("Abort:\t\t%08x,\t%08x\t%08x\n", regs[11], regs[10], regs[9]);
 	kprintf("FIQ:\t\t%08x,\t%08x\t%08x\n", regs[8], regs[7], regs[6]);
 	kprintf("IRQ:\t\t%08x,\t%08x\t%08x\n", regs[5], regs[4], regs[3]);
 	kprintf("Undefined:\t%08x,\t%08x\t%08x\n", regs[2], regs[1], regs[0]);
-	kprintf("System angehalten.");
+	kprintf("System angehalten.\n");
 
-	//while(1);
+	while(1);
 }
 
 /*

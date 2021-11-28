@@ -5,7 +5,7 @@ software_interrupt_asm:
 //Undef/SVC in Decode erkannt also auslösende Instruktion + 4, 
 //aber Instruktion soll übersprungen werden => keine Manipulation vom LR/PC notwendig
 //getrenntes storen sonst writebackkomplikationen, falls sp nicht niedrigstes reg in target list
-sub		r14, r14, #4
+//add		r14, r14, #4
 stmfd	sp!, {r13-r15} //Print I Reglist, Index 19-34
 stmfd 	sp!, {r0-r12}
 
@@ -37,29 +37,17 @@ stmfd	sp!, {r0-r5}
 
 mov		r0, sp //give sp to c function
 
-bl 		software_interrupt //evtl mov ldr statt bl	
-
-ldmfd	sp!, {r0- r12} //remove unnecessary items from stack
-ldmfd	sp!, {r0- r12} //remove unnecessary items from stack
-ldmfd	sp!, {r0- r12} //load necesessary registers before mode change
-add		sp, #8
-ldmfd	sp, {r15}^
-
+bl 		software_interrupt
 
 /*
-r8_usr 	sp_irq
-r9_usr 	lr_svc
-r10_usr sp_svc
-r11_usr lr_abt
-r12_usr sp_abt
-sp_usr 	lr_und
-lr_usr 	sp_und
-r8_fiq 	spsr_fiq
-r9_fiq 	spsr_irq
-r10_fiq spsr_svc
-r11_fiq spsr_abt
-r12_fiq spsr_und
-sp_fiq 	lr_irq
-lr_fiq
-*/
+ldmfd	sp!, {r0 - r5} //remove unnecessary items from stack
+ldmfd	sp!, {r0- r12} //remove unnecessary items from stack
+mov		r0, sp //give sp to c function
+bl 		irq_test
+ldmfd	sp!, {r0- r12} //load necesessary registers before mode change
+mov		r0, sp //give sp to c function
+bl 		irq_test
 
+ldr		lr, =8194 //harter cheat :)
+movs	pc, lr
+*/

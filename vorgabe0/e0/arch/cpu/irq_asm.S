@@ -2,7 +2,7 @@
 
 irq_asm:
 
-sub 	r14, r14, #12  //Offset abziehen für nahtlose Fortführung
+sub 	r14, r14, #4  //Offset abziehen für nahtlose Fortführung
 	
 //getrenntes storen sonst writebackkomplikationen, falls sp nicht niedrigstes reg in target list
 stmfd	sp!, {r13-r15} //Print I Reglist, Index 19-34
@@ -39,15 +39,11 @@ bl 		irq //evtl mov ldr statt bl
 
 ldmfd	sp!, {r0 - r5} //remove unnecessary items from stack
 ldmfd	sp!, {r0- r12} //remove unnecessary items from stack
-mov		r0, sp //give sp to c function
-bl 		irq_test
 ldmfd	sp!, {r0- r12} //load necesessary registers before mode change
 mov		r0, sp //give sp to c function
-bl 		irq_test
-
-
-add		sp, #8
-movs	pc, sp
+ldr 	sp, =25000 //reset Stack Pointer
+bl		irq_test
+movs	pc, lr
 
 
 
