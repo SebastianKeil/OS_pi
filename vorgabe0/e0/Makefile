@@ -69,7 +69,8 @@ lib/regcheck.c \
 lib/regcheck_asm.S \
 arch/bsp/interrupt_ctrl.c \
 arch/bsp/sys_timer.c \
-lib/ringbuffer.c
+lib/ringbuffer.c \
+lib/utilities.c 
 
 
 # Hier separate user files hinzufügen
