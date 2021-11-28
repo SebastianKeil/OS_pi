@@ -1,3 +1,8 @@
+# git checkout main
+# git pull
+# git merge splitFunction
+# git push origin main
+# whoop whoop!!!
 #
 # Kurzanleitung
 # =============
