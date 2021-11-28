@@ -63,7 +63,6 @@ _bsprak:
 	/* change to user mode */
 	//cps #0x10	//nicht in den usermode!
 	cpsie i 	//erlaubt interrupts!!!
-	cpsie f     //verbietet fiq
 	
 	/* Zu c Code springen */
 	bl  start_kernel

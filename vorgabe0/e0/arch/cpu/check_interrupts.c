@@ -1,6 +1,7 @@
 #include <kernel/kprintf.h>
 #include <lib/regcheck.h>
 #include <arch/cpu/shared.h>
+#include <lib/unterprogramm.h>
 
 int print_register_dump;
 
@@ -41,6 +42,7 @@ void check_for_interrupts(char receive_buffer){
 		case 'e':
 			//interaktive unterprogram
 			kprintf("test: unterprogram\n");
+			unterprogramm();
 			break;
 		case 'c':
 			//register checker ausführen

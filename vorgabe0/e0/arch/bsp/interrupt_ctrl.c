@@ -36,7 +36,7 @@ void enable_interrupts_uart(){
 void get_pending_status(unsigned int *sys_timer_pending, unsigned int *uart_pending){
 	*sys_timer_pending = 	interrupt_ctrl_port->irq_pending1 & (1 << SYS_TIMER);
 	*uart_pending = 	interrupt_ctrl_port->irq_pending2 & (1 << UART_INT);
-	kprintf("pending registers checked\n");
+	//kprintf("pending registers checked\n");
 }
 
 

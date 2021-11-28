@@ -31,7 +31,7 @@ void print_timer_setting(){
 void reset_sys_timer(){
 	sys_timer_port->cs = (1 << 1); //reset cs: M1 Bit
 	sys_timer_port->c1 = sys_timer_port->c1 + ticks_till_interrupt;	//reset for next tick
-	kprintf("SYS_TIMER RESET TO: %i\n", sys_timer_port->c1);
+	//kprintf("SYS_TIMER RESET TO: %i\n", sys_timer_port->c1);
 }
 
 

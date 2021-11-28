@@ -10,9 +10,8 @@
 
 
 
-
 volatile unsigned int counter = 0;
-volatile unsigned char receive_buffer;
+volatile unsigned char received_char;
 
 void increment_counter() {
 	counter++;
@@ -27,15 +26,15 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
-	print_register_dump = 1;
+	print_register_dump = 0;
 	
 	disable_uart_fifo();
 	set_uart_receive_interrupt();
 	initialize_buffer(input_buffer);
 	enable_interrupts_uart();
 
-	//enable_interrupts_timer();
-	set_timing(10000);
+	enable_interrupts_timer();
+	set_timing(1000000); //TIMER_INTERVAL 1000000
 	
 	
 	yellow_on();
@@ -56,9 +55,9 @@ void start_kernel(){
 	for (;;) {
 		increment_counter();
 		if(input_buffer->count > 0){
-			receive_buffer = buffer_pull(input_buffer);
-			kprintf("pulled char: %c", receive_buffer);
-			//check_for_interrupts(receive_buffer);
+			received_char = buffer_pull(input_buffer);
+			//kprintf("pulled char: %c", receive_buffer);
+			check_for_interrupts(received_char);
 		}
 		
 		
