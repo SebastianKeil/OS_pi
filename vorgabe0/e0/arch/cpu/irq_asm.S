@@ -2,7 +2,7 @@
 
 irq_asm:
 
-sub 	r14, r14, #4  	//Offset abziehen für nahtlose Fortführung
+sub 	r14, r14, #8  	//Offset abziehen für nahtlose Fortführung
 						//					Index auf Stack:
 stmfd 	sp!, {r0-r12}	//Print I Reglist 	22-34
 stmfd	sp!, {lr}		//					21

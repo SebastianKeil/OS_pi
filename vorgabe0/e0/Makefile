@@ -59,12 +59,7 @@ arch/cpu/software_interrupt_asm.S \
 arch/cpu/undefined_instruction_asm.S \
 arch/cpu/ivt.S \
 arch/cpu/check_interrupts.c \
-arch/cpu/software_interrupt.c \
-arch/cpu/undefined_instruction.c \
-arch/cpu/prefetch_abort.c \
-arch/cpu/data_abort.c \
-arch/cpu/irq.c \
-arch/cpu/fiq.c \
+arch/cpu/exception_handler.c \
 lib/regcheck.c \
 lib/regcheck_asm.S \
 arch/bsp/interrupt_ctrl.c \
