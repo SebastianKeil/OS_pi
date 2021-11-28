@@ -12,6 +12,103 @@
 #define CHECK_BIT(var,pos) ((var) & (1 << pos))
 #define SPSR 1
 #define CPSR 0
+#define LINK_REGISTER 21
+#define DFSR_RW_BIT 11
+
+
+unsigned int get_dfar(){
+	unsigned int value;
+	asm volatile ("mrc p15,0,r0,c6,c0,0":"=r"(value):);
+	return value;
+}
+unsigned int get_dfsr(){
+	unsigned int value;
+	asm volatile ("mrc p15,0,%0, c5, c0, 0":"=r"(value):);
+	return value;
+}
+void get_dfsr_status(unsigned int dfsr){
+	unsigned int status_03  = 15 & dfsr;
+	unsigned int status_4	= 1024 & dfsr;
+	status_4 = (status_4 >> 6);
+	unsigned int status_04 = status_4 + status_03;
+
+	switch (status_04) {
+	case 0:
+		kprintf("No function, reset value");
+		break;
+	case 1:
+		kprintf("Alignment Fault");
+		break;
+	case 2:
+		kprintf("Debug event Fault");
+		break;
+	case 3:
+		kprintf("Access Flag fault on Section");
+		break;
+	case 4:
+		kprintf("Cache maintenance operation fault[b]");
+		break;
+	case 5:
+		kprintf("Translation fault on Section");
+		break;
+	case 6:
+		kprintf("Access Flag fault on Page");
+		break;
+	case 7:
+		kprintf("Translation fault on Section");
+		break;
+	case 8:
+		kprintf("Precise External Abort");
+		break;
+	case 9:
+		kprintf("Domain fault on Section");
+		break;
+	case 10:
+		kprintf("NO function");
+		break;
+	case 11:
+		kprintf("Domain fault on Page");
+		break;
+	case 12:
+		kprintf("External abort on Translation, first level");
+		break;
+	case 13:
+		kprintf("Permsission fault on Section");
+		break;
+	case 14:
+		kprintf("External abort on translation, second level");
+		break;
+	case 15:
+		kprintf("Permission fault on Page");
+		break;
+	case 16:
+		kprintf("No function");
+		break;
+	case 17:
+		kprintf("No function");
+		break;
+	case 18:
+		kprintf("No function");
+		break;
+	case 19:
+		kprintf("No function");
+		break;
+	case 20:
+		kprintf("No function");
+		break;
+	case 21:
+		kprintf("No function");
+		break;
+	case 22:
+		kprintf("Imprecise External Abort");
+		break;
+	case 23:
+		kprintf("No functi0n");
+		break;
+	default:
+		kprintf("error cannot be identified!");
+	}
+}
 
 char* psr_to_bitmask(unsigned int reg, char output[], unsigned int spsr_flag){
 	for(int i = 0; i < 8; i++){
@@ -48,13 +145,52 @@ char* psr_to_bitmask(unsigned int reg, char output[], unsigned int spsr_flag){
 	return output;
 }
 
-void print_reg_dump(unsigned int regs[]){	
+// Art der Exception, Adresse der Exception
+// Nur bei Data Abort: Art und Adresse des verursachenden Speicherzugriffs (DFSR/DFAR)
+// Nur bei Prefetch Abort: Art und Adresse der verursachenden Instruktion (IFSR/IFAR) 
+
+void print_reg_dump(unsigned int regs[], unsigned int modus){	
 
 	char bitmask_cpsr[9];
 	char bitmask_spsr[9];
 	char* cpsr_string = psr_to_bitmask(regs[17], bitmask_cpsr, CPSR);
 	char* spsr_string = psr_to_bitmask(regs[18], bitmask_spsr, SPSR);
-		
+	
+	switch(modus){
+	// 0 reset
+	case 1:
+		kprintf("Undefined Instruction an Stelle 0x%08x\n", (regs[LINK_REGISTER]));
+		break;
+	case 2:
+		kprintf("Supervisor Call an Stelle 0x%08x\n", (regs[LINK_REGISTER]));
+		break;
+	case 3:
+		kprintf("Prefetch Abort an Stelle 0x%08x\n", (regs[LINK_REGISTER]));
+		break;
+	case 4:
+		kprintf("Data Abort an Stelle 0x%08x\nZugriff: ", (regs[LINK_REGISTER]));
+		unsigned int dfar = get_dfar();
+		unsigned int dfsr = get_dfsr();
+		unsigned int read = ((dfsr) & (1 << DFSR_RW_BIT));
+		if (read) {
+			kprintf("lesend ");
+		} else {
+		kprintf("schreibend ");
+		kprintf("auf Adresse: 0x%08x", dfar);
+		}
+	break;
+	// 5 unused
+	case 6:
+		kprintf("IRQ an Stelle 0x%08x\n", (regs[LINK_REGISTER]));
+		break;
+	case 7:
+		kprintf("FIQ an Stelle 0x%08x\n", (regs[LINK_REGISTER]));
+		break;
+	default:
+		return;
+		}
+
+
 	kprintf("###########################################################################\n");
 	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<\n");
 	kprintf("R0:\t0x%08x\tR8:\t0x%08x\n"
