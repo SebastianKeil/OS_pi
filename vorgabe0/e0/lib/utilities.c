@@ -18,13 +18,13 @@
 //MRC p15, 0, <Rt>, c6, c0, 2 ; Read Instruction Fault Address Register
 unsigned int get_ifar(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,r0,c6,c0,0":"=r"(value):);
+	asm volatile ("mrc p15,0,r0,c6,c0,2":"=r"(value):);
 	return value;
 }	
 //MRC p15, 0, <Rt>, c5, c0, 1 ; Read Instruction Fault Status Register
 unsigned int get_ifsr(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,r0,c6,c0,0":"=r"(value):);
+	asm volatile ("mrc p15,0,r0,c5,c0,1":"=r"(value):);
 	return value;
 }
 
@@ -144,7 +144,7 @@ unsigned int get_dfar(){
 }
 unsigned int get_dfsr(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,%0, c5, c0, 0":"=r"(value):);
+	asm volatile ("mrc p15,0,r0, c5, c0, 0":"=r"(value):);
 	return value;
 }
 void print_dfsr_status(unsigned int dfsr){
@@ -306,11 +306,11 @@ void print_reg_dump(unsigned int regs[], unsigned int modus){
 	char bitmask_spsr_und[9];
 	char* cpsr_string = psr_to_bitmask(regs[17], bitmask_cpsr, CPSR);
 	char* spsr_string = psr_to_bitmask(regs[18], bitmask_spsr, SPSR);
-	char* spsr_svc = psr_to_bitmask(regs[12], bitmask_spsr, SPSR);
-	char* spsr_abt = psr_to_bitmask(regs[9], bitmask_spsr, SPSR);
-	char* spsr_fiq = psr_to_bitmask(regs[6], bitmask_spsr, SPSR);
-	char* spsr_irq = psr_to_bitmask(regs[3], bitmask_spsr, SPSR);
-	char* spsr_und = psr_to_bitmask(regs[0], bitmask_spsr, SPSR);
+	char* spsr_svc = psr_to_bitmask(regs[12], bitmask_spsr_svc, SPSR);
+	char* spsr_abt = psr_to_bitmask(regs[9], bitmask_spsr_abt, SPSR);
+	char* spsr_fiq = psr_to_bitmask(regs[6], bitmask_spsr_fiq, SPSR);
+	char* spsr_irq = psr_to_bitmask(regs[3], bitmask_spsr_irq, SPSR);
+	char* spsr_und = psr_to_bitmask(regs[0], bitmask_spsr_und, SPSR);
 	
 	switch(modus){
 	// 0 reset
@@ -372,11 +372,11 @@ void print_reg_dump(unsigned int regs[], unsigned int modus){
 	kprintf(">>> Aktuelle modusspezifische Register <<<\n");
 	kprintf("\t\tLR\t\tSP\t\tSPSR\n");
 	kprintf("User/System:\t%08x,\t%08x\n", regs[16], regs[15]);
-	kprintf("Supervisor:\t%08x,\t%08x\t%c%c%c%c %c %c%c%c\n", regs[14], regs[13], regs[12]);
-	kprintf("Abort:\t\t%08x,\t%08x\t%08x\n", regs[11], regs[10], regs[9]);
-	kprintf("FIQ:\t\t%08x,\t%08x\t%08x\n", regs[8], regs[7], regs[6]);
-	kprintf("IRQ:\t\t%08x,\t%08x\t%08x\n", regs[5], regs[4], regs[3]);
-	kprintf("Undefined:\t%08x,\t%08x\t%08x\n", regs[2], regs[1], regs[0]);
+	kprintf("Supervisor:\t%08x,\t%08x\t%c%c%c%c %c %c%c%c\n", regs[14], regs[13], spsr_svc[0], spsr_svc[1], spsr_svc[2], spsr_svc[3], spsr_svc[4], spsr_svc[5], spsr_svc[6], spsr_svc[7]);
+	kprintf("Abort:\t\t%08x,\t%08x\t%c%c%c%c %c %c%c%c\n", regs[11], regs[10], spsr_abt[0], spsr_abt[1], spsr_abt[2], spsr_abt[3], spsr_abt[4], spsr_abt[5], spsr_abt[6], spsr_abt[7]);
+	kprintf("FIQ:\t\t%08x,\t%08x\t%c%c%c%c %c %c%c%c\n", regs[8], regs[7], spsr_fiq[0], spsr_fiq[1], spsr_fiq[2], spsr_fiq[3], spsr_fiq[4], spsr_fiq[5], spsr_fiq[6], spsr_fiq[7]);
+	kprintf("IRQ:\t\t%08x,\t%08x\t%c%c%c%c %c %c%c%c\n", regs[5], regs[4], spsr_irq[0], spsr_irq[1], spsr_irq[2], spsr_irq[3], spsr_irq[4], spsr_irq[5], spsr_irq[6], spsr_irq[7]);
+	kprintf("Undefined:\t%08x,\t%08x\t%c%c%c%c %c %c%c%c\n", regs[2], regs[1], spsr_und[0], spsr_und[1], spsr_und[2], spsr_und[3], spsr_und[4], spsr_und[5], spsr_und[6], spsr_und[7]);
 	kprintf("System angehalten.\n");
 	return;
 }
