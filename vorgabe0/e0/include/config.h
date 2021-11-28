@@ -17,14 +17,15 @@
  */
 
 /* Include-Pfad bitte gegenfalls anpassen */
-#include <kernel/kprintf.h>
-static inline void test_kprintf(void) {
+
+//#include <kernel/kprintf.h>
+//static inline void test_kprintf(void) {
 	/* Nur für Aufgabenblatt 1
 	 * Hier Test Funktion für kprintf schreiben und
 	 * nach dem vollständigen initialisieren aufrufen
 	 */
-	kprintf("kprintf_test\n");
-}
+//	kprintf("kprintf_test\n");
+//}
 
 /**
  * Erst ab Aufgabenblatt 2 relevant
@@ -39,7 +40,7 @@ static inline void test_kprintf(void) {
 #endif // __QEMU__
 
 // Wir testen nur mit Werten die durch 2^n darstellbar sind
-#define UART_INPUT_BUFFER_SIZE 128
+#define UART_INPUT_BUFFER_SIZE 12 //was 128
 
 // Timer Interrupt Interval zum testen in Mikrosekunden
 // Systimer taktet mit 1MHz

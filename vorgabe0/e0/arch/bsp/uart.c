@@ -1,6 +1,12 @@
 #include <arch/bsp/yellow_led.h>
+#include <kernel/kprintf.h>
 
 #define UART_BASE (0x7E201000 - 0x3F000000)
+#define RXFE 4
+#define TXFE 5
+#define FEN 4
+#define RXIM 4
+#define RTIC 6
 
 struct uart {
 	//0x0
@@ -41,18 +47,41 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
    7 TXFE ..... transmit FIFO is empty.
 */
 
-char uart_read(void)
-{
-	while(uart_port->fr & (1 << 4))
-	{}
-	return (uart_port->dr & 255);
+
+void reset_uart_interrupt(){
+	uart_port->icr |= (1 << RTIC);
+	
+	kprintf("UART_RECEIVE_INTERRUPT CLEARED\n");
+	//kprintf("RTIC: %i\n", uart_port->icr & (1 << RTIC));
 }
 
-void uart_write(char data)
-{
-	while(uart_port->fr & (1 << 5))
+void set_uart_receive_interrupt(){
+	unsigned int reg_copy = uart_port->imsc;
+	reg_copy |= (1 << RXIM);
+	uart_port->imsc = reg_copy;
+	kprintf("UART RECEIVE INTERRUPT ENABLED\n");
+}
+
+void disable_uart_fifo(){
+	unsigned int reg_copy = uart_port->lcrh;
+	reg_copy &= ~(1UL << FEN);
+	uart_port->lcrh = reg_copy;
+	kprintf("UART FIFO DISABLED\n");
+}
+
+unsigned char uart_read(void){
+	//while(uart_port->fr & (1 << RXFE)){}
+	unsigned char data;
+	data = (uart_port->dr & 255);
+	return data;
+}
+
+void uart_write(char data){
+	while(uart_port->fr & (1 << TXFE))
 	{}
 	uart_port->dr = data;
 }
+
+
 
 

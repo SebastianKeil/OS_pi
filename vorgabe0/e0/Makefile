@@ -45,7 +45,29 @@
 BIN_LSG = 
 
 # Hier eure source files hinzufügen
-SRC = arch/cpu/entry.S kernel/start.c arch/bsp/yellow_led.c arch/bsp/uart.c lib/kprintf.c
+SRC = \
+arch/cpu/entry.S \
+kernel/start.c \
+arch/bsp/yellow_led.c \
+arch/bsp/uart.c \
+kernel/kprintf.c \
+arch/cpu/data_abort_asm.S \
+arch/cpu/prefetch_abort_asm.S \
+arch/cpu/fiq_asm.S \
+arch/cpu/irq_asm.S \
+arch/cpu/software_interrupt_asm.S \
+arch/cpu/undefined_instruction_asm.S \
+arch/cpu/ivt.S \
+arch/cpu/check_interrupts.c \
+arch/cpu/exception_handler.c \
+lib/regcheck.c \
+lib/regcheck_asm.S \
+arch/bsp/interrupt_ctrl.c \
+arch/bsp/sys_timer.c \
+lib/ringbuffer.c \
+lib/utilities.c \
+lib/unterprogramm.c
+
 
 # Hier separate user files hinzufügen
 USRC = user/main.c

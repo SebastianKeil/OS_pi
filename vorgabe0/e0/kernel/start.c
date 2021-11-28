@@ -1,10 +1,17 @@
 #include <arch/bsp/yellow_led.h>
+#include <config.h>
 #include <arch/bsp/uart.h>
 #include <kernel/kprintf.h>
-#include <config.h>
+#include <arch/bsp/interrupt_ctrl.h>
+#include <arch/bsp/sys_timer.h>
+#include <arch/cpu/check_interrupts.h>
+#include <lib/ringbuffer.h>
+#include <arch/cpu/shared.h>
+
+
 
 volatile unsigned int counter = 0;
-volatile char receive_buffer;
+volatile unsigned char received_char;
 
 void increment_counter() {
 	counter++;
@@ -12,56 +19,57 @@ void increment_counter() {
 
 
 void start_kernel(){
-	//char *str1 = "Es wurde folgender Charakter eingegeben: ";
-	//char *str2 = "ASCII:";
+	
+	kprintf("\n\n");
+	kprintf("*****************************************************\n");
+	kprintf("******************** KERNEL SETUP *******************\n");
+	kprintf("*****************************************************\n\n");
+	
+	/* KERNEL SETUP */
+	print_register_dump = 0;
+	
+	disable_uart_fifo();
+	set_uart_receive_interrupt();
+	initialize_buffer(input_buffer);
+	enable_interrupts_uart();
 
+	enable_interrupts_timer();
+	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
+	
+	
 	yellow_on();
 	
-	uart_write(10);
-	uart_write(10);
-	kprintf("*****************************************************");
-	uart_write(10);
-	kprintf("********** zum beenden: erst str+a, dann x **********");
-	uart_write(10);
-	kprintf("*****************************************************");
-	uart_write(10);
-	uart_write(10);
-	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: ");
-	uart_write(10);
-	uart_write(10);
-	
+	kprintf("\n\n*****************************************************\n");
+	kprintf("********** zum beenden: erst str+a, dann x **********\n");
+	kprintf("********** s for svc ********************************\n");
+	kprintf("********** a for data_abort *************************\n");
+	kprintf("********** u for undefined **************************\n");
+	kprintf("********** p for prefetch_abort *********************\n");
+	kprintf("********** d switches print ON/OFF ******************\n");
+	kprintf("*****************************************************\n\n");
+	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: \n\n");
+	kprintf("\n");
 
-	/*Functions to test for
-	%c – int Argument wird nach unsigned char umgewandelt und als einzelnes Zeichen ausgegeben
-	%s – durch const char * Argument referenzierte null-terminierte Zeichenkette wird ausgegeben
-	%x – unsigned int Argument wird in hexadezimaler Darstellung ausgegeben
-	%i – int Argument wird in dezimaler Darstellung ausgegeben
-	%u – unsigned int Argument wird in dezimaler Darstellung ausgegeben
-	%p – void * Argument wird in hexadezimaler Darstellung mit dem Prefix 0x ausgegeben
-	%% – Ein einfaches %-Zeichen wird ausgegeben
-	*/
-
-	test_kprintf();
-
-	// int a = 0;
-	// int b = 67;
-	// int c = 427412349;
-	// int a_neg =  - a;
-	// int b_neg =  - b;
-	// int c_neg =  - c;
-	// kprintf("Negativer Zahlentest: \n");
-	// kprintf("Minus*%p* DEC mit Spaces: *%8p* \n",a ,a_neg);
-	// kprintf("Minus*%8p* DEC mit Nullen: *%p*\n",b ,b_neg);
-	// kprintf("Minus*%i* DEC: *%08i* \n",c ,c_neg);
-	// kprintf("Negativer Zahlentest: \n");
-	// uart_write(10);
-	// uart_write(10);
 
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		receive_buffer = uart_read();		
-		kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
+		if(input_buffer->count > 0){
+			received_char = buffer_pull(input_buffer);
+			//kprintf("pulled char: %c", receive_buffer);
+			check_for_interrupts(received_char);
+		}
+		
+		
+		// HA 1:
+		//kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
+		
+		/* generating test interrupts:
+		receive_buffer = uart_read();
+		check_for_interrupts(receive_buffer);
+		*/
 
 	}
+	
+	
 }

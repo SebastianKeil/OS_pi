@@ -1,5 +1,5 @@
 #include<stdarg.h>
-#include <lib/kprintf.h>
+#include <kernel/kprintf.h>
 #include <arch/bsp/uart.h>
 
 
@@ -39,7 +39,7 @@ return(fmt);
 }
 
 
-void print_integer(int i, int base, char *c, int prefix){
+void print_integer(unsigned int i, int base, char *c, int prefix, int neg){
 	const char *symbols = "0123456789abcdef";
 	const char *pre = "0x";
 	const char *nega = "-";
@@ -51,11 +51,6 @@ void print_integer(int i, int base, char *c, int prefix){
 	}
 
 	int slot = 0; //position in Buffer
-	int neg = 0;  //FLAG for negative number
-	if(i < 0){
-		i = i * -1;
-		neg = 1;
-	}
 	if (i == 0){
 		output_buffer[slot] = symbols[0];
 		slot++;
@@ -102,7 +97,6 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 	switch(*fmt){
 	case 'c': //int -> unsigned char
 		i = va_arg(*ap, int);
-		//TODO BOUNDS CHECKEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		uart_write(i);
 		break;
 		
@@ -116,17 +110,23 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 		
 	case 'x': //unsigned int -> hex
 		u_int = va_arg(*ap, unsigned int);
-		print_integer(u_int, 16, c, 0);
+		print_integer(u_int, 16, c, 0, 0);
 		break;
 		
 	case 'i': //signed int -> decimal
 		i = va_arg(*ap, int);
-		print_integer(i, 10, c, 0);
+		if(i < 0){
+			i ^= 4294967295;
+			i++;
+			print_integer(i, 10, c, 0, 1);
+		}else{
+			print_integer(i, 10, c, 0, 0);
+		}
 		break;
 		
 	case 'u': //unsigned int -> decimal
 		u_int = va_arg(*ap, unsigned int);
-		print_integer(u_int, 10, c, 0);
+		print_integer(u_int, 10, c, 0, 0);
 		break;
 		
 	case 'p': // pointer -> hex with prefix 0x
@@ -134,9 +134,9 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 		if(*c == 'x'){
 			uart_write(48);
 			uart_write(120);
-			print_integer(u_int, 16, c, 0);
+			print_integer(u_int, 16, c, 0, 0);
 		} else {
-			print_integer(u_int, 16, c, 2);
+			print_integer(u_int, 16, c, 2, 0);
 			}
 		break;
 		
@@ -152,7 +152,6 @@ void replace_and_write(char *fmt, va_list *ap, char *c){
 void kprintf(char* fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
-	
 	while(*fmt){
 		switch(*fmt){
 		case '%':

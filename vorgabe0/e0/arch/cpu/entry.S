@@ -1,6 +1,7 @@
 .section .init
 
 .global _start
+
 _start:
 	/* Erkennen ob Hypervisor Mode aktiv */
 	mrs r0, cpsr
@@ -34,8 +35,35 @@ _enableAlignCheck:
 
 
 _bsprak:
-	/* Validen Stack Pointer setzten */
-	ldr sp,=0x20000
+/* 	MEMORY LAYOUT
+	sp_svc 0x20000 #131072
+	sp_und 0x21000   +4096
+	sp_usr 0x22000   +4096 
+	sp_abt 0x24000   +8192
+	sp_irq 0x25000   +4096
+	sp_fiq 0x26000   +4096*/
+		
+	ldr 	sp,	=0x20000
+	ldr		r0, =0x21000
+	msr 	sp_und, r0
+	/* user mode gets more space*/
+	ldr		r0, =0x22000
+	msr 	sp_usr, r0 
+	ldr		r0, =0x24000
+	msr 	sp_abt, r0 
+	ldr		r0, =0x25000
+	msr 	sp_irq, r0
+	ldr		r0, =0x26000
+	msr 	sp_fiq, r0
+
+	/* set VBAR in CP15 */
+	ldr r0, =_ivt
+	mcr p15, 0, r0, c12, c0, 0
+	
+	/* change to user mode */
+	//cps #0x10	//nicht in den usermode!
+	cpsie i 	//erlaubt interrupts!!!
+	
 	/* Zu c Code springen */
 	bl  start_kernel
 .Lend:
