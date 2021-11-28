@@ -4,7 +4,7 @@
 unsigned char char_for_unterprogramm;
 unsigned int buffer_count;
 
-void sleep(unsigned int ticks){
+void sleep(int ticks){
 	for(volatile int i = 0; i < ticks; i++){}
 	return;
 }

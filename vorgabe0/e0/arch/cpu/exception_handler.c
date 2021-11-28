@@ -57,7 +57,7 @@ void irq(unsigned int regs[35]){
 		//reset_uart_interrupt();
 		
 	}else if(sys_timer_pending){
-		kprintf("!%i\n", print_register_dump);
+		kprintf("!\n");
 		reset_sys_timer();
 	}
 	return;
