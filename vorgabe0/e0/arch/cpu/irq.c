@@ -17,6 +17,7 @@ unsigned char uart_data;
 
 void irq(unsigned int regs[35]){
 	kprintf("\nirq_handler: there is an irq interrupt!\n");
+	regs[19] = regs[19] - 8;
 	if(print_register_dump){
 		print_reg_dump(regs);
 	}

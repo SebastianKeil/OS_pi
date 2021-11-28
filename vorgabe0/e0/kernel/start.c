@@ -27,14 +27,14 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
-	print_register_dump = 0;
+	print_register_dump = 1;
 	
 	disable_uart_fifo();
 	set_uart_receive_interrupt();
 	initialize_buffer(input_buffer);
-	//enable_interrupts_uart();
+	enable_interrupts_uart();
 
-	enable_interrupts_timer();
+	//enable_interrupts_timer();
 	set_timing(10000);
 	
 	

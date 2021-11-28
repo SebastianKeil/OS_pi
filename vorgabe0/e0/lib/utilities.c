@@ -50,18 +50,12 @@ char* psr_to_bitmask(unsigned int reg, char output[], unsigned int spsr_flag){
 
 void print_reg_dump(unsigned int regs[]){	
 
+	char bitmask_cpsr[9];
 	char bitmask_spsr[9];
-	//char bitmask_cpsr[8];
-	regs[18] = 0x600001d2;
-	char* cpsr_string = psr_to_bitmask(regs[18], bitmask_spsr, SPSR);
+	char* cpsr_string = psr_to_bitmask(regs[17], bitmask_cpsr, CPSR);
+	char* spsr_string = psr_to_bitmask(regs[18], bitmask_spsr, SPSR);
 		
-	kprintf("Test für den SPSR: %x \n", regs[18]);
-	kprintf("SPSR: %c%c%c%c %c %c%c%c\n",cpsr_string[0], cpsr_string[1], cpsr_string[2], cpsr_string[3],cpsr_string[4], cpsr_string[5], cpsr_string[6], cpsr_string[7]);
-
-
-
-  /*
-	kprintf("###########!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!####################\n");
+	kprintf("###########################################################################\n");
 	kprintf(">>> Registerschnappschuss (aktueller Modus) <<<\n");
 	kprintf("R0:\t0x%08x\tR8:\t0x%08x\n"
 			"R1:\t0x%08x\tR9:\t0x%08x\n"
@@ -70,11 +64,10 @@ void print_reg_dump(unsigned int regs[]){
 			"R4:\t0x%08x\tR12:\t0x%08x\n"
 			"R5:\t0x%08x\tSP:\t0x%08x\n"
 			"R6:\t0x%08x\tLR:\t0x%08x\n"
-			"R7:\t0x%08x\tPC:\t0x%08x\n", regs[19], regs[27], regs[20], regs[28], regs[21], regs[29], regs[22], regs[30], regs[23], regs[31], regs[24], regs[32], regs[25], regs[33], regs[26], regs[34]);
+			"R7:\t0x%08x\tPC:\t0x%08x\n", regs[22], regs[30], regs[23], regs[31], regs[24], regs[32], regs[25], regs[33], regs[26], regs[34], regs[27], regs[19], regs[28], regs[21], regs[29], regs[20]);
 	kprintf(">>> Aktuelle Statusregister (SPSR des aktuellen Modus) <<<\n");
-	kprintf(" Test für den CPSR: %x \n", regs[18]);
-	kprintf("CPSR: %c%c%c%c %c %c%c%c\n",cpsr_string[0], cpsr_string[1], cpsr_string[2], cpsr_string[3],cpsr_string[4], cpsr_string[5], cpsr_string[6], cpsr_string[7]);
-	kprintf("SPSR: %08x\n", regs[17]);
+	kprintf("CPSR: %c%c%c%c %c %c%c%c\n",cpsr_string[0], cpsr_string[1], cpsr_string[2], cpsr_string[3], cpsr_string[4], cpsr_string[5], cpsr_string[6], cpsr_string[7]);
+	kprintf("SPSR: %c%c%c%c %c %c%c%c\n", spsr_string[0], spsr_string[1], spsr_string[2], spsr_string[3],spsr_string[4], spsr_string[5], spsr_string[6], spsr_string[7]);
 	kprintf(">>> Aktuelle modusspezifische Register <<<\n");
 	kprintf("\t\tLR\t\tSP\t\tSPSR\n");
 	kprintf("User/System:\t%08x,\t%08x\n", regs[16], regs[15]);
@@ -84,5 +77,4 @@ void print_reg_dump(unsigned int regs[]){
 	kprintf("IRQ:\t\t%08x,\t%08x\t%08x\n", regs[5], regs[4], regs[3]);
 	kprintf("Undefined:\t%08x,\t%08x\t%08x\n", regs[2], regs[1], regs[0]);
 	kprintf("System angehalten.\n");
-	*/
 }
