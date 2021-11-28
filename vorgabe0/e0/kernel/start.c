@@ -27,16 +27,19 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
-	print_register_dump = 1;
+	print_register_dump = 0;
+	
 	disable_uart_fifo();
-	set_uart_receive_interrupt(1);
-	//enable_interrupts_timer();
+	set_uart_receive_interrupt();
 	initialize_buffer(input_buffer);
 	enable_interrupts_uart();
-	set_timing(1000000);
+
+	enable_interrupts_timer();
+	set_timing(10000);
 	
 	
 	yellow_on();
+	
 	kprintf("\n\n*****************************************************\n");
 	kprintf("********** zum beenden: erst str+a, dann x **********\n");
 	kprintf("********** s for svc ********************************\n");
@@ -47,24 +50,18 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: \n\n");
 	kprintf("\n");
-	
-	/*
-	int a = 0xFFFFFFFF;
-	unsigned int b = 0xABCDEFFF;
-
-	kprintf("%p erste \n%p zweite\n", a, b);
-	kprintf("%8p erste \n%8p zweite\n", a, b);
-	*/
 
 
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		
 		if(input_buffer->count > 0){
 			receive_buffer = buffer_pull(input_buffer);
+			kprintf("pulled char: %c", receive_buffer);
 			//check_for_interrupts(receive_buffer);
 		}
+		
+		
 		// HA 1:
 		//kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
 		

@@ -71,7 +71,6 @@ void disable_uart_fifo(){
 
 unsigned char uart_read(void){
 	//while(uart_port->fr & (1 << RXFE)){}
-	kprintf("RTIC: %i\n", uart_port->icr & (1 << RTIC));
 	unsigned char data;
 	data = (uart_port->dr & 255);
 	return data;

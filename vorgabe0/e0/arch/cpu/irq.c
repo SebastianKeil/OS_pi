@@ -41,21 +41,19 @@ void print_reg_dump(unsigned int regs[]){
 }
 
 void irq(unsigned int regs[35]){
+	kprintf("\nirq_handler: there is an irq interrupt!\n");
 	if(print_register_dump){
 		print_reg_dump(regs);
 	}
-	
-	kprintf("\nirq_handler: now checking pending registers..\n");
+	kprintf("now checking pending registers..\n");
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
 		kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
 		buffer_push(uart_data, input_buffer);
-		reset_uart_interrupt();
+		//reset_uart_interrupt();
 		
-	}
-	
-	if(sys_timer_pending){
+	}else if(sys_timer_pending){
 		kprintf("!%i\n", print_register_dump);
 		reset_sys_timer();
 	}
