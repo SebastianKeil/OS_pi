@@ -6,6 +6,7 @@
 #define TXFE 5
 #define FEN 4
 #define RXIM 4
+#define RTIC 6
 
 struct uart {
 	//0x0
@@ -48,8 +49,10 @@ static volatile struct uart * const uart_port = (struct uart *)UART_BASE;
 
 
 void reset_uart_interrupt(){
-	//uart_port->imsc = ... 
+	uart_port->icr |= (1 << RTIC);
+	
 	kprintf("UART_RECEIVE_INTERRUPT CLEARED\n");
+	//kprintf("RTIC: %i\n", uart_port->icr & (1 << RTIC));
 }
 
 void set_uart_receive_interrupt(){
@@ -68,6 +71,7 @@ void disable_uart_fifo(){
 
 unsigned char uart_read(void){
 	//while(uart_port->fr & (1 << RXFE)){}
+	kprintf("RTIC: %i\n", uart_port->icr & (1 << RTIC));
 	unsigned char data;
 	data = (uart_port->dr & 255);
 	return data;

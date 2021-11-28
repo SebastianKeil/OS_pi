@@ -18,7 +18,7 @@ static volatile struct sys_timer * const sys_timer_port = (struct sys_timer *)SY
 
 void set_timing(int time){
 	sys_timer_port->c1 = time;
-	kprintf("SYSTEM TIMER SET TO %i\n", time);
+	kprintf("SYSTEM TIMER SET TO %i\n", sys_timer_port->c1);
 }
 
 void print_timer_setting(){
@@ -28,8 +28,8 @@ void print_timer_setting(){
 
 void reset_sys_timer(){
 	sys_timer_port->cs = 0; 		//reset interrupt
-	sys_timer_port->c1 += TIMER_INTERVAL;	//reset for next tick
-	kprintf("SYS_TIMER RESET\n");
+	sys_timer_port->c1 = sys_timer_port->c1 + TIMER_INTERVAL;	//reset for next tick
+	kprintf("SYS_TIMER RESET TO: %i\n", sys_timer_port->c1);
 }
 
 

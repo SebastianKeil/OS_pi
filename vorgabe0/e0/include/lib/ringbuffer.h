@@ -13,7 +13,7 @@ struct input_buffer {
 extern struct input_buffer * const input_buffer;
 
 void initialize_buffer(struct input_buffer *buffer);
-void buffer_push(unsigned char *input_byte, struct input_buffer *buffer);
+void buffer_push(unsigned char input_byte, struct input_buffer *buffer);
 unsigned char buffer_pull(struct input_buffer *buffer);
 
 #endif
