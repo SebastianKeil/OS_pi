@@ -6,7 +6,7 @@
 #include <arch/bsp/sys_timer.h>
 #include <arch/cpu/check_interrupts.h>
 #include <lib/ringbuffer.h>
-
+#include <arch/cpu/shared.h>
 
 
 
@@ -27,6 +27,7 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
+	print_register_dump = 1;
 	disable_uart_fifo();
 	set_uart_receive_interrupt(1);
 	//enable_interrupts_timer();
@@ -61,9 +62,8 @@ void start_kernel(){
 		increment_counter();
 		
 		if(input_buffer->count > 0){
-			input_buffer->count = 0;
 			receive_buffer = buffer_pull(input_buffer);
-			check_for_interrupts(receive_buffer);
+			//check_for_interrupts(receive_buffer);
 		}
 		// HA 1:
 		//kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);

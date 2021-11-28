@@ -42,7 +42,6 @@ ldmfd	sp!, {r0- r12} //remove unnecessary items from stack
 ldmfd	sp!, {r0- r12} //load necesessary registers before mode change
 mov		r0, sp //give sp to c function
 ldr 	sp, =25000 //reset Stack Pointer
-bl		irq_test
 movs	pc, lr
 
 
