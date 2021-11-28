@@ -34,7 +34,7 @@ void start_kernel(){
 	enable_interrupts_uart();
 
 	enable_interrupts_timer();
-	set_timing(1000000); //TIMER_INTERVAL 1000000
+	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
 	
 	
 	yellow_on();

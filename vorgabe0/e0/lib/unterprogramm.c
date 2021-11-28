@@ -1,5 +1,6 @@
 #include <kernel/kprintf.h>
 #include <lib/ringbuffer.h>
+#include <config.h>
 
 unsigned char char_for_unterprogramm;
 unsigned int buffer_count;
