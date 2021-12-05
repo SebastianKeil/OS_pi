@@ -54,22 +54,27 @@ void start_kernel(){
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		if(input_buffer->count > 0){
-			received_char = buffer_pull(input_buffer);
-			//kprintf("pulled char: %c", receive_buffer);
-			check_for_interrupts(received_char);
-		}
-		
-		
-		// HA 1:
-		//kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
-		
-		/* generating test interrupts:
-		receive_buffer = uart_read();
-		check_for_interrupts(receive_buffer);
-		*/
-
+		idle_thread();
 	}
-	
-	
 }
+
+idle_thread(){
+	asm volatile ("wfi"); //power saving mode till irq
+	//ausführung geht weiter bei uart_receive oder timer interrupt
+	if(input_buffer->count > 0){
+		received_char = buffer_pull(input_buffer);
+		check_for_interrupts(received_char);
+	}
+}
+
+
+/* HA 1:
+kprintf("Es wurde folgender Charakter eingegeben: %c, In Hexadezimal: %x, In Dezimal: %08i\n", receive_buffer, receive_buffer, receive_buffer);
+*/
+
+/* HA 2:
+if(input_buffer->count > 0){
+	received_char = buffer_pull(input_buffer);
+	check_for_interrupts(received_char);
+}
+*/

@@ -49,5 +49,7 @@ void check_for_interrupts(char receive_buffer){
 			kprintf("test: register checker\n");
 			register_checker();
 			break;
+		default:
+			create_thread(receive_buffer);
 	}
 }
