@@ -60,7 +60,6 @@ void start_kernel(){
 
 idle_thread(){
 	asm volatile ("wfi"); //power saving mode till irq
-	//ausführung geht weiter bei uart_receive oder timer interrupt
 	if(input_buffer->count > 0){
 		received_char = buffer_pull(input_buffer);
 		check_for_interrupts(received_char);

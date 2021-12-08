@@ -7,28 +7,28 @@ int print_register_dump;
 
 void check_for_interrupts(char receive_buffer){
 	switch(receive_buffer){
-		case 's':
+		case 'S':
 			//supervisor call
 			kprintf("test: supervisor\n");
 			asm volatile("svc 0");
 					 
 			break;
-		case 'a':
+		case 'A':
 			//data abort
 			kprintf("test: data\n");
 			asm volatile("bkpt #0");
 			break;
-		case 'u':
+		case 'U':
 			//undefined instruction
 			kprintf("test: undefined\n");
 			asm volatile("udf");
 			break;
-		case 'p':
+		case 'P':
 			//prefetch abort
 			kprintf("test: prefetch\n");
 			asm volatile("bkpt #1");
 			break;
-		case 'd':
+		case 'D':
 			//register dump on-off-switch
 			//set global variable 
 			if(print_register_dump == 0){ 
@@ -39,16 +39,14 @@ void check_for_interrupts(char receive_buffer){
 				kprintf("register dump off\n");
 			}
 			break;
-		case 'e':
-			//interaktive unterprogram
-			kprintf("test: unterprogram\n");
-			unterprogramm();
-			break;
+			/*???????
 		case 'c':
 			//register checker ausführen
 			kprintf("test: register checker\n");
 			register_checker();
 			break;
+			*/
+			
 		default:
 			create_thread(receive_buffer);
 	}
