@@ -44,6 +44,6 @@ void init_tcb(unsigned char data){
 
 void create_thread(unsigned char receive_buffer, ){
 	init_tcb();
-	push_to_queue();
+	push_tcb _to_queue();
 	
 }

@@ -37,6 +37,8 @@ mov		r0, sp //give sp to c function
 
 bl 		irq //evtl mov ldr statt bl	
 
+//TODO: FALLS THREAD WECHSEL -> NEUEN KONTEXT AUF DEN STACK
+
 ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
 ldmfd	sp!, {r0- r12} 
 ldmfd	sp!, {lr}		//load necesessary registers before 

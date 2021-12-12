@@ -9,23 +9,23 @@ void check_for_interrupts(char receive_buffer){
 	switch(receive_buffer){
 		case 'S':
 			//supervisor call
-			kprintf("test: supervisor\n");
+			kprintf("test: supervisor interrupt ?from kernel?\n");
 			asm volatile("svc 0");
 					 
 			break;
 		case 'A':
 			//data abort
-			kprintf("test: data\n");
+			kprintf("test: data interrupt from kernel\n");
 			asm volatile("bkpt #0");
 			break;
 		case 'U':
 			//undefined instruction
-			kprintf("test: undefined\n");
+			kprintf("test: undefined interrupt from kernel\n");
 			asm volatile("udf");
 			break;
 		case 'P':
 			//prefetch abort
-			kprintf("test: prefetch\n");
+			kprintf("test: prefetch interrupt from kernel\n");
 			asm volatile("bkpt #1");
 			break;
 		case 'D':
@@ -46,6 +46,8 @@ void check_for_interrupts(char receive_buffer){
 			register_checker();
 			break;
 			*/
+			
+			//TODO: more cases!
 			
 		default:
 			create_thread(receive_buffer);
