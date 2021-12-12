@@ -15,6 +15,13 @@
 #define LINK_REGISTER 21
 #define DFSR_RW_BIT 11
 
+
+
+int define_mode(unsigned int spsr){
+	unsigned int mode = (spsr & 31); 
+	return mode;
+}
+
 //MRC p15, 0, <Rt>, c6, c0, 2 ; Read Instruction Fault Address Register
 unsigned int get_ifar(){
 	unsigned int value;

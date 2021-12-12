@@ -17,26 +17,52 @@
 #define SYS_TIMER 2
 #define UART_INT 25
 
+#define USER_MODE	16 //10000
+#define FIQ_MODE	17 //10001
+#define IRQ_MODE	18 //10010
+#define SVC_MODE	19 //10011
+#define ABORT_MODE	23 //10111
+#define UND_MODE	27 //11011
+#define SYS_MODE	31 //11111
 
 void undefined_instruction(unsigned int regs[35]){
+	if(define_mode(regs[17])== USER_MODE){
+		kill_thread();
+	} else {
 	print_reg_dump(regs, UND);
 	while(1);
+	}
 }
 void software_interrupt(unsigned int regs[35]){
-	print_reg_dump(regs, SVC);
+	if(define_mode(regs[17])== USER_MODE){
+		kill_thread();
+	} else {print_reg_dump(regs, SVC);
 	while(1);
+	}
 }
 void prefetch_abort(unsigned int regs[35]){
+	if(define_mode(regs[17])== USER_MODE){
+		kill_thread();
+	} else {
 	print_reg_dump(regs, PRE);
 	while(1);
+	}
 }
 void data_abort(unsigned int regs[35]){
+	if(define_mode(regs[17])== USER_MODE){
+		kill_thread();
+	} else {
 	print_reg_dump(regs, DATA_ABORT);
 	while(1);
+	}
 }
 void fiq(unsigned int regs[35]){
+	if(define_mode(regs[17])== USER_MODE){
+		kill_thread();
+	} else {
 	print_reg_dump(regs, FIQ);
 	while(1);
+	}
 }
 
 unsigned int sys_timer_pending;
@@ -60,7 +86,7 @@ void irq(unsigned int regs[35]){
 	}else if(sys_timer_pending){
 		kprintf("!\n");
 		reset_sys_timer();
-		//TODO: scheduler();
+		scheduler();
 		
 	}
 	return;
