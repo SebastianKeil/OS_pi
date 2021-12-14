@@ -1,5 +1,6 @@
 #include <lib/unterprogramm.h>
 #include <lib/kmemcpy.h>
+#include <kernel/kprintf.h>
 
 #define PC		20
 #define SP		19
@@ -46,7 +47,7 @@ void init_ready_queue(){
 	ready_queue.last = (struct list_elem*) 0x0;
 }
 
-void change_context(struct list *ready_queue, unsigned int regs[35]){
+void change_context(unsigned int regs[35]){
 	
 	//save old context
 	ready_queue->curr->context->pc = regs[PC];
@@ -65,9 +66,10 @@ void change_context(struct list *ready_queue, unsigned int regs[35]){
 	ready_queue->last = ready_queue->curr->prev;
 }
 
-void scheduler(struct list *ready_queue, unsigned int regs[35]);{
+void scheduler(unsigned int regs[35]);{
 	if(ready_queue->curr && ready_queue->curr->next){
-		change_context(ready_queue, regs);
+		change_context(regs);
+		kprintf("\n");
 	}
 	return;
 }
