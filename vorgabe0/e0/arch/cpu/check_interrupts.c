@@ -5,9 +5,8 @@
 #include <arch/bsp/thread_admin.h>
 
 int print_register_dump;
-extern void (*unterprogramm)();
 
-void check_for_interrupts(char receive_buffer){
+void check_for_interrupts(unsigned char receive_buffer){
 	switch(receive_buffer){
 		case 'S':
 			//supervisor call
@@ -52,12 +51,12 @@ void check_for_interrupts(char receive_buffer){
 			case 't':
 			//data abort
 			kprintf("testcase for create_thread()\n");
-			create_thread(unterprogramm; receive_buffer);
+			create_thread(&receive_buffer, 1, &unterprogramm);
 			break;
 			
 			//TODO: more cases!
 			
 		default:
-			create_thread(unterprogramm; receive_buffer);
+			create_thread(&receive_buffer, 1, &unterprogramm);
 	}
 }

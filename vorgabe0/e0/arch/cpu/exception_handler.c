@@ -27,7 +27,7 @@
 
 void undefined_instruction(unsigned int regs[35]){
 	if(define_mode(regs[17])== USER_MODE){
-		kill_thread();
+		//kill_thread();
 	} else {
 	print_reg_dump(regs, UND);
 	while(1);
@@ -35,14 +35,14 @@ void undefined_instruction(unsigned int regs[35]){
 }
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17])== USER_MODE){
-		kill_thread();
+		//kill_thread();
 	} else {print_reg_dump(regs, SVC);
 	while(1);
 	}
 }
 void prefetch_abort(unsigned int regs[35]){
 	if(define_mode(regs[17])== USER_MODE){
-		kill_thread();
+		//kill_thread();
 	} else {
 	print_reg_dump(regs, PRE);
 	while(1);
@@ -50,7 +50,7 @@ void prefetch_abort(unsigned int regs[35]){
 }
 void data_abort(unsigned int regs[35]){
 	if(define_mode(regs[17])== USER_MODE){
-		kill_thread();
+		//kill_thread();
 	} else {
 	print_reg_dump(regs, DATA_ABORT);
 	while(1);
@@ -58,7 +58,7 @@ void data_abort(unsigned int regs[35]){
 }
 void fiq(unsigned int regs[35]){
 	if(define_mode(regs[17])== USER_MODE){
-		kill_thread();
+		//kill_thread();
 	} else {
 	print_reg_dump(regs, FIQ);
 	while(1);
@@ -85,7 +85,7 @@ void irq(unsigned int regs[35]){
 	}else if(sys_timer_pending){
 		kprintf("!\n");
 		reset_sys_timer();
-		scheduler();
+		//scheduler();
 		
 	}
 	return;

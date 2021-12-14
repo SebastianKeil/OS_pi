@@ -7,6 +7,7 @@
 #include <arch/cpu/check_interrupts.h>
 #include <lib/ringbuffer.h>
 #include <arch/cpu/shared.h>
+#include <kernel/idle_thread.h>
 
 
 
@@ -58,14 +59,7 @@ void start_kernel(){
 	}
 }
 
-idle_thread(){
-	asm volatile ("wfi"); //power saving mode till irq
-	if(input_buffer->count > 0){
-		received_char = buffer_pull(input_buffer);
-		check_for_interrupts(received_char);
-	}
-	
-}
+
 
 
 /* HA 1:
