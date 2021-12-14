@@ -50,7 +50,7 @@ void check_for_interrupts(unsigned char receive_buffer){
 			
 			case 't':
 			//data abort
-			kprintf("testcase for create_thread()\n");
+			kprintf("[t] was pressed: go to create_thread()\n");
 			create_thread(&receive_buffer, 1, &unterprogramm);
 			break;
 			

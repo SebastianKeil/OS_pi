@@ -57,7 +57,7 @@ void init_ready_queue(){
 
 void init_all_tcbs(){
 	for(unsigned int i = 0; i < 31; i++){
-		tcbs[i].sp = (unsigned int*) 0x27000 + (i * 0x1000);
+		tcbs[i].sp = 0x27000 + (i * 0x1000);
 		tcbs[i].id = i;
 		tcbs[i].in_use = 0;
 	}
@@ -112,7 +112,7 @@ void find_free_tcb(){
 }
 
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)()){
-	free_tcb->pc = (unsigned int*) unterprogramm;
+	free_tcb->pc = (unsigned int) unterprogramm;
 	//push_to_thread_stack(data, count);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
