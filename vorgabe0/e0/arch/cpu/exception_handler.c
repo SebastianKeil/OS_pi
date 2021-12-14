@@ -6,6 +6,7 @@
 #include <lib/ringbuffer.h>
 #include <arch/bsp/sys_timer.h>
 #include <arch/bsp/thread_admin.h>
+#include <arch/cpu/check_interrupts.h>
 
 #define UND 1
 #define SVC 2
@@ -81,6 +82,7 @@ void irq(unsigned int regs[]){
 		//kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
 		buffer_push(uart_data, input_buffer);
+		check_for_interrupts(buffer_pull(input_buffer));
 		
 	}else if(sys_timer_pending){
 		kprintf("!\n");

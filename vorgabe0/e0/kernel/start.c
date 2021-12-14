@@ -8,6 +8,7 @@
 #include <lib/ringbuffer.h>
 #include <arch/cpu/shared.h>
 #include <kernel/idle_thread.h>
+#include <arch/bsp/thread_admin.h>
 
 
 
@@ -37,6 +38,8 @@ void start_kernel(){
 	//enable_interrupts_timer();
 	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
 	
+	init_ready_queue();
+	init_all_tcbs();
 	
 	yellow_on();
 	

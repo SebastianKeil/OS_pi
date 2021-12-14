@@ -45,8 +45,8 @@ void scheduler(unsigned int regs[35]);
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-void find_free_tcb(void);
-unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)());
+int finding_free_tcb(void);
+unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)());
 void push_tcb_to_ready_queue(unsigned int thread_id);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)());
 

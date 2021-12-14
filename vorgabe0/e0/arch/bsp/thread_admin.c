@@ -40,10 +40,11 @@ struct list_elem{
 };
 struct list{
 	struct list_elem *curr;
-	struct list_elem *last;
+	struct list_elem *free;
 	//struct list_elem * elements[32];
 };
 struct list *ready_queue;
+struct list_elem threads[32];
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -52,7 +53,7 @@ struct list *ready_queue;
 
 void init_ready_queue(){
 	ready_queue->curr = (struct list_elem*) 0x0;
-	ready_queue->last = (struct list_elem*) 0x0;
+	ready_queue->free = &threads[0];
 }
 
 void init_all_tcbs(){
@@ -65,7 +66,16 @@ void init_all_tcbs(){
 	free_tcb = &tcbs[0];
 	used_tcbs = 0;
 }
-
+/*
+void init_threads_queue(){
+	threads[31]->next = threads[0];
+	threads[0]->prev = threads[31];
+	for(int i = 1; i < 31; i++){
+		threads[i]->next = &threads[i + 1];
+		threads[i]->prev = &threads[i - 1];
+	}	
+}
+*/
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
@@ -88,7 +98,7 @@ void change_context(unsigned int regs[]){
 
 	//change pointer positions
 	ready_queue->curr = ready_queue->curr->next;
-	ready_queue->last = ready_queue->curr->prev;
+	ready_queue->free = ready_queue->curr->prev;
 }
 
 void scheduler(unsigned int regs[]){
@@ -103,34 +113,39 @@ void scheduler(unsigned int regs[]){
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-void find_free_tcb(){
+int finding_free_tcb(){
 	for(int i = 0; i < 32; i++){
 		if(tcbs[i].in_use == 0){
 			free_tcb = &tcbs[i];
+			return 1;
 		}
 	}
+	return 0;
 }
 
-unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)()){
+unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)()){
 	free_tcb->pc = (unsigned int) unterprogramm;
-	//push_to_thread_stack(data, count);
+	free_tcb->registers[0] = *data;
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
 
 void push_tcb_to_ready_queue(unsigned int thread_id){
+	ready_queue->free->context = &tcbs[thread_id];
+	
 	
 }
 
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)()){
-	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
-	find_free_tcb();
-	used_tcbs ++;
-	//creat
+	kprintf("create thread%i with char: %c\n", free_tcb->id, *data);
+	unsigned int thread_id = fill_tcb(data, unterprogramm);
+	
+	if(!finding_free_tcb()){
+		kprintf("all tcbs in use!\n");
+		free_tcb = (struct tcb*) 0x0;
+	}
 	
 	push_tcb_to_ready_queue(thread_id);
-	
-
 }
 
 
