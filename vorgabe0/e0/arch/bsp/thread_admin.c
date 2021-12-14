@@ -1,6 +1,18 @@
 #include <lib/unterprogramm.h>
 #include <lib/kmemcpy.h>
 
+#define PC		20
+#define SP		19
+#define CPSR	18
+
+/*	Layout vom regs[35] Array:
+	regs[34-22]		R12-R0
+	regs[21]		LR
+	regs[20]		PC
+	regs[19]		SP
+	regs[18-0]		Daten für den Registerprint		
+*/
+
 struct tcb{
 	//thread's context
 	unsigned int id;
@@ -14,7 +26,6 @@ struct tcb{
 struct tcb tcbs[33]; //32 threads supported
 unsigned int used_tcbs;
 struct tcb * free_tcb; //first free tcb slot
-
 
 struct list_elem{
 	struct list_elem * next;
@@ -33,6 +44,32 @@ struct list ready_queue;
 void init_ready_queue(){
 	ready_queue.curr = (struct list_elem*) 0x0;
 	ready_queue.last = (struct list_elem*) 0x0;
+}
+
+void change_context(struct list *ready_queue, unsigned int regs[35]){
+	
+	//save old context
+	ready_queue->curr->context->pc = regs[PC];
+	ready_queue->curr->context->sp = regs[SP];
+	ready_queue->curr->context->cpsr = regs[CPSR];
+	kmemcopy(&(ready_queue->curr->context->registers), &regs[22], 13*sizeof(unsigned int));
+
+	//load new context
+	regs[PC] = ready_queue->curr->next->context->pc;
+	regs[SP] = ready_queue->curr->next->context->sp;
+	regs[CPSR] = ready_queue->curr->next->context->cpsr;
+	kmemcopy(&regs[22], &(ready_queue->curr->next->context->registers), 13*sizeof(unsigned int));
+
+	//change pointer positions
+	ready_queue->curr = ready_queue->curr->next;
+	ready_queue->last = ready_queue->curr->prev;
+}
+
+void scheduler(struct list *ready_queue, unsigned int regs[35]);{
+	if(ready_queue->curr && ready_queue->curr->next){
+		change_context(ready_queue, regs);
+	}
+	return;
 }
 
 void init_all_tcbs(){

@@ -81,12 +81,10 @@ void irq(unsigned int regs[35]){
 		uart_data = uart_read();
 		buffer_push(uart_data, input_buffer);
 		
-		
 	}else if(sys_timer_pending){
 		kprintf("!\n");
 		reset_sys_timer();
-		scheduler(*ready_queue ,regs[35]);
-		
+		scheduler(regs);
 	}
 	return;
 }
