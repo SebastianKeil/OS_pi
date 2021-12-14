@@ -71,7 +71,8 @@ arch/bsp/interrupt_ctrl.c \
 arch/bsp/sys_timer.c \
 lib/ringbuffer.c \
 lib/utilities.c \
-lib/unterprogramm.c
+lib/unterprogramm.c \
+arch/bsp/thread_admin.c
 
 
 # Hier separate user files hinzufügen

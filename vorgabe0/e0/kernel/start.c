@@ -33,7 +33,7 @@ void start_kernel(){
 	initialize_buffer(input_buffer);
 	enable_interrupts_uart();
 
-	enable_interrupts_timer();
+	//enable_interrupts_timer();
 	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
 	
 	
@@ -60,12 +60,11 @@ void start_kernel(){
 
 idle_thread(){
 	asm volatile ("wfi"); //power saving mode till irq
-	/*
 	if(input_buffer->count > 0){
 		received_char = buffer_pull(input_buffer);
 		check_for_interrupts(received_char);
 	}
-	*/
+	
 }
 
 

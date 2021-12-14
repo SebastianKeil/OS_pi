@@ -2,8 +2,10 @@
 #include <lib/regcheck.h>
 #include <arch/cpu/shared.h>
 #include <lib/unterprogramm.h>
+#include <arch/bsp/thread_admin.h>
 
 int print_register_dump;
+extern void (*unterprogramm)();
 
 void check_for_interrupts(char receive_buffer){
 	switch(receive_buffer){
@@ -47,9 +49,15 @@ void check_for_interrupts(char receive_buffer){
 			break;
 			*/
 			
+			case 't':
+			//data abort
+			kprintf("testcase for create_thread()\n");
+			create_thread(unterprogramm; receive_buffer);
+			break;
+			
 			//TODO: more cases!
 			
 		default:
-			create_thread(receive_buffer);
+			create_thread(unterprogramm; receive_buffer);
 	}
 }
