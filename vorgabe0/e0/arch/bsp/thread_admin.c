@@ -70,7 +70,7 @@ void init_all_tcbs(){
 	struct tcb tcb30;
 	struct tcb tcb31;
 	
-	kmem_cpy
+	kmemcpy(&tcbs[0], &tcb0, sizeof(struct tcb));
 	tcbs[0] =  tcb0;
 	tcbs[1] =  tcb1;
 	tcbs[2] =  tcb2;
