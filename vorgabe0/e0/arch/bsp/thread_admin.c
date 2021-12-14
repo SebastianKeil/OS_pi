@@ -23,27 +23,27 @@ struct tcb{
 	//thread's context
 	unsigned int id;
 	unsigned int in_use;
-	unsigned int* pc;
-	unsigned int* sp;
+	unsigned int pc;
+	unsigned int sp;
 	unsigned int cpsr;
 	unsigned int registers[13];
 };
 struct tcb tcbs[32];
-struct tcb * free_tcb; //first free tcb slot
+struct tcb *free_tcb; //first free tcb slot
 unsigned int used_tcbs;
 
 
 struct list_elem{
-	struct list_elem * next;
-	struct list_elem * prev;
-	struct tcb * context;
+	struct list_elem *next;
+	struct list_elem *prev;
+	struct tcb *context;
 };
 struct list{
-	struct list_elem * curr;
-	struct list_elem * last;
+	struct list_elem *curr;
+	struct list_elem *last;
 	//struct list_elem * elements[32];
 };
-struct list ready_queue;
+struct list *ready_queue;
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -51,8 +51,8 @@ struct list ready_queue;
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 void init_ready_queue(){
-	ready_queue.curr = (struct list_elem*) 0x0;
-	ready_queue.last = (struct list_elem*) 0x0;
+	ready_queue->curr = (struct list_elem*) 0x0;
+	ready_queue->last = (struct list_elem*) 0x0;
 }
 
 void init_all_tcbs(){
@@ -71,26 +71,27 @@ void init_all_tcbs(){
 //_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-void change_context(unsigned int regs[35]){
+void change_context(unsigned int regs[]){
 	
 	//save old context
-	ready_queue->curr->context->pc = regs[PC];
-	ready_queue->curr->context->sp = regs[SP];
-	ready_queue->curr->context->cpsr = regs[CPSR];
-	kmemcopy(&(ready_queue->curr->context->registers), &regs[22], 13*sizeof(unsigned int));
+	(ready_queue->curr->context->pc) = regs[PC];
+	(ready_queue->curr->context->sp) = regs[SP];
+	(ready_queue->curr->context->cpsr) = regs[CPSR];
+	kmemcpy(&(ready_queue->curr->context->registers), &regs[22], 13*sizeof(unsigned int));
+	
 
 	//load new context
-	regs[PC] = ready_queue->curr->next->context->pc;
-	regs[SP] = ready_queue->curr->next->context->sp;
-	regs[CPSR] = ready_queue->curr->next->context->cpsr;
-	kmemcopy(&regs[22], &(ready_queue->curr->next->context->registers), 13*sizeof(unsigned int));
+	regs[PC] = (ready_queue->curr->next->context->pc);
+	regs[SP] = (ready_queue->curr->next->context->sp);
+	regs[CPSR] = (ready_queue->curr->next->context->cpsr);
+	kmemcpy(&regs[22], &(ready_queue->curr->next->context->registers), 13*sizeof(unsigned int));
 
 	//change pointer positions
 	ready_queue->curr = ready_queue->curr->next;
 	ready_queue->last = ready_queue->curr->prev;
 }
 
-void scheduler(unsigned int regs[35]);{
+void scheduler(unsigned int regs[]){
 	if(ready_queue->curr && ready_queue->curr->next){
 		change_context(regs);
 		kprintf("\n");

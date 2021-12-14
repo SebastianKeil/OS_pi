@@ -5,6 +5,7 @@
 #include <arch/bsp/uart.h>
 #include <lib/ringbuffer.h>
 #include <arch/bsp/sys_timer.h>
+#include <arch/bsp/thread_admin.h>
 
 #define UND 1
 #define SVC 2
@@ -69,7 +70,7 @@ unsigned int sys_timer_pending;
 unsigned int uart_pending;
 unsigned char uart_data;
 
-void irq(unsigned int regs[35]){
+void irq(unsigned int regs[]){
 	//kprintf("\nirq_handler: there is an irq interrupt!\n");
 	if(print_register_dump){
 		print_reg_dump(regs, IRQ);
