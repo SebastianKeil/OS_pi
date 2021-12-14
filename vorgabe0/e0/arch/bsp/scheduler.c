@@ -19,20 +19,22 @@ void change_context(struct *ready_queue, unsigned int regs[35]){
 	ready_queue->curr->context->pc = regs[PC];
 	ready_queue->curr->context->sp = regs[SP];
 	ready_queue->curr->context->cpsr = regs[CPSR];
-	kmemcopy(&(ready_queue->curr->context->registers), &regs[22], 13*sizeof(uint_32));
+	kmemcopy(&(ready_queue->curr->context->registers), &regs[22], 13*sizeof(unsigned int));
 
 	//load new context
 	regs[PC] = ready_queue->curr->next->context->pc;
 	regs[SP] = ready_queue->curr->next->context->sp;
 	regs[CPSR] = ready_queue->curr->next->context->cpsr;
-	kmemcopy(&regs[22], &(ready_queue->curr->next->context->registers), 13*sizeof(uint_32));
+	kmemcopy(&regs[22], &(ready_queue->curr->next->context->registers), 13*sizeof(unsigned int));
 
+	//change pointer positions
 	ready_queue->curr = ready_queue->curr->next;
 	ready_queue->last = ready_queue->curr->prev;
 }
 
-void scheduler();{
-	//TODO round robin
-
+void scheduler(struct *ready_queue, unsigned int regs[35]);{
+	if(ready_queue->curr && ready_queue->curr->next){
+		change_context(&ready_queue, regs[35]); //ready_queue hier so übergeben???
+	}
 	return;
 }
