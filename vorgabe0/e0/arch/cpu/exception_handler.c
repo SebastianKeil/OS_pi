@@ -85,7 +85,7 @@ void irq(unsigned int regs[35]){
 	}else if(sys_timer_pending){
 		kprintf("!\n");
 		reset_sys_timer();
-		scheduler();
+		scheduler(regs[35]);
 		
 	}
 	return;
