@@ -33,9 +33,9 @@ struct list{
 }
 
 struct list_elem* curr;
-struct list* ready_queue;
 
 void init_ready_queue(){
+	struct list ready_queue;
 	ready_queue->first = (list_elem*) 0x0;
 	ready_queue->last = (list_elem*) 0x0;
 }
@@ -112,6 +112,7 @@ void init_all_tcbs(){
 	for(int i = 0; i < 32; i++){
 		tcbs[i].sp = (int*) 0x27000 + (i * 0x1000)
 		tcbs[i].id = i;
+		tcbs[i].in_use = 0;
 	}
 	
 	//set next free tcb to tcb0
@@ -127,7 +128,7 @@ void find_free_tcb(){
 	}
 }
 
-int fill_tcb(unsigned char receive_buffer, void (*unterprogramm)()){
+int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)()){
 	free_tcb->pc = (int*) unterprogramm;
 	*(free_tcb->sp) = receive_buffer;
 	free_tcb->in_use = 1;
@@ -138,8 +139,8 @@ void push_tcb_to_queue(thread_id){
 	
 }
 
-void create_thread(unsigned char receive_buffer, void (*unterprogramm)()){
-	int thread_id = fill_tcb(receive_buffer, unterprogramm);
+void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)()){
+	int thread_id = fill_tcb(data, count, unterprogramm);
 	find_free_tcb();
 	used_tcbs ++;
 	creat
