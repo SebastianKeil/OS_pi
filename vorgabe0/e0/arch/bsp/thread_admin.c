@@ -40,7 +40,7 @@ struct list_elem{
 };
 struct list{
 	struct list_elem *curr;
-	struct list_elem *free;
+	struct list_elem *last;
 	//struct list_elem * elements[32];
 };
 struct list *ready_queue;
@@ -53,7 +53,7 @@ struct list_elem threads[32];
 
 void init_ready_queue(){
 	ready_queue->curr = (struct list_elem*) 0x0;
-	ready_queue->free = &threads[0];
+	ready_queue->last = (struct list_elem*) 0x0;
 }
 
 void init_all_tcbs(){
@@ -66,6 +66,20 @@ void init_all_tcbs(){
 	free_tcb = &tcbs[0];
 	used_tcbs = 0;
 }
+void init_thread_slots(){
+	for(int i = 0; i < 32; i++){
+			threads[i].context = &tcbs[i];
+	}
+}
+
+void init_thread_admin(){
+	kprintf("INIT THREAD ADMIN\n");
+	init_ready_queue();
+	kprintf("now ready_queue->curr: %p\n", ready_queue->curr);
+	init_all_tcbs();
+	init_thread_slots();
+}
+
 /*
 void init_threads_queue(){
 	threads[31]->next = threads[0];
@@ -81,24 +95,27 @@ void init_threads_queue(){
 //_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-void change_context(unsigned int regs[]){
-	
-	//save old context
+
+void save_context(unsigned int regs[]){
 	(ready_queue->curr->context->pc) = regs[PC];
 	(ready_queue->curr->context->sp) = regs[SP];
 	(ready_queue->curr->context->cpsr) = regs[CPSR];
 	kmemcpy(&(ready_queue->curr->context->registers), &regs[22], 13*sizeof(unsigned int));
-	
+}
 
-	//load new context
+void load_context(unsigned int regs[]){
 	regs[PC] = (ready_queue->curr->next->context->pc);
 	regs[SP] = (ready_queue->curr->next->context->sp);
 	regs[CPSR] = (ready_queue->curr->next->context->cpsr);
 	kmemcpy(&regs[22], &(ready_queue->curr->next->context->registers), 13*sizeof(unsigned int));
+}
 
+void change_context(unsigned int regs[]){
+	save_context(regs);
+	load_context(regs);
 	//change pointer positions
 	ready_queue->curr = ready_queue->curr->next;
-	ready_queue->free = ready_queue->curr->prev;
+	ready_queue->last = ready_queue->curr->prev;
 }
 
 void scheduler(unsigned int regs[]){
@@ -113,7 +130,7 @@ void scheduler(unsigned int regs[]){
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-int finding_free_tcb(){
+int find_free_tcb(){
 	for(int i = 0; i < 32; i++){
 		if(tcbs[i].in_use == 0){
 			free_tcb = &tcbs[i];
@@ -123,156 +140,53 @@ int finding_free_tcb(){
 	return 0;
 }
 
-unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)()){
+unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)(unsigned char)){
 	free_tcb->pc = (unsigned int) unterprogramm;
-	free_tcb->registers[0] = *data;
+	free_tcb->registers[0] = (unsigned int) data;
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
 
-void push_tcb_to_ready_queue(unsigned int thread_id){
-	ready_queue->free->context = &tcbs[thread_id];
-	
-	
+void push_tcb_to_ready_queue(unsigned int tcb_id, unsigned int regs[]){
+	kprintf("1push_tcb_to_queue..\n");
+	kprintf("still ready_queue->curr: %p\n", ready_queue->curr);
+	if(ready_queue->curr == 0x0){ //no other threads
+		kprintf("2\n");
+		ready_queue->curr = &threads[tcb_id];
+		ready_queue->last = &threads[tcb_id];
+		regs[PC] = (ready_queue->curr->context->pc);
+		regs[SP] = (ready_queue->curr->context->sp);
+		regs[CPSR] = (ready_queue->curr->context->cpsr);
+		kmemcpy(&regs[22], &(ready_queue->curr->context->registers), 13*sizeof(unsigned int));
+	} else {
+		ready_queue->last->next = &threads[tcb_id];
+		threads[tcb_id].prev = ready_queue->last;
+		ready_queue->last = &threads[tcb_id];
+	}
 }
 
-void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)()){
-	kprintf("create thread%i with char: %c\n", free_tcb->id, *data);
-	unsigned int thread_id = fill_tcb(data, unterprogramm);
+void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char), unsigned int regs[]){
+	kprintf("222222222222222222 ready_queue->curr: %p\n", ready_queue->curr);
+	if(free_tcb == 0x0){
+		kprintf("cant create thread! already 32 threads running..\n");
+		return;
+	}
+
+	kprintf("create thread %i with char: %c\n", free_tcb->id, *data);
+	unsigned int tcb_id = fill_tcb(data, unterprogramm);
+	used_tcbs ++;
 	
-	if(!finding_free_tcb()){
+	if(!find_free_tcb()){
 		kprintf("all tcbs in use!\n");
 		free_tcb = (struct tcb*) 0x0;
 	}
 	
-	push_tcb_to_ready_queue(thread_id);
+	push_tcb_to_ready_queue(tcb_id, regs);
+	kprintf("3leave thread admin\n");
+}
+
+void kill_thread(){
+	//sort list, than systimer
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-	//declaration of 32 tcbs
-	struct tcb tcb0;
-	struct tcb tcb1;
-	struct tcb tcb2;
-	struct tcb tcb3;
-	struct tcb tcb4;
-	struct tcb tcb5;
-	struct tcb tcb6;
-	struct tcb tcb7;
-	struct tcb tcb8;
-	struct tcb tcb9;
-	struct tcb tcb10;
-	struct tcb tcb11;
-	struct tcb tcb12;
-	struct tcb tcb13;
-	struct tcb tcb14;
-	struct tcb tcb15;
-	struct tcb tcb16;
-	struct tcb tcb17;
-	struct tcb tcb18;
-	struct tcb tcb19;
-	struct tcb tcb20;
-	struct tcb tcb21;
-	struct tcb tcb22;
-	struct tcb tcb23;
-	struct tcb tcb24;
-	struct tcb tcb25;
-	struct tcb tcb26;
-	struct tcb tcb27;
-	struct tcb tcb28;
-	struct tcb tcb29;
-	struct tcb tcb30;
-	struct tcb tcb31;
-	
-	kmemcpy(&tcbs[0], &tcb0, sizeof(struct tcb));
-	tcbs[0] =  tcb0;
-	tcbs[1] =  tcb1;
-	tcbs[2] =  tcb2;
-	tcbs[3] =  tcb3;
-	tcbs[4] =  tcb4;
-	tcbs[5] =  tcb5;
-	tcbs[6] =  tcb6;
-	tcbs[7] =  tcb7;
-	tcbs[8] =  tcb8;
-	tcbs[9] =  tcb9;
-	tcbs[10] = tcb10;
-	tcbs[11] = tcb11;
-	tcbs[12] = tcb12;
-	tcbs[13] = tcb13;
-	tcbs[14] = tcb14;
-	tcbs[15] = tcb15;
-	tcbs[16] = tcb16;
-	tcbs[17] = tcb17;
-	tcbs[18] = tcb18;
-	tcbs[19] = tcb19;
-	tcbs[20] = tcb20;
-	tcbs[21] = tcb21;
-	tcbs[22] = tcb22;
-	tcbs[23] = tcb23;
-	tcbs[24] = tcb24;
-	tcbs[25] = tcb25;
-	tcbs[26] = tcb26;
-	tcbs[27] = tcb27;
-	tcbs[28] = tcb28;
-	tcbs[29] = tcb29;
-	tcbs[30] = tcb30;
-	tcbs[31] = tcb31;
-	
-	tcbs[0] =  tcb0;
-	tcbs[1] =  tcb1;
-	tcbs[2] =  tcb2;
-	tcbs[3] =  tcb3;
-	tcbs[4] =  tcb4;
-	tcbs[5] =  tcb5;
-	tcbs[6] =  tcb6;
-	tcbs[7] =  tcb7;
-	tcbs[8] =  tcb8;
-	tcbs[9] =  tcb9;
-	tcbs[10] = tcb10;
-	tcbs[11] = tcb11;
-	tcbs[12] = tcb12;
-	tcbs[13] = tcb13;
-	tcbs[14] = tcb14;
-	tcbs[15] = tcb15;
-	tcbs[16] = tcb16;
-	tcbs[17] = tcb17;
-	tcbs[18] = tcb18;
-	tcbs[19] = tcb19;
-	tcbs[20] = tcb20;
-	tcbs[21] = tcb21;
-	tcbs[22] = tcb22;
-	tcbs[23] = tcb23;
-	tcbs[24] = tcb24;
-	tcbs[25] = tcb25;
-	tcbs[26] = tcb26;
-	tcbs[27] = tcb27;
-	tcbs[28] = tcb28;
-	tcbs[29] = tcb29;
-	tcbs[30] = tcb30;
-	tcbs[31] = tcb31;
-	*/

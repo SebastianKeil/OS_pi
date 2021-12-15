@@ -10,22 +10,20 @@ void sleep(int ticks){
 	return;
 }
 
-void print_answer(unsigned char print_char){
-	for(int i = 0; i < 64; i++){
-		kprintf("%c", print_char);
+void print_answer(unsigned char input){
+	for(int i = 0; i < 10; i++){
+		kprintf("%c", input);
 		sleep(BUSY_WAIT_COUNTER);
 	}
 	return;
 }
 
-void unterprogramm(){
+void end_this_thread(){
+	asm volatile("svc 0");
+}
+
+void unterprogramm(unsigned char *input){
 	kprintf("unterprogramm laeuft...\n");
-	for(;;){
-		buffer_count = get_buffer_count(input_buffer);
-		if(input_buffer->count > 0){
-			//kprintf("unterprogramm has received char");
-				char_for_unterprogramm = buffer_pull(input_buffer);
-				print_answer(char_for_unterprogramm);
-		}
-	}
+	print_answer(*input);
+	end_this_thread();
 }

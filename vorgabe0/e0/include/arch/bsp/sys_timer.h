@@ -4,5 +4,6 @@
 void set_timing(int time);
 void print_timer_setting(void);
 void reset_sys_timer(void);
+void call_sys_timer(void);
 
 #endif

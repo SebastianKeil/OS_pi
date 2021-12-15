@@ -34,4 +34,8 @@ void reset_sys_timer(){
 	//kprintf("SYS_TIMER RESET TO: %i\n", sys_timer_port->c1);
 }
 
+void call_sys_timer_interrupt(){
+	//TODO
+}
+
 

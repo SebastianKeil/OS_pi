@@ -18,6 +18,7 @@
 
 #define SYS_TIMER 2
 #define UART_INT 25
+#define KILL_THREAD 404
 
 #define USER_MODE	16 //10000
 #define FIQ_MODE	17 //10001
@@ -28,7 +29,7 @@
 #define SYS_MODE	31 //11111
 
 void undefined_instruction(unsigned int regs[35]){
-	if(define_mode(regs[17])== USER_MODE){
+	if(define_mode(regs[17]) == USER_MODE){
 		//kill_thread();
 	} else {
 	print_reg_dump(regs, UND);
@@ -36,14 +37,15 @@ void undefined_instruction(unsigned int regs[35]){
 	}
 }
 void software_interrupt(unsigned int regs[35]){
-	if(define_mode(regs[17])== USER_MODE){
+	if(define_mode(regs[17]) == USER_MODE){
+		if(regs[22] == KILL_THREAD) kprintf("thread ended itself");
 		//kill_thread();
 	} else {print_reg_dump(regs, SVC);
 	while(1);
 	}
 }
 void prefetch_abort(unsigned int regs[35]){
-	if(define_mode(regs[17])== USER_MODE){
+	if(define_mode(regs[17]) == USER_MODE){
 		//kill_thread();
 	} else {
 	print_reg_dump(regs, PRE);
@@ -51,7 +53,7 @@ void prefetch_abort(unsigned int regs[35]){
 	}
 }
 void data_abort(unsigned int regs[35]){
-	if(define_mode(regs[17])== USER_MODE){
+	if(define_mode(regs[17]) == USER_MODE){
 		//kill_thread();
 	} else {
 	print_reg_dump(regs, DATA_ABORT);
@@ -59,7 +61,7 @@ void data_abort(unsigned int regs[35]){
 	}
 }
 void fiq(unsigned int regs[35]){
-	if(define_mode(regs[17])== USER_MODE){
+	if(define_mode(regs[17]) == USER_MODE){
 		//kill_thread();
 	} else {
 	print_reg_dump(regs, FIQ);
@@ -82,7 +84,8 @@ void irq(unsigned int regs[]){
 		//kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
 		buffer_push(uart_data, input_buffer);
-		check_for_interrupts(buffer_pull(input_buffer));
+		check_for_interrupts(buffer_pull(input_buffer), regs);
+		kprintf("5 leaving exeption handler\n");
 		
 	}else if(sys_timer_pending){
 		kprintf("!\n");

@@ -6,12 +6,12 @@
 
 int print_register_dump;
 
-void check_for_interrupts(unsigned char receive_buffer){
+void check_for_interrupts(unsigned char receive_buffer, unsigned int regs[35]){
 	switch(receive_buffer){
 		case 'S':
 			//supervisor call
 			kprintf("test: supervisor interrupt ?from kernel?\n");
-			asm volatile("svc 0");
+			asm volatile("svc #1");
 					 
 			break;
 		case 'A':
@@ -51,12 +51,13 @@ void check_for_interrupts(unsigned char receive_buffer){
 			case 't':
 			//data abort
 			kprintf("[t] was pressed: go to create_thread()\n");
-			create_thread(&receive_buffer, 1, &unterprogramm);
+			create_thread(&receive_buffer, 1, &unterprogramm, regs);
 			break;
 			
 			//TODO: more cases!
 			
 		default:
-			create_thread(&receive_buffer, 1, &unterprogramm);
+			create_thread(&receive_buffer, 1, &unterprogramm, regs);
+			kprintf("4leaving default\n");
 	}
 }

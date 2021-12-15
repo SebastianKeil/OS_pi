@@ -18,11 +18,4 @@ void idle_thread(){
 		kprintf("power saving!!\n");
 		sleeps(100000000);
 	}
-	
-	//not in use:
-	kprintf("idle_thread: interrupt accured, now checking source..\n");
-	if(input_buffer->count > 0){
-		received = buffer_pull(input_buffer);
-		check_for_interrupts(received);
-	}
 }

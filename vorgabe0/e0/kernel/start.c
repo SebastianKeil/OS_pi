@@ -38,8 +38,7 @@ void start_kernel(){
 	//enable_interrupts_timer();
 	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
 	
-	init_ready_queue();
-	init_all_tcbs();
+	init_thread_admin();
 	
 	yellow_on();
 	

@@ -32,22 +32,27 @@ struct list{
 //_/_/_/_/_/_/_/_/ SETUP /_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
+void init_thread_admin(void);
 void init_ready_queue(void);
 void init_all_tcbs(void);
+void init_thread_slots();
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+void safe_context(unsigned int regs[]);
+void load_context(unsigned int regs[]);
 void change_context(unsigned int regs[35]);
 void scheduler(unsigned int regs[35]);
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-int finding_free_tcb(void);
+int find_free_tcb(void);
 unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)());
-void push_tcb_to_ready_queue(unsigned int thread_id);
-void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)());
+void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
+void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(), unsigned int regs[]);
+void kill_thread(void);
 
 #endif
