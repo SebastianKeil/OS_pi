@@ -32,7 +32,7 @@ void start_kernel(){
 	
 	disable_uart_fifo();
 	set_uart_receive_interrupt();
-	initialize_buffer(input_buffer);
+	initialize_buffer(&uart_input_buffer);
 	enable_interrupts_uart();
 
 	//enable_interrupts_timer();

@@ -52,8 +52,8 @@ struct list_elem threads[32];
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 void init_ready_queue(){
-	ready_queue->curr = (struct list_elem*) 0x0;
-	ready_queue->last = (struct list_elem*) 0x0;
+	ready_queue->curr = 0x0;
+	ready_queue->last = 0x0;
 }
 
 void init_all_tcbs(){
@@ -150,8 +150,9 @@ unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)(unsigned char))
 void push_tcb_to_ready_queue(unsigned int tcb_id, unsigned int regs[]){
 	kprintf("1push_tcb_to_queue..\n");
 	kprintf("still ready_queue->curr: %p\n", ready_queue->curr);
+	kprintf("&threads[tcb_id]: %p\n", &threads[tcb_id]);
 	if(ready_queue->curr == 0x0){ //no other threads
-		kprintf("2\n");
+		kprintf("2 changing registers\n");
 		ready_queue->curr = &threads[tcb_id];
 		ready_queue->last = &threads[tcb_id];
 		regs[PC] = (ready_queue->curr->context->pc);
@@ -166,7 +167,8 @@ void push_tcb_to_ready_queue(unsigned int tcb_id, unsigned int regs[]){
 }
 
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char), unsigned int regs[]){
-	kprintf("222222222222222222 ready_queue->curr: %p\n", ready_queue->curr);
+	kprintf("create thread: ready_queue->curr: %p\n", ready_queue->curr);
+	
 	if(free_tcb == 0x0){
 		kprintf("cant create thread! already 32 threads running..\n");
 		return;
@@ -182,7 +184,7 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	}
 	
 	push_tcb_to_ready_queue(tcb_id, regs);
-	kprintf("3leave thread admin\n");
+	kprintf("3 leave thread admin\n");
 }
 
 void kill_thread(){

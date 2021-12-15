@@ -83,8 +83,8 @@ void irq(unsigned int regs[]){
 	if(uart_pending){
 		//kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
-		buffer_push(uart_data, input_buffer);
-		check_for_interrupts(buffer_pull(input_buffer), regs);
+		buffer_push(uart_data, &uart_input_buffer);
+		check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
 		kprintf("5 leaving exeption handler\n");
 		
 	}else if(sys_timer_pending){

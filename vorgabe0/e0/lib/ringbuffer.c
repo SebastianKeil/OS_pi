@@ -8,7 +8,7 @@ struct input_buffer {
   unsigned int write; 	
 };
 
-struct input_buffer * const input_buffer;
+struct input_buffer uart_input_buffer;
 unsigned char pulled_char;
 
 

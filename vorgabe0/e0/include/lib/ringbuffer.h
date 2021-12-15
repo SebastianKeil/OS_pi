@@ -10,7 +10,7 @@ struct input_buffer {
   unsigned int write; 	
 };
 
-extern struct input_buffer * const input_buffer;
+extern struct input_buffer uart_input_buffer;
 
 void initialize_buffer(struct input_buffer *buffer);
 unsigned int get_buffer_count(struct input_buffer *buffer);
