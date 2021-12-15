@@ -44,7 +44,7 @@ void print_ifsr_status(unsigned int ifsr){
 		kprintf("No function, reset value");
 		break;
 	case 1:
-		kprintf("Alignment Fault");
+		kprintf("No function");
 		break;
 	case 2:
 		kprintf("Debug event Fault");
@@ -53,7 +53,7 @@ void print_ifsr_status(unsigned int ifsr){
 		kprintf("Access Flag fault on Section");
 		break;
 	case 4:
-		kprintf("Cache maintenance operation fault");
+		kprintf("No function");
 		break;
 	case 5:
 		kprintf("Translation fault on Section");
@@ -71,7 +71,7 @@ void print_ifsr_status(unsigned int ifsr){
 		kprintf("Domain fault on Section");
 		break;
 	case 10:
-		kprintf("NO function");
+		kprintf("No function");
 		break;
 	case 11:
 		kprintf("Domain fault on Page");
@@ -80,7 +80,7 @@ void print_ifsr_status(unsigned int ifsr){
 		kprintf("External abort on Section");
 		break;
 	case 13:
-		kprintf("Permsission fault on Section");
+		kprintf("Permission fault on Section");
 		break;
 	case 14:
 		kprintf("External abort on Page");
@@ -107,34 +107,34 @@ void print_ifsr_status(unsigned int ifsr){
 		kprintf("No function");
 		break;
 	case 22:
-		kprintf("Imprecise External Abort");
+		kprintf("No function");
 		break;
 	case 23:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 24:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 25:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 26:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 27:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 28:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 29:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 30:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 31:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	default:
 		kprintf("status not listed");
@@ -190,7 +190,7 @@ void print_dfsr_status(unsigned int dfsr){
 		kprintf("Domain fault on Section");
 		break;
 	case 10:
-		kprintf("NO function");
+		kprintf("No function");
 		break;
 	case 11:
 		kprintf("Domain fault on Page");
@@ -229,31 +229,31 @@ void print_dfsr_status(unsigned int dfsr){
 		kprintf("Imprecise External Abort");
 		break;
 	case 23:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 24:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 25:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 26:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 27:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 28:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 29:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 30:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	case 31:
-		kprintf("No functi0n");
+		kprintf("No function");
 		break;
 	default:
 		kprintf("status not listed");
