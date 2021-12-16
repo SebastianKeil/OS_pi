@@ -59,7 +59,7 @@ void print_list_elem(unsigned int _j){
 		kprintf("  curr->");} else {kprintf("\t");}
 		
 	//kprintf("[%i]: '%c'", _j, *(unsigned char*)(tcbs[_j].registers[0]));
-	kprintf("[%i]: '%c'", _j, tcbs[_j].data);
+	kprintf("[%i]'%c'", _j, (tcbs[_j].data));
 	
 	if(ready_queue->last->context->id == _j){ 
 		kprintf("<-last\n");} else {kprintf("\n");}
@@ -160,10 +160,22 @@ int find_free_tcb(){
 	return 0;
 }
 
+void decrease_sp(unsigned int* _sp, unsigned int size){
+	if(size < 8){
+		*_sp -= 8;
+	}else{
+		*_sp -= size;
+		*_sp -= (size - (size % 8));
+	}
+}
+
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char)){
 	free_tcb->pc = (unsigned int) unterprogramm;
-	kmemcpy(&(free_tcb->registers[0]), &data, count * sizeof(unsigned char*));
 	
+	decrease_sp(&free_tcb->sp, (count * sizeof(unsigned char*)));
+	kmemcpy((void*)free_tcb->sp, data, count * sizeof(unsigned char*));
+	
+	free_tcb->registers[0] = free_tcb->sp;
 	//for debugging
 	free_tcb->data = *data;
 	
