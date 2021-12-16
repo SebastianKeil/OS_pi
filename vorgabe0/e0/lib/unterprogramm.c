@@ -12,7 +12,7 @@ void sleep(int ticks){
 
 void print_answer(unsigned char *input){
 	for(int i = 0; i < 5; i++){
-		kprintf("%c, ", *input);
+		kprintf("%c", *input);
 		sleep(BUSY_WAIT_COUNTER*20);
 	}
 	return;

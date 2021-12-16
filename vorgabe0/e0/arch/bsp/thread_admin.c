@@ -28,7 +28,8 @@ struct tcb{
 	unsigned int sp;
 	unsigned int cpsr;
 	unsigned int registers[13];
-	//for debugging
+	
+	//DEBUG
 	unsigned char data;
 };
 struct tcb tcbs[32];
@@ -126,7 +127,7 @@ void load_context(unsigned int regs[], struct tcb* context){
 	regs[SP] = context->sp;
 	regs[CPSR] = context->cpsr;
 	kmemcpy(&regs[22], &(context->registers), 13 * sizeof(unsigned int));
-	kprintf("\n");
+	
 }
 
 void change_context(unsigned int regs[]){
@@ -141,6 +142,8 @@ void scheduler(unsigned int regs[]){
 	if(used_tcbs > 1){
 		change_context(regs);
 		kprintf("\n");
+		
+		//DEBUG
 		print_ready_queue();
 	}
 	return;
@@ -176,10 +179,11 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogr
 	kmemcpy((void*)free_tcb->sp, data, count * sizeof(unsigned char*));
 	
 	free_tcb->registers[0] = free_tcb->sp;
-	//for debugging
+	
+	//DEBUG
 	free_tcb->data = *data;
 	
-	//kprintf("fill $r0: %c\n", *(unsigned char*)free_tcb->registers[0]);
+	kprintf("fill $r0 of tcb[%i]: %c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
@@ -191,6 +195,7 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 		ready_queue->last = &threads[thread_id];
 		ready_queue->curr->next = ready_queue->curr;
 		ready_queue->curr->prev = ready_queue->curr;
+		kprintf("\n");
 		load_context(irq_regs, ready_queue->curr->context);
 		
 	
@@ -216,15 +221,18 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already 32 threads running..\n");
 		return;}
+		
+	//DEBUG
 	print_ready_queue();
 	kprintf("creating thread %i with char: %c\n", free_tcb->id, *data);
+	
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
 	push_tcb_to_ready_queue(thread_id, irq_regs);
 	used_tcbs ++;
 	find_free_tcb();
-	print_ready_queue();
 	
-	//kprintf("3 leave thread admin\n");
+	//DEBUG
+	//print_ready_queue();
 }
 
 void kill_thread(unsigned int regs[]){
@@ -235,8 +243,10 @@ void kill_thread(unsigned int regs[]){
 		ready_queue->curr = 0x0;
 		regs[LR] = (unsigned int) &idle_thread;	
 		
+		//DEBUG
+		//print_ready_queue();
+		
 	}else if(used_tcbs > 1){
-		//struct list_elem *temp = ready_queue->curr;
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr->next->prev = ready_queue->curr->prev;
 		ready_queue->curr->prev->next = ready_queue->curr->next;
