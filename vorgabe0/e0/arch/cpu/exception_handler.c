@@ -18,8 +18,9 @@
 
 #define SYS_TIMER 2
 #define UART_INT 25
-#define KILL_THREAD 404
+#define KILL_THREAD 69
 
+#define BIT_MASK_24 16777215
 #define USER_MODE	16 //10000
 #define FIQ_MODE	17 //10001
 #define IRQ_MODE	18 //10010
@@ -27,6 +28,11 @@
 #define ABORT_MODE	23 //10111
 #define UND_MODE	27 //11011
 #define SYS_MODE	31 //11111
+
+unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
+	unsigned int svc_imm = instruction & bit_mask;
+	return svc_imm;
+}
 
 void undefined_instruction(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
@@ -38,15 +44,19 @@ void undefined_instruction(unsigned int regs[35]){
 }
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		if(regs[22] == KILL_THREAD) kprintf("thread ended itself");
-		//kill_thread();
+		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
+		if(svc_imm == 69){
+			kprintf("\nthread killed itself\n");
+		}
+			kill_thread(regs);
+		//}
 	} else {print_reg_dump(regs, SVC);
 	while(1);
 	}
 }
 void prefetch_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kill_thread();
+		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, PRE);
 	while(1);
@@ -54,7 +64,7 @@ void prefetch_abort(unsigned int regs[35]){
 }
 void data_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kill_thread();
+		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, DATA_ABORT);
 	while(1);
@@ -62,7 +72,7 @@ void data_abort(unsigned int regs[35]){
 }
 void fiq(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kill_thread();
+		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, FIQ);
 	while(1);
@@ -85,10 +95,9 @@ void irq(unsigned int regs[]){
 		uart_data = uart_read();
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
-		kprintf("5 leaving exeption handler\n");
 		
 	}else if(sys_timer_pending){
-		kprintf("!\n");
+		kprintf("!");
 		reset_sys_timer();
 		scheduler(regs);
 	}

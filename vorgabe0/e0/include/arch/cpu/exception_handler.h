@@ -21,6 +21,8 @@
 #define SYS_TIMER 2
 #define UART_INT 25
 
+unsigned int get_imm(unsigned int instruction, unsigned int bit_mask);
+
 void undefined_instruction(unsigned int regs[35]);
 void software_interrupt(unsigned int regs[35]);
 void prefetch_abort(unsigned int regs[35]);

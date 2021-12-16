@@ -42,17 +42,22 @@ void init_thread_slots();
 //_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 void safe_context(unsigned int regs[]);
-void load_context(unsigned int regs[]);
+void load_context(unsigned int regs[], struct tcb* context);
 void change_context(unsigned int regs[35]);
 void scheduler(unsigned int regs[35]);
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+
+void print_list_elem(int i);
+void print_ready_queue(void);
+
 int find_free_tcb(void);
 unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)());
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(), unsigned int regs[]);
-void kill_thread(void);
+void kill_thread(unsigned int regs[]);
 
 #endif

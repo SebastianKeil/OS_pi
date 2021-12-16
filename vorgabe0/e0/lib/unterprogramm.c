@@ -13,17 +13,17 @@ void sleep(int ticks){
 void print_answer(unsigned char input){
 	for(int i = 0; i < 10; i++){
 		kprintf("%c", input);
-		sleep(BUSY_WAIT_COUNTER);
+		sleep(BUSY_WAIT_COUNTER*20);
 	}
 	return;
 }
 
 void end_this_thread(){
-	asm volatile("svc 0");
+	asm volatile("svc #69");
 }
 
 void unterprogramm(unsigned char *input){
-	kprintf("unterprogramm laeuft...\n");
+	//kprintf("unterprogramm laeuft mit: %c\n", input);
 	print_answer(*input);
 	end_this_thread();
 }

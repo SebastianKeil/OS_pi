@@ -11,11 +11,11 @@ void sleeps(int ticks){
 }
 
 void idle_thread(){
-	kprintf("idle_thread: entering power saving mode..\n");
+	//kprintf("idle_thread: entering power saving mode..\n");
 	
 	//asm volatile ("wfi"); //power saving mode till irq
 	while(uart_input_buffer.count < 1){
-		kprintf("power saving!!\n");
+		//kprintf("power saving!!\n");
 		sleeps(100000000);
 	}
 }
