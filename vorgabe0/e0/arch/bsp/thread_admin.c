@@ -28,6 +28,8 @@ struct tcb{
 	unsigned int sp;
 	unsigned int cpsr;
 	unsigned int registers[13];
+	//for debugging
+	unsigned char data;
 };
 struct tcb tcbs[32];
 struct tcb *free_tcb; //first free tcb slot
@@ -44,14 +46,42 @@ struct list{
 	struct list_elem *last;
 	//struct list_elem * elements[32];
 };
-struct list *ready_queue;
+struct list queue;
+struct list *ready_queue = &queue;
 struct list_elem threads[32];
+
+
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//_/_/_/_/_/_/_/_/ DEBUG /_/_/_/_/_/_/_/_/_/
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+void print_list_elem(unsigned int _j){
+	if(ready_queue->curr->context->id == _j){ 
+		kprintf("  curr->");} else {kprintf("\t");}
+		
+	//kprintf("[%i]: '%c'", _j, *(unsigned char*)(tcbs[_j].registers[0]));
+	kprintf("[%i]: '%c'", _j, tcbs[_j].data);
+	
+	if(ready_queue->last->context->id == _j){ 
+		kprintf("<-last\n");} else {kprintf("\n");}
+}	
+
+void print_ready_queue(){
+	kprintf("\n");
+	kprintf("queue has %i active threads:\n", used_tcbs);
+	kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
+	if(ready_queue->curr == 0x0) kprintf("  curr->0x0\n");
+	unsigned int j = ready_queue->curr->context->id;
+	for(unsigned int i = 0; i < used_tcbs; i++){
+		print_list_elem(j);
+		j = threads[j].next->context->id;
+	}
+	kprintf("\n");
+}
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/ SETUP /_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
 void init_ready_queue(){
 	ready_queue->curr = 0x0;
 	ready_queue->last = 0x0;
@@ -84,8 +114,6 @@ void init_thread_admin(){
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
-
 void save_context(unsigned int regs[]){
 	(ready_queue->curr->context->pc) = regs[LR];
 	(ready_queue->curr->context->sp) = regs[SP];
@@ -110,16 +138,10 @@ void change_context(unsigned int regs[]){
 }
 
 void scheduler(unsigned int regs[]){
-	//no thread active
-	if(ready_queue->curr == 0x0) return;
-	
-	//exactly 1 thread active
-	else if(ready_queue->curr == ready_queue->curr->next) return;
-	
-	//more than 1 thread active
-	else if(ready_queue->curr != ready_queue->curr->next){
+	if(used_tcbs > 1){
 		change_context(regs);
 		kprintf("\n");
+		print_ready_queue();
 	}
 	return;
 }
@@ -127,19 +149,6 @@ void scheduler(unsigned int regs[]){
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
-void print_list_elem(int i){
-	kprintf("\t[%i]: %c\n", i, (char) tcbs[i].registers[0]);
-}
-
-void print_ready_queue(){
-	kprintf("queue changed to %i active threads:\n", used_tcbs);
-	for(int i = 0; i < used_tcbs; i++){
-		print_list_elem(i);
-	}
-}
-
-
 int find_free_tcb(){
 	for(int i = 0; i < 32; i++){
 		if(tcbs[i].in_use == 0){
@@ -154,32 +163,39 @@ int find_free_tcb(){
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char)){
 	free_tcb->pc = (unsigned int) unterprogramm;
 	kmemcpy(&(free_tcb->registers[0]), &data, count * sizeof(unsigned char*));
+	
+	//for debugging
+	free_tcb->data = *data;
+	
+	//kprintf("fill $r0: %c\n", *(unsigned char*)free_tcb->registers[0]);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
 
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){	
 	//no threads active
-	if(ready_queue->curr == 0x0){ 	
-		kprintf("this is the only thread.\n");							
+	if(used_tcbs == 0){ 							
 		ready_queue->curr = &threads[thread_id];
 		ready_queue->last = &threads[thread_id];
 		ready_queue->curr->next = ready_queue->curr;
 		ready_queue->curr->prev = ready_queue->curr;
 		load_context(irq_regs, ready_queue->curr->context);
-		print_ready_queue();
+		
 	
 	//exactly 1 thread active
-	} else if(ready_queue->curr == ready_queue->last){ 	
+	} else if(used_tcbs == 1){ 	
 		ready_queue->curr->next = &threads[thread_id];
 		ready_queue->curr->prev = &threads[thread_id];
 		threads[thread_id].next = ready_queue->curr;
 		threads[thread_id].prev = ready_queue->curr;
+		ready_queue->last = &threads[thread_id];
 	
-	//more than 2 threads active
+	//2 or more threads active
 	} else{
 		ready_queue->last->next = &threads[thread_id];
 		threads[thread_id].prev = ready_queue->last;
+		threads[thread_id].next = ready_queue->curr;
+		ready_queue->curr->prev = &threads[thread_id];
 		ready_queue->last = &threads[thread_id];
 	}
 }
@@ -188,15 +204,39 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already 32 threads running..\n");
 		return;}
-		
-	//kprintf("create thread %i with char: %c\n", free_tcb->id, *data);
+	print_ready_queue();
+	kprintf("creating thread %i with char: %c\n", free_tcb->id, *data);
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
-	used_tcbs ++;
 	push_tcb_to_ready_queue(thread_id, irq_regs);
+	used_tcbs ++;
+	find_free_tcb();
+	print_ready_queue();
+	
 	//kprintf("3 leave thread admin\n");
 }
 
 void kill_thread(unsigned int regs[]){
+	
+	//killing the only thread
+	if(used_tcbs == 1){
+		ready_queue->curr->context->in_use = 0;
+		ready_queue->curr = 0x0;
+		regs[LR] = (unsigned int) &idle_thread;	
+		
+	}else if(used_tcbs > 1){
+		//struct list_elem *temp = ready_queue->curr;
+		ready_queue->curr->context->in_use = 0;
+		ready_queue->curr->next->prev = ready_queue->curr->prev;
+		ready_queue->curr->prev->next = ready_queue->curr->next;
+		ready_queue->curr = ready_queue->curr->next;
+		load_context(regs, ready_queue->curr->context);
+	}
+	used_tcbs--;
+	return;
+
+
+
+/*
 	if(used_tcbs == 2){
 		//kprintf("exactly two threads remaining.\n");
 		ready_queue->curr->next->prev = 0x0;
@@ -223,6 +263,7 @@ void kill_thread(unsigned int regs[]){
 	kprintf("return to idle thread \n");
 	regs[LR] = (unsigned int) &idle_thread;		
 	return;
+	*/
 }
 
 

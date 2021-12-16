@@ -4,7 +4,6 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/  DATA /_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
 struct tcb{
 	//thread's context
 	unsigned int id;
@@ -29,9 +28,15 @@ struct list{
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//_/_/_/_/_/_/_/_/ DEBUG /_/_/_/_/_/_/_/_/_/
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+void print_list_elem(int i);
+void print_ready_queue(void);
+
+
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/ SETUP /_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
 void init_thread_admin(void);
 void init_ready_queue(void);
 void init_all_tcbs(void);
@@ -49,11 +54,6 @@ void scheduler(unsigned int regs[35]);
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
-
-void print_list_elem(int i);
-void print_ready_queue(void);
-
 int find_free_tcb(void);
 unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)());
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);

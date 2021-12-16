@@ -11,8 +11,8 @@ void sleep(int ticks){
 }
 
 void print_answer(unsigned char input){
-	for(int i = 0; i < 10; i++){
-		kprintf("%c", input);
+	for(int i = 0; i < 5; i++){
+		kprintf("%i%c, ", i, input);
 		sleep(BUSY_WAIT_COUNTER*20);
 	}
 	return;
@@ -23,7 +23,8 @@ void end_this_thread(){
 }
 
 void unterprogramm(unsigned char *input){
+	unsigned char print_data = *input;
 	//kprintf("unterprogramm laeuft mit: %c\n", input);
-	print_answer(*input);
+	print_answer(print_data);
 	end_this_thread();
 }
