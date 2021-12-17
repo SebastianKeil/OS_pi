@@ -33,9 +33,9 @@ void buffer_push(unsigned char input_byte, struct input_buffer *buffer){
 	//kprintf("\n************* RINGBUFFER MESSAGE  *****************\n");
 	//kprintf("buffer count after pushing '%c': %i/%i\n", input_byte, buffer->count, UART_INPUT_BUFFER_SIZE);
 	
-	if(buffer->write == UART_INPUT_BUFFER_SIZE - 1){
+	if(buffer->write == UART_INPUT_BUFFER_SIZE){
 		buffer->write = 0; //start from 0 when at the end
-		if(buffer->read == UART_INPUT_BUFFER_SIZE - 1){
+		if(buffer->read == UART_INPUT_BUFFER_SIZE && buffer->count == UART_INPUT_BUFFER_SIZE){
 			buffer->read = 0; //start from 0 when at the end
 		}
 	}else{

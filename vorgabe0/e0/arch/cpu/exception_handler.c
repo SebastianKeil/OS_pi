@@ -46,8 +46,8 @@ void undefined_instruction(unsigned int regs[35]){
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		//for svc calls:
-		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
-		//if(svc_imm == 69) kprintf("\nthread killed itself\n");
+		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
+		if(svc_imm == 69) kprintf(" KILLED ");
 		
 		kill_thread(regs);
 		

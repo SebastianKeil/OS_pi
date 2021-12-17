@@ -23,6 +23,7 @@ void end_this_thread(){
 }
 
 void unterprogramm(unsigned char *input){
+
 	//kprintf("unterprogramm laeuft mit: %c\n", input);
 	print_answer(input);
 	end_this_thread();

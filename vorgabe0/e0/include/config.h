@@ -40,7 +40,7 @@
 #endif // __QEMU__
 
 // Wir testen nur mit Werten die durch 2^n darstellbar sind
-#define UART_INPUT_BUFFER_SIZE 12 //was 128
+#define UART_INPUT_BUFFER_SIZE 4 //was 128
 
 // Timer Interrupt Interval zum testen in Mikrosekunden
 // Systimer taktet mit 1MHz

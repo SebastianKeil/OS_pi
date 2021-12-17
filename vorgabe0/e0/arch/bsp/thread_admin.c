@@ -6,6 +6,7 @@
 #define LR		21
 #define SP		19
 #define CPSR	18
+#define THREAD_COUNT	32
 
 /*	Layout vom regs[35] Array:
 	regs[34-22]		R12-R0
@@ -32,7 +33,7 @@ struct tcb{
 	//DEBUG
 	unsigned char data;
 };
-struct tcb tcbs[32];
+struct tcb tcbs[THREAD_COUNT];
 struct tcb *free_tcb; //first free tcb slot
 unsigned int used_tcbs;
 
@@ -49,7 +50,7 @@ struct list{
 };
 struct list queue;
 struct list *ready_queue = &queue;
-struct list_elem threads[32];
+struct list_elem threads[THREAD_COUNT];
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -57,7 +58,7 @@ struct list_elem threads[32];
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 void print_list_elem(unsigned int _j){
 	if(ready_queue->curr->context->id == _j){ 
-		kprintf("  curr->");} else {kprintf("\t");}
+		kprintf("\t\t\t  curr->");} else {kprintf("\t\t\t\t");}
 		
 	//kprintf("[%i]: '%c'", _j, *(unsigned char*)(tcbs[_j].registers[0]));
 	kprintf("[%i]'%c'", _j, (tcbs[_j].data));
@@ -67,10 +68,11 @@ void print_list_elem(unsigned int _j){
 }	
 
 void print_ready_queue(){
+	//return;
 	kprintf("\n");
-	kprintf("queue has %i active threads:\n", used_tcbs);
-	kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
-	if(ready_queue->curr == 0x0) kprintf("  curr->0x0\n");
+	//kprintf("queue has %i active threads:\n", used_tcbs);
+	//kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
+	if(ready_queue->curr == 0x0) kprintf("  \t\t\tcurr->0x0\n");
 	unsigned int j = ready_queue->curr->context->id;
 	for(unsigned int i = 0; i < used_tcbs; i++){
 		print_list_elem(j);
@@ -89,7 +91,7 @@ void init_ready_queue(){
 }
 
 void init_all_tcbs(){
-	for(unsigned int i = 0; i < 31; i++){
+	for(unsigned int i = 0; i < THREAD_COUNT; i++){
 		tcbs[i].sp = 0x27000 + (i * 0x1000);
 		tcbs[i].id = i;
 		tcbs[i].in_use = 0;
@@ -99,7 +101,7 @@ void init_all_tcbs(){
 	used_tcbs = 0;
 }
 void init_thread_slots(){
-	for(int i = 0; i < 32; i++){
+	for(int i = 0; i < THREAD_COUNT; i++){
 			threads[i].context = &tcbs[i];
 	}
 }
@@ -153,7 +155,7 @@ void scheduler(unsigned int regs[]){
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 int find_free_tcb(){
-	for(int i = 0; i < 32; i++){
+	for(int i = 0; i < THREAD_COUNT; i++){
 		if(tcbs[i].in_use == 0){
 			free_tcb = &tcbs[i];
 			return 1;
@@ -173,8 +175,10 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 }
 
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char)){
+
 	free_tcb->pc = (unsigned int) unterprogramm;
-	
+
+	free_tcb->sp = 0x27000 + (free_tcb->id * 0x1000);
 	decrease_sp(&free_tcb->sp, (count * sizeof(unsigned char*)));
 	kmemcpy((void*)free_tcb->sp, data, count * sizeof(unsigned char*));
 	
@@ -183,7 +187,7 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogr
 	//DEBUG
 	free_tcb->data = *data;
 	
-	kprintf("fill $r0 of tcb[%i]: %c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
+	//kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
@@ -219,12 +223,12 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char), unsigned int irq_regs[]){
 	if(!find_free_tcb()){
-		kprintf("cant create thread! already 32 threads running..\n");
+		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;}
 		
 	//DEBUG
 	print_ready_queue();
-	kprintf("creating thread %i with char: %c\n", free_tcb->id, *data);
+	kprintf("creating threads[%i] with char: %c\n", free_tcb->id, *data);
 	
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
 	push_tcb_to_ready_queue(thread_id, irq_regs);
@@ -254,6 +258,9 @@ void kill_thread(unsigned int regs[]){
 		load_context(regs, ready_queue->curr->context);
 	}
 	used_tcbs--;
+	print_ready_queue();
+	//ready_queue->curr->context->sp = 0x27000 + (ready_queue->curr->context->id * 0x1000);
+	//ready_queue->curr->context-> = 0x27000 + (ready_queue->curr->context->id * 0x1000);
 	return;
 
 
