@@ -52,17 +52,21 @@ void buffer_push(unsigned char input_byte, struct input_buffer *buffer){
 }
 
 unsigned char buffer_pull(struct input_buffer *buffer){
-	if(buffer->count > 0){
-		pulled_char = buffer->data[buffer->read];
-		buffer->count --;
-		//kprintf("buffer count after pull: %i/%i\n", buffer->count, UART_INPUT_BUFFER_SIZE);
-		if(buffer->read == UART_INPUT_BUFFER_SIZE - 1){
-			buffer->read = 0; //start from 0 when at the end
-		}else{
-			buffer->read ++;
-		}
-	}else{
+	if(buffer->count == 0){
 		kprintf("cant pull: input_buffer empty!\n");
+		return '0';
 	}
+	
+	pulled_char = buffer->data[buffer->read];
+	buffer->count --;
+	
+	//kprintf("buffer count after pull: %i/%i\n", buffer->count, UART_INPUT_BUFFER_SIZE);
+	
+	if(buffer->read == UART_INPUT_BUFFER_SIZE){
+		buffer->read = 0; //start from 0 when at the end
+	}else{
+		buffer->read ++;
+	}
+	
 	return pulled_char;
 }

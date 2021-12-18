@@ -10,6 +10,7 @@ unsigned char receive_buffer;
 void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 	unsigned char receive_buffer = data;
 	switch(receive_buffer){
+	/*
 		case 'S':
 			//supervisor call
 			kprintf("test: supervisor interrupt ?from kernel?\n");
@@ -42,6 +43,7 @@ void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 				kprintf("register dump off\n");
 			}
 			break;
+			
 			/*???????
 		case 'c':
 			//register checker ausführen
@@ -51,8 +53,10 @@ void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 			*/
 			
 			//TODO: more cases!
+	//*/
 			
 		default:
 			create_thread(&receive_buffer, 1, &unterprogramm, regs);
+			break;
 	}
 }

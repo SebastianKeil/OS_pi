@@ -7,6 +7,8 @@
 #define SP		19
 #define CPSR	18
 #define THREAD_COUNT	32
+#define USER_STACK_BASE 0x27000
+#define USER_STACK_SIZE 0x1000
 
 /*	Layout vom regs[35] Array:
 	regs[34-22]		R12-R0
@@ -92,7 +94,7 @@ void init_ready_queue(){
 
 void init_all_tcbs(){
 	for(unsigned int i = 0; i < THREAD_COUNT; i++){
-		tcbs[i].sp = 0x27000 + (i * 0x1000);
+		tcbs[i].sp = USER_STACK_BASE + (i * USER_STACK_SIZE);
 		tcbs[i].id = i;
 		tcbs[i].in_use = 0;
 	}
@@ -141,13 +143,14 @@ void change_context(unsigned int regs[]){
 }
 
 void scheduler(unsigned int regs[]){
+	//kprintf("\nscheduling %i threads\n", used_tcbs);
 	if(used_tcbs > 1){
 		change_context(regs);
 		kprintf("\n");
 		
 		//DEBUG
 		print_ready_queue();
-	}
+	}else //kprintf("active threads: %i\n", used_tcbs);
 	return;
 }
 
@@ -178,7 +181,7 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogr
 
 	free_tcb->pc = (unsigned int) unterprogramm;
 
-	free_tcb->sp = 0x27000 + (free_tcb->id * 0x1000);
+	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
 	decrease_sp(&free_tcb->sp, (count * sizeof(unsigned char*)));
 	kmemcpy((void*)free_tcb->sp, data, count * sizeof(unsigned char*));
 	
@@ -227,8 +230,8 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 		return;}
 		
 	//DEBUG
-	print_ready_queue();
-	kprintf("creating threads[%i] with char: %c\n", free_tcb->id, *data);
+	//print_ready_queue();
+	kprintf("\ncreating threads[%i] with char: %c\n", free_tcb->id, *data);
 	
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
 	push_tcb_to_ready_queue(thread_id, irq_regs);
@@ -236,13 +239,13 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	find_free_tcb();
 	
 	//DEBUG
-	//print_ready_queue();
+	print_ready_queue();
 }
 
 void kill_thread(unsigned int regs[]){
-	
 	//killing the only thread
 	if(used_tcbs == 1){
+		kprintf("\nkilling last thread [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr = 0x0;
 		regs[LR] = (unsigned int) &idle_thread;	
@@ -251,6 +254,7 @@ void kill_thread(unsigned int regs[]){
 		//print_ready_queue();
 		
 	}else if(used_tcbs > 1){
+		kprintf("\nkilling [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr->next->prev = ready_queue->curr->prev;
 		ready_queue->curr->prev->next = ready_queue->curr->next;
@@ -258,41 +262,12 @@ void kill_thread(unsigned int regs[]){
 		load_context(regs, ready_queue->curr->context);
 	}
 	used_tcbs--;
+	
+	
+	//DEBUG
 	print_ready_queue();
-	//ready_queue->curr->context->sp = 0x27000 + (ready_queue->curr->context->id * 0x1000);
-	//ready_queue->curr->context-> = 0x27000 + (ready_queue->curr->context->id * 0x1000);
+	
 	return;
-
-
-
-/*
-	if(used_tcbs == 2){
-		//kprintf("exactly two threads remaining.\n");
-		ready_queue->curr->next->prev = 0x0;
-		ready_queue->curr->prev->next = 0x0;		
-	} else if(used_tcbs > 2){
-			//kprintf("more than two threads remaining.\n");
-		ready_queue->curr->next->prev = ready_queue->curr->prev;
-		ready_queue->curr->prev->next = ready_queue->curr->next;
-	}
-	ready_queue->curr->context->in_use = 0;
-	used_tcbs--;
-	ready_queue->curr->prev = 0x0;
-	struct list_elem *temp = ready_queue->curr->next;
-	ready_queue->curr->next = 0x0;
-	ready_queue->curr = temp;
-	if(!ready_queue->curr){
-		//kprintf("last thread killed.\n");
-	}	
-	if(ready_queue->curr){
-		//kprintf("at least one thread remaining.\n");
-		load_context(regs, ready_queue->curr->context);
-		return;
-	}
-	kprintf("return to idle thread \n");
-	regs[LR] = (unsigned int) &idle_thread;		
-	return;
-	*/
 }
 
 
