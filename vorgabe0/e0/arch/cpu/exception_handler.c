@@ -35,7 +35,6 @@ unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 }
 
 void undefined_instruction(unsigned int regs[35]){
-	kprintf("undefined exception!!\n");
 	if(define_mode(regs[17]) == USER_MODE){
 		kprintf("kill thread because undefined instruction\n");
 		kill_thread(regs);
@@ -45,7 +44,6 @@ void undefined_instruction(unsigned int regs[35]){
 	}
 }
 void software_interrupt(unsigned int regs[35]){
-	kprintf("svc exception!!\n");
 	if(define_mode(regs[17]) == USER_MODE){
 		//for svc calls:
 		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
@@ -69,7 +67,6 @@ void prefetch_abort(unsigned int regs[35]){
 	}
 }
 void data_abort(unsigned int regs[35]){
-	kprintf("data exception!!\n");
 	if(define_mode(regs[17]) == USER_MODE){
 		kprintf("kill thread because data abort\n");
 		kill_thread(regs);
