@@ -10,7 +10,6 @@ unsigned char receive_buffer;
 void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 	unsigned char receive_buffer = data;
 	switch(receive_buffer){
-	/*
 		case 'S':
 			//supervisor call
 			kprintf("test: supervisor interrupt ?from kernel?\n");
@@ -32,7 +31,7 @@ void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 			kprintf("test: prefetch interrupt from kernel\n");
 			asm volatile("bkpt #1");
 			break;
-		case 'D':
+		case 'd':
 			//register dump on-off-switch
 			//set global variable 
 			if(print_register_dump == 0){ 
@@ -44,7 +43,7 @@ void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 			}
 			break;
 			
-			/*???????
+			/*
 		case 'c':
 			//register checker ausführen
 			kprintf("test: register checker\n");
@@ -52,11 +51,9 @@ void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 			break;
 			*/
 			
-			//TODO: more cases!
-	//*/
-			
 		default:
 			create_thread(&receive_buffer, 1, &unterprogramm, regs);
+			kprintf("leaving check_interrupts..\n");
 			break;
 	}
 }

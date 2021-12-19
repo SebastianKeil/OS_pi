@@ -2,7 +2,7 @@
 
 irq_asm:
 
-sub 	r14, r14, #8  	//Offset abziehen für nahtlose Fortführung
+sub 	r14, r14, #0  	//Offset abziehen für nahtlose Fortführung
 						//					Index auf Stack:
 stmfd 	sp!, {r0-r12}	//Print I Reglist 	22-34
 stmfd	sp!, {lr}		//					21
@@ -37,7 +37,8 @@ mov		r0, sp //give sp to c function
 
 bl 		irq //evtl mov ldr statt bl	
 
-//TODO: FALLS THREAD WECHSEL -> NEUEN KONTEXT AUF DEN STACK
+//auf dem stack liegt das SPSR vom tcb, das muss in das aktuelle SPSR vom irq geschrieben werden,
+//damit unten bei "movs	pc, lr" das richtige SPSR ins CPSR geladen wird
 
 ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
 ldmfd	sp!, {r0- r12} 

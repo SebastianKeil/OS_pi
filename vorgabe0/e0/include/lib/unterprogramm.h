@@ -3,8 +3,8 @@
 
 
 void sleep(unsigned int ticks);
-void print_answer(unsigned char print_char);
+void print_answer(unsigned char *input);
 void end_this_thread(void);
-void unterprogramm(unsigned char*);
+void unterprogramm(unsigned char *input);
 
 #endif

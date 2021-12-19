@@ -1,5 +1,4 @@
 #include <kernel/kprintf.h>
-#include <lib/ringbuffer.h>
 #include <config.h>
 #include <lib/regcheck.h>
 #include <lib/unterprogramm.h>
@@ -7,8 +6,8 @@
 unsigned char char_for_unterprogramm;
 unsigned int buffer_count;
 
-void sleep(int ticks){
-	for(volatile int i = 0; i < ticks; i++){}
+void sleep(unsigned int ticks){
+	for(volatile unsigned int i = 0; i < ticks; i++){}
 	return;
 }
 
@@ -25,7 +24,7 @@ void end_this_thread(){
 }
 
 void unterprogramm(unsigned char *input){
-	unsigned char character = input[0];
+	unsigned char character = *input;
 	switch(character){
 		case 's':
 			//supervisor call
@@ -39,8 +38,9 @@ void unterprogramm(unsigned char *input){
 			break;
 		case 'a':
 			//data abort
-			kprintf("test: data interrupt by thread\n");
-			asm volatile("bkpt #0");
+			kprintf("test: data abort by thread\n");
+			//asm volatile("bkpt #0");
+			asm volatile("mov r0, #0x1 \n ldr r0, [r0]");
 			break;
 		case 'u':
 			//undefined instruction
@@ -51,10 +51,12 @@ void unterprogramm(unsigned char *input){
 			//register checker ausführen
 			kprintf("test: register checker\n");
 			register_checker();
+			end_this_thread();
 			break;
 		default:
 			//kprintf("unterprogramm laeuft mit: %c\n", input);
 			print_answer(input);
 			end_this_thread();
+			break;
 	}
 }

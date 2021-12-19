@@ -6,6 +6,8 @@
 #define LR		21
 #define SP		19
 #define CPSR	18
+#define USER_MODE 0x10
+
 #define THREAD_COUNT	32
 #define USER_STACK_BASE 0x27000
 #define USER_STACK_SIZE 0x1000
@@ -169,8 +171,11 @@ int find_free_tcb(){
 }
 
 void decrease_sp(unsigned int* _sp, unsigned int size){
+	kprintf("sp: %p -> %c\n", *_sp, *(unsigned char*) _sp);
 	if(size < 8){
+		kprintf("decreasing stack\n");
 		*_sp -= 8;
+		
 	}else{
 		*_sp -= size;
 		*_sp -= (size - (size % 8));
@@ -180,17 +185,19 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char)){
 
 	free_tcb->pc = (unsigned int) unterprogramm;
+	//free_tcb->cpsr = USER_MODE;
 
 	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
 	decrease_sp(&free_tcb->sp, (count * sizeof(unsigned char*)));
 	kmemcpy((void*)free_tcb->sp, data, count * sizeof(unsigned char*));
+	kprintf("sp: %p -> %c\n", free_tcb->sp, *(unsigned char*) free_tcb->sp);
 	
 	free_tcb->registers[0] = free_tcb->sp;
 	
 	//DEBUG
 	free_tcb->data = *data;
 	
-	//kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
+	kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
@@ -202,7 +209,6 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 		ready_queue->last = &threads[thread_id];
 		ready_queue->curr->next = ready_queue->curr;
 		ready_queue->curr->prev = ready_queue->curr;
-		kprintf("\n");
 		load_context(irq_regs, ready_queue->curr->context);
 		
 	
@@ -240,6 +246,7 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	
 	//DEBUG
 	print_ready_queue();
+	kprintf("leaving create thread..\n");
 }
 
 void kill_thread(unsigned int regs[]){

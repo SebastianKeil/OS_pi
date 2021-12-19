@@ -35,7 +35,7 @@ void start_kernel(){
 	initialize_buffer(&uart_input_buffer);
 	enable_interrupts_uart();
 
-	enable_interrupts_timer();
+	//enable_interrupts_timer();
 	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
 	
 	init_thread_admin();
@@ -57,8 +57,10 @@ void start_kernel(){
 	// Endless counter
 	for (;;) {
 		increment_counter();
+		
 		/*change to user mode*/
 		asm ("cps #0x10");
+		
 		idle_thread();
 	}
 }

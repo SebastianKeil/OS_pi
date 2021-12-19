@@ -2,7 +2,7 @@
 
 data_abort_asm:
 
-sub 	r14, r14, #4  	//Offset abziehen für Wiederholung
+sub 	r14, r14, #4	//Offset abziehen für Wiederholung
 						//					Index auf Stack:
 stmfd 	sp!, {r0-r12}	//Print I Reglist 	22-34
 stmfd	sp!, {lr}		//					21
