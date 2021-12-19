@@ -48,6 +48,7 @@ void software_interrupt(unsigned int regs[35]){
 		//for svc calls:
 		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		//if(svc_imm == 69) kprintf(" KILLED ");
+		kprintf("kill thread because svc!?\n");
 		kill_thread(regs);
 		
 	} else {
