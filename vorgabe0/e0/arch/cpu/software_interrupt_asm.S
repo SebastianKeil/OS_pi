@@ -37,9 +37,20 @@ mov		r0, sp //give sp to c function
 
 bl 		software_interrupt
 //hier gehts noch nicht hin :)
-ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
-ldmfd	sp!, {r0- r12} 
+//ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
+//ldmfd	sp!, {r0- r12} 
+//ldmfd	sp!, {lr}		//load necesessary registers before 
+//ldmfd	sp!, {r0- r12} 
+//movs	pc, lr
+
+ldmfd	sp!, {r0 - r7}
+ldmfd	sp!, {r0 - r8}  //remove unnecessary items from stack
+
+ldmfd	sp!, {r0}		//load new spsr
+msr		SPSR_cxsf, r0
+
+ldmfd	sp!, {r0- r2} 	// remove unnecessary items from stack
+
 ldmfd	sp!, {lr}		//load necesessary registers before 
 ldmfd	sp!, {r0- r12} 
 movs	pc, lr
-

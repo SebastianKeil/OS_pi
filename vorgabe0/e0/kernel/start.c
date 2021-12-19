@@ -35,7 +35,7 @@ void start_kernel(){
 	initialize_buffer(&uart_input_buffer);
 	enable_interrupts_uart();
 
-	//enable_interrupts_timer();
+	enable_interrupts_timer();
 	set_timing(TIMER_INTERVAL); //TIMER_INTERVAL 1000000
 	
 	init_thread_admin();
@@ -44,13 +44,15 @@ void start_kernel(){
 	
 	kprintf("\n\n*****************************************************\n");
 	kprintf("********** zum beenden: erst str+a, dann x **********\n");
-	kprintf("********** s for svc ********************************\n");
-	kprintf("********** a for data_abort *************************\n");
-	kprintf("********** u for undefined **************************\n");
-	kprintf("********** p for prefetch_abort *********************\n");
-	kprintf("********** d switches print ON/OFF ******************\n");
+	kprintf("********** Grossbuchstaben für Kernel Interrupts ****\n");
+	kprintf("********** Kleinbuchstaben für Thread Interrupts ****\n");
+	kprintf("********** S/s for svc ******************************\n");
+	kprintf("********** A/a for data_abort ***********************\n");
+	kprintf("********** U/u for undefined ************************\n");
+	kprintf("********** P/p for prefetch_abort *******************\n");
+	kprintf("***** d switches register prints ON/OFF *************\n");
 	kprintf("*****************************************************\n\n");
-	kprintf("Hallo ich bin der Kernel, gib eine Ziffer ein: \n\n");
+	kprintf("Hallo ich bin der Kernel, starte print-threads: \n\n");
 	kprintf("\n");
 
 

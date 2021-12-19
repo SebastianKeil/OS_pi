@@ -28,28 +28,28 @@ void unterprogramm(unsigned char *input){
 	switch(character){
 		case 's':
 			//supervisor call
-			kprintf("test: supervisor interrupt by thread\n");
+			//kprintf("test: supervisor interrupt by thread\n");
 			asm volatile("svc #1");	 
 			break;
 		case 'p':
 			//prefetch abort
-			kprintf("test: prefetch interrupt by thread\n");
-			asm volatile("bkpt #1");
+			//kprintf("test: prefetch interrupt by thread\n");
+			asm volatile("bkpt #2");
 			break;
 		case 'a':
 			//data abort
-			kprintf("test: data abort by thread\n");
+			//kprintf("test: data abort by thread\n");
 			//asm volatile("bkpt #0");
 			asm volatile("mov r0, #0x1 \n ldr r0, [r0]");
 			break;
 		case 'u':
 			//undefined instruction
-			kprintf("test: undefined interrupt by thread\n");
+			//kprintf("test: undefined interrupt by thread\n");
 			asm volatile("udf");
 			break;
 		case 'c':
 			//register checker ausführen
-			kprintf("test: register checker\n");
+			//kprintf("test: register checker\n");
 			register_checker();
 			end_this_thread();
 			break;

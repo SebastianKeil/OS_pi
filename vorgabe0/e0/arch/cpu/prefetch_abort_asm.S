@@ -35,10 +35,22 @@ stmfd	sp!, {r0-r5}
 
 mov		r0, sp //give sp to c function
 
-bl 		irq //evtl mov ldr statt bl	
+bl 		prefetch_abort //evtl mov ldr statt bl	
 //hier gehts noch nicht hin :)
-ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
-ldmfd	sp!, {r0- r12} 
+//ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
+//ldmfd	sp!, {r0- r12} 
+//ldmfd	sp!, {lr}		//load necesessary registers before 
+//ldmfd	sp!, {r0- r12} 
+//movs	pc, lr
+
+ldmfd	sp!, {r0 - r7}
+ldmfd	sp!, {r0 - r8}  //remove unnecessary items from stack
+
+ldmfd	sp!, {r0}		//load new spsr
+msr		SPSR_cxsf, r0
+
+ldmfd	sp!, {r0- r2} 	// remove unnecessary items from stack
+
 ldmfd	sp!, {lr}		//load necesessary registers before 
 ldmfd	sp!, {r0- r12} 
 movs	pc, lr

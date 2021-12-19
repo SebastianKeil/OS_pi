@@ -5,7 +5,7 @@
 
 #define LR		21
 #define SP		19
-#define CPSR	18
+#define CPSR	17
 #define USER_MODE 0x10
 
 #define THREAD_COUNT	32
@@ -72,7 +72,7 @@ void print_list_elem(unsigned int _j){
 }	
 
 void print_ready_queue(){
-	//return;
+	return;
 	kprintf("\n");
 	//kprintf("queue has %i active threads:\n", used_tcbs);
 	//kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
@@ -183,8 +183,8 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char)){
 
 	free_tcb->pc = (unsigned int) unterprogramm;
-	//free_tcb->cpsr = USER_MODE;
-
+	free_tcb->cpsr = USER_MODE;
+	
 	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
 	decrease_sp(&free_tcb->sp, (count * sizeof(unsigned char*)));
 	kmemcpy((void*)free_tcb->sp, data, count * sizeof(unsigned char*));
@@ -194,7 +194,7 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogr
 	//DEBUG
 	free_tcb->data = *data;
 	
-	kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
+	//kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
@@ -234,7 +234,7 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 		
 	//DEBUG
 	//print_ready_queue();
-	kprintf("\ncreating threads[%i] with char: %c\n", free_tcb->id, *data);
+	//kprintf("\ncreating threads[%i] with char: %c\n", free_tcb->id, *data);
 	
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
 	push_tcb_to_ready_queue(thread_id, irq_regs);
@@ -243,13 +243,13 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	
 	//DEBUG
 	print_ready_queue();
-	kprintf("leaving create thread..\n");
+	//kprintf("leaving create thread..\n");
 }
 
 void kill_thread(unsigned int regs[]){
 	//killing the only thread
 	if(used_tcbs == 1){
-		kprintf("\nkilling last thread [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
+		//kprintf("\nkilling last thread [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr = 0x0;
 		regs[LR] = (unsigned int) &idle_thread;	
@@ -258,7 +258,7 @@ void kill_thread(unsigned int regs[]){
 		//print_ready_queue();
 		
 	}else if(used_tcbs > 1){
-		kprintf("\nkilling [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
+		//kprintf("\nkilling [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr->next->prev = ready_queue->curr->prev;
 		ready_queue->curr->prev->next = ready_queue->curr->next;

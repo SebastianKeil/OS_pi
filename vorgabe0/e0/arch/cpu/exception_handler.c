@@ -36,7 +36,7 @@ unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 
 void undefined_instruction(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		kprintf("kill thread because undefined instruction\n");
+		//kprintf("kill thread because undefined instruction\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, UND);
@@ -48,7 +48,6 @@ void software_interrupt(unsigned int regs[35]){
 		//for svc calls:
 		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		//if(svc_imm == 69) kprintf(" KILLED ");
-		kprintf("svc came from user\n");
 		kill_thread(regs);
 		
 	} else {
@@ -57,9 +56,8 @@ void software_interrupt(unsigned int regs[35]){
 	}
 }
 void prefetch_abort(unsigned int regs[35]){
-	kprintf("prefetch exception!!\n");
 	if(define_mode(regs[17]) == USER_MODE){
-		kprintf("kill thread because prefetch abort\n");
+		//kprintf("kill thread because prefetch abort\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, PRE);
@@ -68,7 +66,7 @@ void prefetch_abort(unsigned int regs[35]){
 }
 void data_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		kprintf("kill thread because data abort\n");
+		//kprintf("kill thread because data abort\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, DATA_ABORT);
@@ -76,9 +74,8 @@ void data_abort(unsigned int regs[35]){
 	}
 }
 void fiq(unsigned int regs[35]){
-	kprintf("fiq exception!!\n");
 	if(define_mode(regs[17]) == USER_MODE){
-		kprintf("kill thread because fiq\n");
+		//kprintf("kill thread because fiq\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, FIQ);
@@ -91,7 +88,6 @@ unsigned int uart_pending;
 unsigned char uart_data;
 
 void irq(unsigned int regs[]){
-	kprintf("irq exception!!\n");
 	//kprintf("\nirq_handler: there is an irq interrupt!\n");
 	if(print_register_dump){
 		print_reg_dump(regs, IRQ);
@@ -103,7 +99,7 @@ void irq(unsigned int regs[]){
 		uart_data = uart_read();
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
-		kprintf("leaving exception_handler.. \n");
+		//kprintf("leaving exception_handler.. \n");
 		
 	}else if(sys_timer_pending){
 		kprintf("!");
