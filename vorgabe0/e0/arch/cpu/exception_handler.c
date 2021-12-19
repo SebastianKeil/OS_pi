@@ -36,7 +36,7 @@ unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 
 void undefined_instruction(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kprintf("kill thread because undefined instruction\n");
+		kprintf("kill thread because undefined instruction\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, UND);
@@ -57,7 +57,7 @@ void software_interrupt(unsigned int regs[35]){
 }
 void prefetch_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kprintf("kill thread because prefetch abort\n");
+		kprintf("kill thread because prefetch abort\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, PRE);
@@ -66,7 +66,7 @@ void prefetch_abort(unsigned int regs[35]){
 }
 void data_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kprintf("kill thread because data abort\n");
+		kprintf("kill thread because data abort\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, DATA_ABORT);
@@ -75,7 +75,7 @@ void data_abort(unsigned int regs[35]){
 }
 void fiq(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//kprintf("kill thread because fiq\n");
+		kprintf("kill thread because fiq\n");
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, FIQ);
