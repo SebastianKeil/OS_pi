@@ -2,6 +2,12 @@
 
 software_interrupt_asm:
 
+//TODO_/_/_/_/_/_/_/_/_/ TODO _/_/_/_/_/_/_/_/_/ TODO
+//falls svc für put char oder kprintf ausgelöst wurde, müssen die entsprecheneden parameter 
+//abgesichert und weitergegeben werden, da im exeption_handler.c diese daten erwartet werden!
+//TODO_/_/_/_/_/_/_/_/_/ TODO _/_/_/_/_/_/_/_/_/ TODO
+
+
 //Undef/SVC in Decode erkannt also auslösende Instruktion + 4, 
 //aber Instruktion soll übersprungen werden => keine Manipulation vom LR/PC notwendig
 sub 	r14, r14, #0  	//Offset abziehen für nahtlose Fortführung

@@ -9,6 +9,7 @@
 #include <arch/cpu/shared.h>
 #include <kernel/idle_thread.h>
 #include <arch/bsp/thread_admin.h>
+#include <user/masterprogramm.h>
 
 
 
@@ -63,7 +64,7 @@ void start_kernel(){
 		/*change to user mode*/
 		asm ("cps #0x10");
 		
-		idle_thread();
+		masterprogramm();
 	}
 }
 

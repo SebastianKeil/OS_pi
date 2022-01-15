@@ -1,26 +1,17 @@
 #include <user/user_lib/user_syscalls.h>
 #include <config.h>
 #include <lib/regcheck.h>
-#include <lib/unterprogramm.h>
-
-unsigned char char_for_unterprogramm;
-unsigned int buffer_count;
+#include <user/unterprogramm.h>
+#include <kernel/kprintf.h>
 
 
 
-void print_answer(unsigned char *input){
-	for(int i = 0; i < 10; i++){
-		kprintf("%c", *input);
-		
-		//TODO_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-		//sleep(BUSY_WAIT_COUNTER*20);
-	}
-	return;
-}
-
-void masterprogramm(unsigned char *input){
-	unsigned char character = *input;
-	switch(character){
+void masterprogramm(){	
+	kprintf("entering masterprogramm..\n");
+	unsigned char input = syscall_get_char();
+	
+	/*
+	switch(input){
 		case 's':
 			//supervisor call
 			//kprintf("test: supervisor interrupt by thread\n");
@@ -53,11 +44,15 @@ void masterprogramm(unsigned char *input){
 			break;
 		default:
 			//kprintf("unterprogramm laeuft mit: %c\n", input);
-			print_answer(input);
+			syscall_create_thread(input, )
 			
 			//TODO_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 			//end_this_thread();
 			
 			break;
 	}
+	*/
 }
+
+
+

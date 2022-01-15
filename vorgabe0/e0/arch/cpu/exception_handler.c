@@ -43,18 +43,49 @@ void undefined_instruction(unsigned int regs[35]){
 	while(1);
 	}
 }
+
+/*_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+syscall_put_char(unsigned char c)	->	asm volatile("svc #42");		
+syscall_get_char()					->	asm volatile("svc #43");
+syscall_kill_thread()				->	asm volatile("svc #69");
+syscall_create_thread()				->	asm volatile("svc #44");
+syscall_sleep_thread()				->	asm volatile("svc #45");
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_*/
+
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		//for svc calls:
-		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
-		//if(svc_imm == 69) kprintf(" KILLED ");
-		kill_thread(regs);
-		
+		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
+		switch(svc_imm){
+			case 42:
+				kprintf("\n");
+				break;
+				
+			case 43:
+				kprintf("get char for me!\n");
+				//char must be in $r0
+				break;
+				
+			case 69:
+				kprintf("\n");
+				kill_thread(regs);
+				break;
+				
+			case 44:
+				kprintf("\n");
+				break;
+				
+			case 45:
+				kprintf("\n");
+				break;
+		}
 	} else {
 		print_reg_dump(regs, SVC);
 		while(1);
 	}
 }
+
+
 void prefetch_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		//kprintf("kill thread because prefetch abort\n");
@@ -99,6 +130,7 @@ void irq(unsigned int regs[]){
 		uart_data = uart_read();
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
+		
 		//kprintf("leaving exception_handler.. \n");
 		
 	}else if(sys_timer_pending){
