@@ -337,31 +337,38 @@ void kill_thread(unsigned int regs[]){
 }
 
 void wait_thread(unsigned int sleep_time, unsigned int regs[]){
-	if (sleep_time == 0){
-		sleep_time = 1;
-	}
-	//TODO 
-	//thread wird aus ready_queue (<-pointer) entfernt, inklusive kontextwechsel! (ähnlich wie bei kill_thread() mit used_tcbs>1)
-	//thread wird in waiting_queue (<-pointer) eingereiht (ähnlich wie bei push_tcb_to_ready_queue())
 
 	ready_queue->curr->sleep_time = sleep_time; // (sleep_time==0 && thread is in waiting_queue) -> thread is waiting for char
 												// (sleep_time>0 && thread is in waiting_queue) -> thread is sleeping
 	//TODO 
-	if(used_tcbs == 1){
-		//nur teile kopiert von  kill_thread()
-		ready_queue->curr = 0x0;
+	if(waiting_queue->count == 0){
+		//verschiebe ready_queue->curr zu waiting_queue->curr
+		waiting_queue->cur = ready_queue->curr;
+		waiting_queue->last = ready_queue->curr;
+		waiting_queue->curr->next = waiting_queue->curr;
+		waiting_queue->curr->prev = waiting_queue->curr;
 		
+	} else if(waiting_queue->count == 1){ 	
+		waiting_queue->curr->next = ready_queue->curr;
+		waiting_queue->curr->prev = ready_queue->curr;
+		ready_queue->curr->next = waiting_queue->curr;
+		ready_queue->curr->prev = waiting_queue->curr;
+		waiting_queue->last = ready_queue->curr;
 		
-	}else if(used_tcbs > 1){
-		//nur teile kopiert von  kill_thread()
-		ready_queue->curr->next->prev = ready_queue->curr->prev;
-		ready_queue->curr->prev->next = ready_queue->curr->next;
-		ready_queue->curr = ready_queue->curr->next;
-		load_context(regs, ready_queue->curr->context);
+	}else{
+		waiting_queue->last->next = ready_queue->curr;
+		ready_queue->curr->prev = waiting_queue->last;
+		ready_queue->curr->next = waiting_queue->curr;
+		waiting_queue->curr->prev = ready_queue->curr;
+		waiting_queue->last = ready_queue->curr;
 	}
 	
+	//"lösche" ready_queue->curr aus ready_queue + kontextwechsel 
+	ready_queue->curr->next->prev = ready_queue->curr->prev;
+	ready_queue->curr->prev->next = ready_queue->curr->next;
+	ready_queue->curr = ready_queue->curr->next;
+	load_context(regs, ready_queue->curr->context);
 }
-
 
 
 
