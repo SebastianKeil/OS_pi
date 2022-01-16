@@ -60,18 +60,10 @@ syscall_sleep_thread()				->	asm volatile("svc #45");
 
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
-		//for svc calls:
-<<<<<<< HEAD
-		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
-		//if(svc_imm == 69) kprintf(" KILLED ");
-		kprintf("kill thread because svc!?\n");
-		kill_thread(regs);
-		
-=======
+		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		unsigned int sleep_time = regs[34];
 		unsigned char char_send = regs[34];
 		struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
-		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		switch(svc_imm){
 			case 42:
 				kprintf("%c", char_send);
@@ -105,10 +97,9 @@ void software_interrupt(unsigned int regs[35]){
 				wait_thread(sleep_time, regs);
 				break;
 		}
->>>>>>> splitFunction
 	} else {
 		print_reg_dump(regs, SVC);
-		while(1); //muss das nicht weg?
+		while(1);
 	}
 }
 
