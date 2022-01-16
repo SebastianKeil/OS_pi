@@ -340,10 +340,11 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 
 	ready_queue->curr->sleep_time = sleep_time; // (sleep_time==0 && thread is in waiting_queue) -> thread is waiting for char
 												// (sleep_time>0 && thread is in waiting_queue) -> thread is sleeping
+	struct list_elem *temp_curr = ready_queue->curr;
 	//TODO 
 	if(waiting_queue->count == 0){
 		//verschiebe ready_queue->curr zu waiting_queue->curr
-		waiting_queue->cur = ready_queue->curr;
+		waiting_queue->curr = ready_queue->curr;
 		waiting_queue->last = ready_queue->curr;
 		waiting_queue->curr->next = waiting_queue->curr;
 		waiting_queue->curr->prev = waiting_queue->curr;
@@ -363,17 +364,21 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 		waiting_queue->last = ready_queue->curr;
 	}
 	
-	//"lösche" ready_queue->curr aus ready_queue + kontextwechsel 
-	ready_queue->curr->next->prev = ready_queue->curr->prev;
-	ready_queue->curr->prev->next = ready_queue->curr->next;
-	ready_queue->curr = ready_queue->curr->next;
-	load_context(regs, ready_queue->curr->context);
+	//ready_queue neu sortieren
+	if(ready_queue->count == 1){
+		ready_queue->curr = 0x0;
+		regs[LR] = (unsigned int) &idle_thread;
+		
+	} else if(ready_queue->count > 1){
+		temp_curr->next->prev = temp_curr->prev;
+		temp_curr->prev->next = temp_curr->next;
+		ready_queue->curr = temp_curr->next;
+		load_context(regs, ready_queue->curr->context);
+	}
+	
+	ready_queue->count--;
+	waiting_queue->count++;
 }
-
-
-
-
-
 
 
 
