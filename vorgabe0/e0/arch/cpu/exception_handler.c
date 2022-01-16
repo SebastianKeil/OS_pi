@@ -29,6 +29,12 @@
 #define UND_MODE	27 //11011
 #define SYS_MODE	31 //11111
 
+struct _thread_create_context{ 
+	unsigned char* data;
+	unsigned int count;
+	void (*unterprogramm)(unsigned char*);
+};
+
 unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 	unsigned int svc_imm = instruction & bit_mask;
 	return svc_imm;
@@ -63,7 +69,20 @@ void software_interrupt(unsigned int regs[35]){
 				
 			case 43:
 				kprintf("get char for me!\n");
-				//char must be in $r0
+				
+				//char must be in $r0 when returning
+				if(uart_input_buffer.count > 0){
+					unsigned char received_char = buffer_pull(&uart_input_buffer);
+					//TODO_
+					//aufrufender thread erwartet received_char in $r0
+					//asm("move r0, r1"::"r"(received_char)); ????
+					return;
+				} else {
+					//thread muss auf uart warten (irq -> uart_pending)
+					//thread in waiting queue einreihen
+					//wait_thread(regs);
+				}
+				
 				break;
 				
 			case 69:
@@ -72,7 +91,11 @@ void software_interrupt(unsigned int regs[35]){
 				break;
 				
 			case 44:
-				kprintf("\n");
+				kprintf("create thread for me!\n");
+				struct _thread_create_context *_thread_create_context_ptr;
+				//in den grade erstellten struct* (<-pointer) laden wir die adresse aus $r0 um zugriff zu bekommen (trotz trennung usr<->os):
+				//asm("move r1, r0":"+r"(thread_create_context_ptr):); ????
+				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
 			case 45:
@@ -129,7 +152,10 @@ void irq(unsigned int regs[]){
 		//kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
 		buffer_push(uart_data, &uart_input_buffer);
-		check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
+		//TODO
+		//check_for_waiting_threads();
+		
+		//check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
 		
 		//kprintf("leaving exception_handler.. \n");
 		

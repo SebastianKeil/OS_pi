@@ -56,9 +56,13 @@ void scheduler(unsigned int regs[35]);
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 int find_free_tcb(void);
 void decrease_sp(unsigned int* _sp, unsigned int size);
-unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)());
+unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)(unsigned char*));
+unsigned int fill_tcb_simple(void (*unterprogramm)(unsigned char*));
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
-void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(), unsigned int regs[]);
+void push_tcb_to_ready_queue_simple(unsigned int thread_id);
+void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int regs[]);
+void create_thread_simple(void (*unterprogramm)(unsigned char*));
 void kill_thread(unsigned int regs[]);
+void wait_thread(unsigned int regs[]);
 
 #endif

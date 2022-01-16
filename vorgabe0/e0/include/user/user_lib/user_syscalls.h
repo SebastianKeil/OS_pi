@@ -14,7 +14,7 @@ syscall_sleep_thread()				->	asm volatile("svc #45");
 void syscall_put_char(unsigned char c);
 unsigned char syscall_get_char(void);
 void syscall_kill_thread();
-void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(), unsigned int regs[]);
+void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*));
 void syscall_sleep_thread();
 
 #endif

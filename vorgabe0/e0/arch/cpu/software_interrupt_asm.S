@@ -3,8 +3,8 @@
 software_interrupt_asm:
 
 //TODO_/_/_/_/_/_/_/_/_/ TODO _/_/_/_/_/_/_/_/_/ TODO
-//falls svc für put char oder kprintf ausgelöst wurde, müssen die entsprecheneden parameter 
-//abgesichert und weitergegeben werden, da im exeption_handler.c diese daten erwartet werden!
+//falls svc für put char oder create_thread ausgelöst wurde, müssen die entsprecheneden parameter (in $r1 als struct*?)
+//abgelegt und weitergegeben werden, da im exeption_handler.c diese daten erwartet werden!
 //TODO_/_/_/_/_/_/_/_/_/ TODO _/_/_/_/_/_/_/_/_/ TODO
 
 
@@ -40,6 +40,7 @@ mrs		r0, spsr_und
 stmfd	sp!, {r0-r5}
 
 mov		r0, sp //give sp to c function
+
 
 bl 		software_interrupt
 //hier gehts noch nicht hin :)

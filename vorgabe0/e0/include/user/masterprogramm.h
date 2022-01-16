@@ -2,6 +2,6 @@
 #define _UNTERPROGRAMM_H
 
 
-void masterprogramm();
+void masterprogramm(unsigned char *void_char);
 
 #endif
