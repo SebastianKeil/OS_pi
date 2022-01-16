@@ -94,11 +94,11 @@ void software_interrupt(unsigned int regs[35]){
 				
 			case 44:
 				kprintf("create thread for me!\n");
-				struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[34];
+				struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
 				//in den grade erstellten struct* (<-pointer) laden wir die adresse aus $r0 um zugriff zu bekommen (trotz trennung usr<->os):
 				//asm("move r1, r0":"+r"(thread_create_context_ptr):); ????
 				kprintf("test2\n");
-				kprintf("%p\n", _thread_create_context_ptr->data);
+				kprintf("%c\n", *(_thread_create_context_ptr->data));
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				

@@ -26,10 +26,8 @@ struct thread_create_context{
 void syscall_put_char(unsigned char c){
 	unsigned int character = (unsigned int)c;
 	asm volatile 	("stmfd sp!, {r0}");
-	asm volatile 	("mov r0, %0\n\t"	
-					"svc #42\n\t"
-					: 
-					: "r" (character));
+	asm volatile	("mov r0, %0" : : "r" (character));
+	asm volatile	("svc #42");
 	asm volatile 	("ldmfd sp!, {r0}");
 }
 
@@ -61,18 +59,14 @@ void syscall_create_thread(unsigned char* data, unsigned int count, void (*unter
 	thread_create_context.unterprogramm = unterprogramm;
 	kprintf("test1\n");
 	asm volatile	("stmfd sp!, {r0}");
-	asm volatile 	("mov r0, %0\n\t"	
-					"svc #44\n\t"
-					: 
-					: "r" (&thread_create_context));
+	asm volatile	("mov r0, %0" : : "r" (&thread_create_context));
+	asm volatile	("svc #44");
 	asm volatile 	("ldmfd sp!, {r0}");
 }
 
 void syscall_sleep_thread(unsigned int length){
 	asm volatile	("stmfd sp!, {r0}");
-	asm volatile 	("mov r0, %0\n\t"	
-					"svc #45\n\t"
-					: 
-					: "r" (length));
+	asm volatile	("mov r0, %0" : : "r" (length));
+	asm volatile	("svc #45");
 	asm volatile 	("ldmfd sp!, {r0}");
 }
