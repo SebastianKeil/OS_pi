@@ -61,6 +61,7 @@ syscall_sleep_thread()				->	asm volatile("svc #45");
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		//for svc calls:
+		unsigned int sleep_time = regs[34];
 		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		switch(svc_imm){
 			case 42:
@@ -72,7 +73,7 @@ void software_interrupt(unsigned int regs[35]){
 				break;
 				
 			case 43:
-				kprintf("get char for me!\n");
+				//kprintf("get char for me!\n");
 				
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
@@ -104,7 +105,6 @@ void software_interrupt(unsigned int regs[35]){
 				
 			case 45:
 				kprintf("make me sleep!\n");
-				unsigned int sleep_time = regs[34];
 				//in $r0 ist ein int für die dauer der sleep-zeit (genaue bedeutung des int können wir selbst festlegen: in sekunden oder in zeitscheiben)
 				if (sleep_time == 0){
 					sleep_time = 1;
