@@ -2,6 +2,10 @@
 #include <config.h>
 #include <lib/regcheck.h>
 #include <lib/unterprogramm.h>
+#include <user/user_lib/user_syscalls.h>
+
+#define LOWER_BOUND_UPPER_CASE 65
+#define UPPER_BOUND_UPPER_CASE 90
 
 unsigned char char_for_unterprogramm;
 unsigned int buffer_count;
@@ -13,18 +17,30 @@ void sleep(unsigned int ticks){
 
 void print_answer(unsigned char *input){
 	for(int i = 0; i < 10; i++){
-		kprintf("%c", *input);
-		sleep(BUSY_WAIT_COUNTER*20);
+	syscall_put_char("%c", *input);
+		syscall_sleep_thread(1);
 	}
 	return;
 }
 
-void end_this_thread(){
-	asm volatile("svc #69");
+void print_answer_uppercase(unsigned char *input){
+	for(int i = 0; i < 10; i++){
+	syscall_put_char("%c", *input);
+	sleep(BUSY_WAIT_COUNTER*20);
+	}
+	return;
 }
 
 void unterprogramm(unsigned char *input){
 	unsigned char character = *input;
+	unsigned int range = (unsigned int)character;
+
+	if (range >= LOWER_BOUND_UPPER_CASE && range <= UPPER_BOUND_UPPER_CASE){
+		print_answer_uppercase(input);
+		end_this_thread();	
+		return;
+	}
+
 	switch(character){
 		case 's':
 			//supervisor call
@@ -51,12 +67,12 @@ void unterprogramm(unsigned char *input){
 			//register checker ausführen
 			//kprintf("test: register checker\n");
 			register_checker();
-			end_this_thread();
+			syscall_kill_thread();
 			break;
 		default:
 			//kprintf("unterprogramm laeuft mit: %c\n", input);
 			print_answer(input);
-			end_this_thread();
+			syscall_kill_thread();
 			break;
 	}
 }
