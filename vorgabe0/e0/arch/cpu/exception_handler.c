@@ -29,6 +29,12 @@
 #define UND_MODE	27 //11011
 #define SYS_MODE	31 //11111
 
+struct _thread_create_context{ 
+	unsigned char* data;
+	unsigned int count;
+	void (*unterprogramm)(unsigned char*);
+};
+
 unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 	unsigned int svc_imm = instruction & bit_mask;
 	return svc_imm;
@@ -43,19 +49,70 @@ void undefined_instruction(unsigned int regs[35]){
 	while(1);
 	}
 }
+
+/*_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+syscall_put_char(unsigned char c)	->	asm volatile("svc #42");		
+syscall_get_char()					->	asm volatile("svc #43");
+syscall_kill_thread()				->	asm volatile("svc #69");
+syscall_create_thread()				->	asm volatile("svc #44");
+syscall_sleep_thread()				->	asm volatile("svc #45");
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_*/
+
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		//for svc calls:
+<<<<<<< HEAD
 		//unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		//if(svc_imm == 69) kprintf(" KILLED ");
 		kprintf("kill thread because svc!?\n");
 		kill_thread(regs);
 		
+=======
+		unsigned int sleep_time = regs[34];
+		unsigned char char_send = regs[34];
+		struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
+		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
+		switch(svc_imm){
+			case 42:
+				kprintf("%c", char_send);
+				break;
+				
+			case 43:
+				if(uart_input_buffer.count > 0){
+					unsigned char received_char = buffer_pull(&uart_input_buffer);
+					asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
+					return;
+				} else {
+					//thread muss auf uart warten (irq -> uart_pending)
+					//thread in waiting queue einreihen
+					wait_thread(0, regs);
+				}
+				
+				break;
+				
+			case 69:
+				kill_thread(regs);
+				break;
+				
+			case 44:
+				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
+				break;
+				
+			case 45:
+				if (sleep_time == 0){
+					sleep_time = 1;
+				}
+				wait_thread(sleep_time, regs);
+				break;
+		}
+>>>>>>> splitFunction
 	} else {
 		print_reg_dump(regs, SVC);
-		while(1);
+		while(1); //muss das nicht weg?
 	}
 }
+
+
 void prefetch_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		kprintf("kill thread because prefetch abort\n");
@@ -99,7 +156,11 @@ void irq(unsigned int regs[]){
 		//kprintf("uart is pending, push char to buffer\n");
 		uart_data = uart_read();
 		buffer_push(uart_data, &uart_input_buffer);
-		check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
+		//TODO
+		//check_for_waiting_threads();
+		
+		//check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
+		
 		//kprintf("leaving exception_handler.. \n");
 		
 	}else if(sys_timer_pending){

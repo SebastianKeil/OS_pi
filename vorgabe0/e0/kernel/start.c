@@ -9,11 +9,13 @@
 #include <arch/cpu/shared.h>
 #include <kernel/idle_thread.h>
 #include <arch/bsp/thread_admin.h>
+#include <user/masterprogramm.h>
+#include <user/user_lib/user_syscalls.h>
 
 
 
 volatile unsigned int counter = 0;
-volatile unsigned char received_char;
+unsigned char void_char;
 
 void increment_counter() {
 	counter++;
@@ -54,6 +56,15 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	kprintf("Hallo ich bin der Kernel, starte print-threads: \n\n");
 	kprintf("\n");
+	
+	/*change to user mode*/
+		asm ("cps #0x10");
+		
+		void_char = 'v';
+		//initial thread
+		syscall_create_thread(&void_char, 0, &masterprogramm);
+		
+		//create_thread_simple(&masterprogramm);
 
 
 	// Endless counter
@@ -61,9 +72,10 @@ void start_kernel(){
 		increment_counter();
 		
 		/*change to user mode*/
-		asm ("cps #0x10");
+		//asm ("cps #0x10");
 		
-		idle_thread();
+		//initial thread
+		//create_thread_simple(&masterprogramm);
 	}
 }
 

@@ -46,14 +46,19 @@ struct list_elem{
 	struct list_elem *next;
 	struct list_elem *prev;
 	struct tcb *context;
+	unsigned int sleep_time;
 };
 struct list{
 	struct list_elem *curr;
 	struct list_elem *last;
+	unsigned int count;
 	//struct list_elem * elements[32];
 };
-struct list queue;
-struct list *ready_queue = &queue;
+struct list r_queue;
+struct list *ready_queue = &r_queue;
+struct list w_queue;
+struct list *waiting_queue = &w_queue;
+
 struct list_elem threads[THREAD_COUNT];
 
 
@@ -92,6 +97,13 @@ void print_ready_queue(){
 void init_ready_queue(){
 	ready_queue->curr = 0x0;
 	ready_queue->last = 0x0;
+	ready_queue->count = 0;
+}
+
+void init_waiting_queue(){
+	waiting_queue->curr = 0x0;
+	waiting_queue->last = 0x0;
+	waiting_queue->count = 0;
 }
 
 void init_all_tcbs(){
@@ -113,7 +125,9 @@ void init_thread_slots(){
 void init_thread_admin(){
 	kprintf("INIT THREAD ADMIN\n");
 	init_ready_queue();
+	init_waiting_queue();
 	kprintf("now ready_queue->curr: %p\n", ready_queue->curr);
+	kprintf("now waiting_queue->curr: %p\n", waiting_queue->curr);
 	init_all_tcbs();
 	init_thread_slots();
 }
@@ -152,7 +166,12 @@ void scheduler(unsigned int regs[]){
 		
 		//DEBUG
 		print_ready_queue();
-	}else //kprintf("active threads: %i\n", used_tcbs);
+	}else if(ready_queue->curr->context->data == '#'){ // # = masterprogramm
+		load_context(regs, ready_queue->curr->next->context);
+	}
+	
+	
+	//kprintf("active threads: %i\n", used_tcbs);
 	return;
 }
 
@@ -180,7 +199,7 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 	}
 }
 
-unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char)){
+unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
 
 	free_tcb->pc = (unsigned int) unterprogramm;
 	free_tcb->cpsr = USER_MODE;
@@ -195,6 +214,22 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogr
 	free_tcb->data = *data;
 	
 	//kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
+	free_tcb->in_use = 1;
+	return free_tcb->id;
+}
+
+unsigned int fill_tcb_simple(void (*unterprogramm)(unsigned char*)){
+
+	free_tcb->pc = (unsigned int) unterprogramm;
+	free_tcb->cpsr = USER_MODE;
+	
+	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
+	
+	
+	//DEBUG # stands for masterprogramm
+	free_tcb->data = '#';
+	
+	kprintf("tcb[%i]: pc->%c\n", free_tcb->id, (unsigned char)free_tcb->pc);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
@@ -225,9 +260,19 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 		ready_queue->curr->prev = &threads[thread_id];
 		ready_queue->last = &threads[thread_id];
 	}
+	
+	ready_queue->count ++;
+	threads[thread_id].sleep_time = 0;
 }
 
-void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char), unsigned int irq_regs[]){
+void push_tcb_to_ready_queue_simple(unsigned int thread_id){								
+	ready_queue->curr = &threads[thread_id];
+	ready_queue->last = &threads[thread_id];
+	ready_queue->curr->next = ready_queue->curr;
+	ready_queue->curr->prev = ready_queue->curr;
+}
+
+void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int irq_regs[]){
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;}
@@ -235,7 +280,6 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	//DEBUG
 	//print_ready_queue();
 	//kprintf("\ncreating threads[%i] with char: %c\n", free_tcb->id, *data);
-	
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
 	push_tcb_to_ready_queue(thread_id, irq_regs);
 	used_tcbs ++;
@@ -245,6 +289,20 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	print_ready_queue();
 	//kprintf("leaving create thread..\n");
 }
+
+/*void create_thread_simple(void (*unterprogramm)(unsigned char)){
+	if(!find_free_tcb()){
+		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
+		return;}
+	unsigned int thread_id = fill_tcb_simple(unterprogramm);
+	push_tcb_to_ready_queue_simple(thread_id);
+	used_tcbs ++;
+	find_free_tcb();
+	
+	//DEBUG
+	print_ready_queue();
+	//kprintf("leaving create thread..\n");
+}*/
 
 void kill_thread(unsigned int regs[]){
 	//killing the only thread
@@ -266,6 +324,7 @@ void kill_thread(unsigned int regs[]){
 		load_context(regs, ready_queue->curr->context);
 	}
 	used_tcbs--;
+	ready_queue->count--;
 	
 	
 	//DEBUG
@@ -274,11 +333,49 @@ void kill_thread(unsigned int regs[]){
 	return;
 }
 
+void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 
-
-
-
-
+	ready_queue->curr->sleep_time = sleep_time; // (sleep_time==0 && thread is in waiting_queue) -> thread is waiting for char
+												// (sleep_time>0 && thread is in waiting_queue) -> thread is sleeping
+	struct list_elem *temp_curr = ready_queue->curr;
+	//TODO 
+	if(waiting_queue->count == 0){
+		//verschiebe ready_queue->curr zu waiting_queue->curr
+		waiting_queue->curr = ready_queue->curr;
+		waiting_queue->last = ready_queue->curr;
+		waiting_queue->curr->next = waiting_queue->curr;
+		waiting_queue->curr->prev = waiting_queue->curr;
+		
+	} else if(waiting_queue->count == 1){ 	
+		waiting_queue->curr->next = ready_queue->curr;
+		waiting_queue->curr->prev = ready_queue->curr;
+		ready_queue->curr->next = waiting_queue->curr;
+		ready_queue->curr->prev = waiting_queue->curr;
+		waiting_queue->last = ready_queue->curr;
+		
+	}else{
+		waiting_queue->last->next = ready_queue->curr;
+		ready_queue->curr->prev = waiting_queue->last;
+		ready_queue->curr->next = waiting_queue->curr;
+		waiting_queue->curr->prev = ready_queue->curr;
+		waiting_queue->last = ready_queue->curr;
+	}
+	
+	//ready_queue neu sortieren
+	if(ready_queue->count == 1){
+		ready_queue->curr = 0x0;
+		regs[LR] = (unsigned int) &idle_thread;
+		
+	} else if(ready_queue->count > 1){
+		temp_curr->next->prev = temp_curr->prev;
+		temp_curr->prev->next = temp_curr->next;
+		ready_queue->curr = temp_curr->next;
+		load_context(regs, ready_queue->curr->context);
+	}
+	
+	ready_queue->count--;
+	waiting_queue->count++;
+}
 
 
 

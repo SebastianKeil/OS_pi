@@ -1,7 +1,7 @@
 #include <kernel/kprintf.h>
 #include <lib/regcheck.h>
 #include <arch/cpu/shared.h>
-#include <lib/unterprogramm.h>
+#include <user/unterprogramm.h>
 #include <arch/bsp/thread_admin.h>
 
 int print_register_dump;
@@ -46,7 +46,7 @@ void check_for_interrupts(unsigned char data, unsigned int regs[35]){
 			break;
 			
 		default:
-			create_thread(&receive_buffer, 1, &unterprogramm, regs);
+			//create_thread(&receive_buffer, 1, &unterprogramm, regs);
 			//kprintf("leaving check_interrupts..\n");
 			break;
 	}
