@@ -14,7 +14,7 @@ void idle_thread(){
 	//asm volatile ("wfi");
 	kprintf("entering idle thread!\n");
 	while(1){
-		kprintf("power saving..\n");
+		//kprintf("power saving..\n");
 		sleeps(100000000);
 	}
 }

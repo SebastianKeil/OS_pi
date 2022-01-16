@@ -15,10 +15,22 @@ struct thread_create_context{
 	void (*unterprogramm)(unsigned char*);
 } thread_create_context;
 
-
+	//Unterschied?????????????????????????????????????????????????????????????????????????????????????????
+	// asm volatile 	("mov r0 %0\n\t"	
+	// 				"svc #42\n\t"
+	// 				: 
+	// 				: "r" (character));
+	// asm volatile	("mov r0, %0" : : "r" (character));
+	// asm volatile	("svc #42");
 
 void syscall_put_char(unsigned char c){
-	asm volatile ("svc #42");
+	unsigned int character = (unsigned int)c;
+	asm volatile 	("stmfd sp!, {r0}");
+	asm volatile 	("mov r0, %0\n\t"	
+					"svc #42\n\t"
+					: 
+					: "r" (character));
+	asm volatile 	("ldmfd sp!, {r0}");
 }
 
 
@@ -30,37 +42,37 @@ return a;
 }*/
 
 unsigned char syscall_get_char(void){
-	unsigned char received_char;
-	
-	//hier: speicher $r0 auf stack??	<-----------------------,
-	//															|
-	asm volatile ("svc #43");//									|
-	//OS gibt uns den char in $r0. dann in variable laden:		|
-	//asm("mov %1, %0" : "+r" (received_char):); richtig???		|
-	//															|
-	//evtl hier: $r0 vom stack wiederherstellen!	<-----------'
-	
+	asm volatile 	("stmfd sp!, {r0}\t\n" 
+				 	"svc #43");
+	register unsigned char received_char asm ("r0");
+	asm volatile 	("ldmfd sp!, {r0}");
+	kprintf("%c", received_char);
 	return received_char;
 }
 
 void syscall_kill_thread(){
-	asm volatile("svc #69");
+	asm volatile 	("svc #69");
 }
 
 void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
+	
 	thread_create_context.data = data;
 	thread_create_context.count = count;
 	thread_create_context.unterprogramm = unterprogramm;
-	
-	//evtl $r0 auf stack wegspeicher!?	<-----------------------------------------------,
-	//jetzt thread_create_context* (<-pointer!) in $r0 legen							|
-	//in der svc behandlung werden die daten gebraucht um thread_create aufzurufen		|
-	//asm("mov %1, %0" : : "r" (&thread_create_context)); richtig???					|
-	asm volatile("svc #44");//															|
-	//$r0 vom stack wiederherstellen !?	<-----------------------------------------------'
-	
+	kprintf("test1\n");
+	asm volatile	("stmfd sp!, {r0}");
+	asm volatile 	("mov r0, %0\n\t"	
+					"svc #44\n\t"
+					: 
+					: "r" (&thread_create_context));
+	asm volatile 	("ldmfd sp!, {r0}");
 }
 
-void syscall_sleep_thread(){
-	asm volatile ("svc #45");
+void syscall_sleep_thread(unsigned int length){
+	asm volatile	("stmfd sp!, {r0}");
+	asm volatile 	("mov r0, %0\n\t"	
+					"svc #45\n\t"
+					: 
+					: "r" (length));
+	asm volatile 	("ldmfd sp!, {r0}");
 }

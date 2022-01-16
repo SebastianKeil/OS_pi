@@ -273,6 +273,7 @@ void push_tcb_to_ready_queue_simple(unsigned int thread_id){
 }
 
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int irq_regs[]){
+	kprintf("test3 \n");
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;}
@@ -280,8 +281,9 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	//DEBUG
 	//print_ready_queue();
 	//kprintf("\ncreating threads[%i] with char: %c\n", free_tcb->id, *data);
-	
+	kprintf("test4 \n");
 	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
+	kprintf("test5 \n");
 	push_tcb_to_ready_queue(thread_id, irq_regs);
 	used_tcbs ++;
 	find_free_tcb();
@@ -335,6 +337,9 @@ void kill_thread(unsigned int regs[]){
 }
 
 void wait_thread(unsigned int sleep_time, unsigned int regs[]){
+	if (sleep_time == 1){
+		sleep_time = 1;
+	}
 	//TODO 
 	//thread wird aus ready_queue (<-pointer) entfernt, inklusive kontextwechsel! (ähnlich wie bei kill_thread() mit used_tcbs>1)
 	//thread wird in waiting_queue (<-pointer) eingereiht (ähnlich wie bei push_tcb_to_ready_queue())

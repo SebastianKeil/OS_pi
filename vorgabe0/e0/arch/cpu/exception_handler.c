@@ -77,9 +77,7 @@ void software_interrupt(unsigned int regs[35]){
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
 					unsigned char received_char = buffer_pull(&uart_input_buffer);
-					//TODO_
-					//aufrufender thread erwartet received_char in $r0
-					//asm("move r0, r1"::"r"(received_char)); ????
+					asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
 					return;
 				} else {
 					//thread muss auf uart warten (irq -> uart_pending)
@@ -99,23 +97,21 @@ void software_interrupt(unsigned int regs[35]){
 				struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[34];
 				//in den grade erstellten struct* (<-pointer) laden wir die adresse aus $r0 um zugriff zu bekommen (trotz trennung usr<->os):
 				//asm("move r1, r0":"+r"(thread_create_context_ptr):); ????
+				kprintf("test2\n");
+				kprintf("%p\n", _thread_create_context_ptr->data);
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
 			case 45:
 				kprintf("make me sleep!\n");
-				unsigned int sleep_time;
+				unsigned int sleep_time = regs[34];
 				//in $r0 ist ein int für die dauer der sleep-zeit (genaue bedeutung des int können wir selbst festlegen: in sekunden oder in zeitscheiben)
-				//asm("addi r1, r0, #0":"r"(sleep_time):); ???
-				if(sleep_time == 0){
-					sleep_time = 1; //vorschlag, weil sleep_time hat mindestgröße (anforderung aufgabenblatt)
-				}
 				wait_thread(sleep_time, regs);
 				break;
 		}
 	} else {
 		print_reg_dump(regs, SVC);
-		while(1);
+		while(1); //muss das nicht weg?
 	}
 }
 
