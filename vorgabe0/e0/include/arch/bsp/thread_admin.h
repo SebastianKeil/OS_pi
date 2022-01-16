@@ -39,6 +39,7 @@ void print_ready_queue(void);
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 void init_thread_admin(void);
 void init_ready_queue(void);
+void init_waiting_queue(void);
 void init_all_tcbs(void);
 void init_thread_slots();
 
@@ -63,6 +64,6 @@ void push_tcb_to_ready_queue_simple(unsigned int thread_id);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int regs[]);
 void create_thread_simple(void (*unterprogramm)(unsigned char*));
 void kill_thread(unsigned int regs[]);
-void wait_thread(unsigned int regs[]);
+void wait_thread(unsigned int sleep_time, unsigned int regs[]);
 
 #endif

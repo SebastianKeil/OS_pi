@@ -46,10 +46,12 @@ struct list_elem{
 	struct list_elem *next;
 	struct list_elem *prev;
 	struct tcb *context;
+	unsigned int sleep_time;
 };
 struct list{
 	struct list_elem *curr;
 	struct list_elem *last;
+	unsigned int count;
 	//struct list_elem * elements[32];
 };
 struct list r_queue;
@@ -95,6 +97,13 @@ void print_ready_queue(){
 void init_ready_queue(){
 	ready_queue->curr = 0x0;
 	ready_queue->last = 0x0;
+	ready_queue->count = 0;
+}
+
+void init_waiting_queue(){
+	waiting_queue->curr = 0x0;
+	waiting_queue->last = 0x0;
+	waiting_queue->count = 0;
 }
 
 void init_all_tcbs(){
@@ -116,7 +125,9 @@ void init_thread_slots(){
 void init_thread_admin(){
 	kprintf("INIT THREAD ADMIN\n");
 	init_ready_queue();
+	init_waiting_queue();
 	kprintf("now ready_queue->curr: %p\n", ready_queue->curr);
+	kprintf("now waiting_queue->curr: %p\n", waiting_queue->curr);
 	init_all_tcbs();
 	init_thread_slots();
 }
@@ -249,6 +260,9 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 		ready_queue->curr->prev = &threads[thread_id];
 		ready_queue->last = &threads[thread_id];
 	}
+	
+	ready_queue->count ++;
+	threads[thread_id].sleep_time = 0;
 }
 
 void push_tcb_to_ready_queue_simple(unsigned int thread_id){								
@@ -311,6 +325,7 @@ void kill_thread(unsigned int regs[]){
 		load_context(regs, ready_queue->curr->context);
 	}
 	used_tcbs--;
+	ready_queue->count--;
 	
 	
 	//DEBUG
@@ -319,10 +334,26 @@ void kill_thread(unsigned int regs[]){
 	return;
 }
 
-void wait_thread(unsigned int regs[]){
+void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 	//TODO 
 	//thread wird aus ready_queue (<-pointer) entfernt, inklusive kontextwechsel! (ähnlich wie bei kill_thread() mit used_tcbs>1)
 	//thread wird in waiting_queue (<-pointer) eingereiht (ähnlich wie bei push_tcb_to_ready_queue())
+
+	ready_queue->curr->sleep_time = sleep_time; // (sleep_time==0 && thread is in waiting_queue) -> thread is waiting for char
+												// (sleep_time>0 && thread is in waiting_queue) -> thread is sleeping
+	//TODO 
+	if(used_tcbs == 1){
+		//nur teile kopiert von  kill_thread()
+		ready_queue->curr = 0x0;
+		
+		
+	}else if(used_tcbs > 1){
+		//nur teile kopiert von  kill_thread()
+		ready_queue->curr->next->prev = ready_queue->curr->prev;
+		ready_queue->curr->prev->next = ready_queue->curr->next;
+		ready_queue->curr = ready_queue->curr->next;
+		load_context(regs, ready_queue->curr->context);
+	}
 	
 }
 

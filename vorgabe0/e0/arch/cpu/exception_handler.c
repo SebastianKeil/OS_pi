@@ -64,7 +64,11 @@ void software_interrupt(unsigned int regs[35]){
 		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		switch(svc_imm){
 			case 42:
-				kprintf("\n");
+				kprintf("put char for me!\n");
+				unsigned char char_send;
+				//in $r0 liegt char für kprintf()
+				//asm("addi r1, r0, #0":"r"(char_send):); ???
+				kprintf("%c", char_send);
 				break;
 				
 			case 43:
@@ -80,26 +84,33 @@ void software_interrupt(unsigned int regs[35]){
 				} else {
 					//thread muss auf uart warten (irq -> uart_pending)
 					//thread in waiting queue einreihen
-					//wait_thread(regs);
+					wait_thread(0, regs);
 				}
 				
 				break;
 				
 			case 69:
-				kprintf("\n");
+				kprintf("kill me!\n");
 				kill_thread(regs);
 				break;
 				
 			case 44:
 				kprintf("create thread for me!\n");
-				struct _thread_create_context *_thread_create_context_ptr;
+				struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[34];
 				//in den grade erstellten struct* (<-pointer) laden wir die adresse aus $r0 um zugriff zu bekommen (trotz trennung usr<->os):
 				//asm("move r1, r0":"+r"(thread_create_context_ptr):); ????
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
 			case 45:
-				kprintf("\n");
+				kprintf("make me sleep!\n");
+				unsigned int sleep_time;
+				//in $r0 ist ein int für die dauer der sleep-zeit (genaue bedeutung des int können wir selbst festlegen: in sekunden oder in zeitscheiben)
+				//asm("addi r1, r0, #0":"r"(sleep_time):); ???
+				if(sleep_time == 0){
+					sleep_time = 1; //vorschlag, weil sleep_time hat mindestgröße (anforderung aufgabenblatt)
+				}
+				wait_thread(sleep_time, regs);
 				break;
 		}
 	} else {
