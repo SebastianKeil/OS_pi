@@ -106,6 +106,9 @@ void software_interrupt(unsigned int regs[35]){
 				kprintf("make me sleep!\n");
 				unsigned int sleep_time = regs[34];
 				//in $r0 ist ein int für die dauer der sleep-zeit (genaue bedeutung des int können wir selbst festlegen: in sekunden oder in zeitscheiben)
+				if (sleep_time == 0){
+					sleep_time = 1;
+				}
 				wait_thread(sleep_time, regs);
 				break;
 		}

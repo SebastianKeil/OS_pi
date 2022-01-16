@@ -337,7 +337,7 @@ void kill_thread(unsigned int regs[]){
 }
 
 void wait_thread(unsigned int sleep_time, unsigned int regs[]){
-	if (sleep_time == 1){
+	if (sleep_time == 0){
 		sleep_time = 1;
 	}
 	//TODO 
