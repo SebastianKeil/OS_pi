@@ -51,6 +51,7 @@ void safe_context(unsigned int regs[]);
 void load_context(unsigned int regs[], struct tcb* context);
 void change_context(unsigned int regs[35]);
 void scheduler(unsigned int regs[35]);
+void check_for_waiting_threads(unsigned int regs[35]);
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
@@ -58,12 +59,10 @@ void scheduler(unsigned int regs[35]);
 int find_free_tcb(void);
 void decrease_sp(unsigned int* _sp, unsigned int size);
 unsigned int fill_tcb(unsigned char* data, void (*unterprogramm)(unsigned char*));
-unsigned int fill_tcb_simple(void (*unterprogramm)(unsigned char*));
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
-void push_tcb_to_ready_queue_simple(unsigned int thread_id);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int regs[]);
-void create_thread_simple(void (*unterprogramm)(unsigned char*));
 void kill_thread(unsigned int regs[]);
 void wait_thread(unsigned int sleep_time, unsigned int regs[]);
+void wake_thread(unsigned char _send_char, struct list_elem* _curr, unsigned int regs[35]);
 
 #endif
