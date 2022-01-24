@@ -2,7 +2,7 @@
 #include <lib/regcheck.h>
 #include <arch/cpu/shared.h>
 #include <user/unterprogramm.h>
-#include <arch/bsp/thread_admin.h>
+#include <kernel/thread_admin.h>
 
 int print_register_dump;
 unsigned char receive_buffer;

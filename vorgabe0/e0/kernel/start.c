@@ -8,7 +8,7 @@
 #include <lib/ringbuffer.h>
 #include <arch/cpu/shared.h>
 #include <kernel/idle_thread.h>
-#include <arch/bsp/thread_admin.h>
+#include <kernel/thread_admin.h>
 #include <user/masterprogramm.h>
 #include <user/user_lib/user_syscalls.h>
 

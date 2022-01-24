@@ -71,13 +71,12 @@ arch/bsp/interrupt_ctrl.c \
 arch/bsp/sys_timer.c \
 lib/ringbuffer.c \
 lib/utilities.c \
-arch/bsp/thread_admin.c \
+kernel/thread_admin.c \
 lib/kmemcpy.c \
 kernel/idle_thread.c \
 user/masterprogramm.c \
 user/unterprogramm.c \
 user/user_lib/user_syscalls.c \
-#lib/unterprogramm.c \
 
 
 # Hier separate user files hinzufügen

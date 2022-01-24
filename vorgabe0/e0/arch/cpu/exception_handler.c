@@ -5,7 +5,7 @@
 #include <arch/bsp/uart.h>
 #include <lib/ringbuffer.h>
 #include <arch/bsp/sys_timer.h>
-#include <arch/bsp/thread_admin.h>
+#include <kernel/thread_admin.h>
 #include <arch/cpu/check_interrupts.h>
 
 #define UND 1
@@ -148,7 +148,7 @@ void irq(unsigned int regs[]){
 		uart_data = uart_read();
 		buffer_push(uart_data, &uart_input_buffer);
 		//TODO
-		//check_for_waiting_threads();
+		check_for_waiting_threads(regs);
 		
 		//check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
 		

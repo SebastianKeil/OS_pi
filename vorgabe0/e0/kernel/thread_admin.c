@@ -2,6 +2,7 @@
 #include <lib/kmemcpy.h>
 #include <kernel/kprintf.h>
 #include <kernel/idle_thread.h>
+#include <lib/ringbuffer.h>
 
 #define LR		21
 #define SP		19
@@ -21,9 +22,9 @@
 */
 
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/  DATA /_/_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//////////////////////_/
+/////////  DATA //////////_/
+//////////////////////_/
 
 struct tcb{
 	//thread's context
@@ -62,14 +63,14 @@ struct list *waiting_queue = &w_queue;
 struct list_elem threads[THREAD_COUNT];
 
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/_/ DEBUG /_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//////////////////////_/
+////////// DEBUG /////////_/
+//////////////////////_/
 void print_list_elem(unsigned int _j){
 	if(ready_queue->curr->context->id == _j){ 
 		kprintf("\t\t\t  curr->");} else {kprintf("\t\t\t\t");}
 		
-	//kprintf("[%i]: '%c'", _j, *(unsigned char*)(tcbs[_j].registers[0]));
+	//kprintf("[%i]: '%c'", _j, (unsigned char)(tcbs[_j].registers[0]));
 	kprintf("[%i]'%c'", _j, (tcbs[_j].data));
 	
 	if(ready_queue->last->context->id == _j){ 
@@ -91,9 +92,9 @@ void print_ready_queue(){
 }
 
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/_/ SETUP /_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//////////////////////_/
+////////// SETUP /////////_/
+//////////////////////_/
 void init_ready_queue(){
 	ready_queue->curr = 0x0;
 	ready_queue->last = 0x0;
@@ -132,9 +133,9 @@ void init_thread_admin(){
 	init_thread_slots();
 }
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/ SCHEDULER /_/_/_/_/_/_/_/_/
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//////////////////////_/
+///////// SCHEDULER ////////_/
+//////////////////////_/
 void save_context(unsigned int regs[]){
 	(ready_queue->curr->context->pc) = regs[LR];
 	(ready_queue->curr->context->sp) = regs[SP];
@@ -175,9 +176,26 @@ void scheduler(unsigned int regs[]){
 	return;
 }
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-//_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+void check_for_waiting_threads(unsigned int regs[35]){
+	if(waiting_queue->count == 0){
+		kprintf("no waiting thread!\n");
+		return;
+	}
+	
+	struct list_elem *_curr = waiting_queue->curr;
+	for(int i = 0; i < waiting_queue->count; i++){
+		if(_curr->sleep_time == 0){
+			wake_thread(buffer_pull(&uart_input_buffer), _curr, regs);
+			return;
+		}
+		_curr = _curr->next;
+	}
+}
+
+//////////////////////_/
+////// THREAD ADMINISTRATION /////_/
+//////////////////////_/
 int find_free_tcb(){
 	for(int i = 0; i < THREAD_COUNT; i++){
 		if(tcbs[i].in_use == 0){
@@ -199,7 +217,7 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 	}
 }
 
-unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
+unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char)){
 
 	free_tcb->pc = (unsigned int) unterprogramm;
 	free_tcb->cpsr = USER_MODE;
@@ -213,26 +231,11 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogr
 	//DEBUG
 	free_tcb->data = *data;
 	
-	//kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, *(unsigned char*)free_tcb->registers[0]);
+	//kprintf("fill $r0 of tcb[%i]: sp->%c\n", free_tcb->id, (unsigned char)free_tcb->registers[0]);
 	free_tcb->in_use = 1;
 	return free_tcb->id;
 }
 
-unsigned int fill_tcb_simple(void (*unterprogramm)(unsigned char*)){
-
-	free_tcb->pc = (unsigned int) unterprogramm;
-	free_tcb->cpsr = USER_MODE;
-	
-	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
-	
-	
-	//DEBUG # stands for masterprogramm
-	free_tcb->data = '#';
-	
-	kprintf("tcb[%i]: pc->%c\n", free_tcb->id, (unsigned char)free_tcb->pc);
-	free_tcb->in_use = 1;
-	return free_tcb->id;
-}
 
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){	
 	//no threads active
@@ -265,14 +268,8 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 	threads[thread_id].sleep_time = 0;
 }
 
-void push_tcb_to_ready_queue_simple(unsigned int thread_id){								
-	ready_queue->curr = &threads[thread_id];
-	ready_queue->last = &threads[thread_id];
-	ready_queue->curr->next = ready_queue->curr;
-	ready_queue->curr->prev = ready_queue->curr;
-}
 
-void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int irq_regs[]){
+void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char), unsigned int irq_regs[]){
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;}
@@ -289,20 +286,6 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	print_ready_queue();
 	//kprintf("leaving create thread..\n");
 }
-
-/*void create_thread_simple(void (*unterprogramm)(unsigned char)){
-	if(!find_free_tcb()){
-		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
-		return;}
-	unsigned int thread_id = fill_tcb_simple(unterprogramm);
-	push_tcb_to_ready_queue_simple(thread_id);
-	used_tcbs ++;
-	find_free_tcb();
-	
-	//DEBUG
-	print_ready_queue();
-	//kprintf("leaving create thread..\n");
-}*/
 
 void kill_thread(unsigned int regs[]){
 	//killing the only thread
@@ -378,8 +361,19 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 }
 
 
+void wake_thread(unsigned char _send_char, struct list_elem* _curr, unsigned int regs[35]){
+	//_curr bekommt _send_char in $r0
+	_curr->context->registers[0] = (unsigned int) _send_char;
+	
+	//_curr in ready_queue einordnen
+	unsigned int _thread_id = _curr->context->id;
+	push_tcb_to_ready_queue(_thread_id, regs);
+	
+	//_curr aus waiting_queue löschen
+	waiting_queue->curr->next->prev = waiting_queue->curr->prev;
+	waiting_queue->curr->prev->next = waiting_queue->curr->next;
+	waiting_queue->curr = waiting_queue->curr->next;
 
-
-
-
-
+	ready_queue->count++;
+	waiting_queue->count--;
+}
