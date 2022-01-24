@@ -65,15 +65,14 @@ void software_interrupt(unsigned int regs[35]){
 		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
 		switch(svc_imm){
 			case 42:
-				kprintf("put char for me!\n");
-				unsigned char char_send;
+				kprintf("put from $r0 char for me!\n");
 				//in $r0 liegt char für kprintf()
-				//asm("addi r1, r0, #0":"r"(char_send):); ???
+				register unsigned char char_send asm ("r0");
 				kprintf("%c", char_send);
 				break;
 				
 			case 43:
-				//kprintf("get char for me!\n");
+				kprintf("get char for me!\n");
 				
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
@@ -81,8 +80,7 @@ void software_interrupt(unsigned int regs[35]){
 					asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
 					return;
 				} else {
-					//thread muss auf uart warten (irq -> uart_pending)
-					//thread in waiting queue einreihen
+					kprintf("buffer count: %i, thread has to wait!\n", uart_input_buffer.count);
 					wait_thread(0, regs);
 				}
 				
@@ -96,10 +94,6 @@ void software_interrupt(unsigned int regs[35]){
 			case 44:
 				kprintf("create thread for me!\n");
 				struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
-				//in den grade erstellten struct* (<-pointer) laden wir die adresse aus $r0 um zugriff zu bekommen (trotz trennung usr<->os):
-				//asm("move r1, r0":"+r"(thread_create_context_ptr):); ????
-				kprintf("test2\n");
-				kprintf("%c\n", *(_thread_create_context_ptr->data));
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
