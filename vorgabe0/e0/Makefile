@@ -21,6 +21,7 @@
 # make qemu_debug       -- Baut den Kernel und führt ihn unter QEMU mit debug
 #                          Optionen aus. Zum debuggen in einem zweiten Terminal
 #                          folgendes ausführen:
+#						gdb-multiarch build/kernel.elf
 #                          $ arm-none-eabi-gdb build/kernel.elf
 #                          $ target remote localhost:1234
 #
@@ -77,6 +78,7 @@ kernel/idle_thread.c \
 user/masterprogramm.c \
 user/unterprogramm.c \
 user/user_lib/user_syscalls.c \
+
 
 
 # Hier separate user files hinzufügen

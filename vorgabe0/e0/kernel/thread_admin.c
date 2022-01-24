@@ -14,7 +14,7 @@
 #define USER_STACK_BASE 0x27000
 #define USER_STACK_SIZE 0x1000
 
-/*	Layout vom regs[35] Array:
+/*	Layout vom regs[35] Array: R0=regs[22]
 	regs[34-22]		R12-R0
 	regs[21]		LR
 	regs[20]		PC
@@ -27,7 +27,7 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/  DATA /_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
+unsigned int penisnudel = 21;
 /*
 struct tcb{
 	//thread's context
@@ -199,6 +199,8 @@ void check_for_waiting_threads(unsigned int regs[35]){
 		}
 		_temp = _temp->next;
 	}
+	kprintf("no waiting thread!\n");
+	return;
 }
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -248,7 +250,7 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogra
 
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){	
 	//no threads active
-	if(used_tcbs == 0){ 							
+	if(ready_queue->count == 0){ 							
 		ready_queue->curr = &threads[thread_id];
 		ready_queue->last = &threads[thread_id];
 		ready_queue->curr->next = ready_queue->curr;
@@ -257,7 +259,7 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 		
 	
 	//exactly 1 thread active
-	} else if(used_tcbs == 1){ 	
+	} else if(ready_queue->count == 1){ 	
 		ready_queue->curr->next = &threads[thread_id];
 		ready_queue->curr->prev = &threads[thread_id];
 		threads[thread_id].next = ready_queue->curr;
@@ -299,7 +301,7 @@ void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)
 
 void kill_thread(unsigned int regs[]){
 	//killing the only thread
-	if(used_tcbs == 1){
+	if(ready_queue->count == 1){
 		//kprintf("\nkilling last thread [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr = 0x0;
@@ -308,7 +310,7 @@ void kill_thread(unsigned int regs[]){
 		//DEBUG
 		//print_ready_queue();
 		
-	}else if(used_tcbs > 1){
+	}else if(ready_queue->count > 1){
 		//kprintf("\nkilling [%i]'%c'\n", ready_queue->curr->context->id, ready_queue->curr->context->data);
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr->next->prev = ready_queue->curr->prev;
@@ -331,6 +333,7 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 	kprintf("thread_admin speaking: going to make thread[%i] wait for %i..\n", ready_queue->curr->context->id, sleep_time);
 	ready_queue->curr->sleep_time = sleep_time; // (sleep_time ==0 && thread is in waiting_queue) -> thread is waiting for char
 												// (sleep_time  >0 && thread is in waiting_queue) -> thread is sleeping
+	save_context(regs);
 	struct list_elem *temp_curr = ready_queue->curr;
 	//TODO 
 	kprintf("before waiting_queue->count: %i\n", waiting_queue->count);
@@ -373,27 +376,32 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 	waiting_queue->count++;
 	kprintf("now waiting_queue->count: %i\n", waiting_queue->count);
 	kprintf("now ready_queue->count: %i\n", ready_queue->count);
+	return;
 }
 
 
-void wake_thread(unsigned char _send_char, struct list_elem* _wait_thread, unsigned int regs[35]){
+void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]){
 	//_wait_thread bekommt _send_char in $r0
-	kprintf("im going to wake thread[%i] with char: %c\n", _wait_thread->context->id, _send_char);
-	_wait_thread->context->registers[0] = (unsigned int) _send_char;
+	kprintf("im going to wake thread[%i] with char: %c\n", _waiting_thread->context->id, _send_char);
+	_waiting_thread->context->registers[0] = (unsigned int) _send_char;
 	
-	//_wait_thread in ready_queue einordnen
-	unsigned int _thread_id = _wait_thread->context->id;
+	//_waiting_thread in ready_queue einordnen
+	unsigned int _thread_id = _waiting_thread->context->id;
+	
+	//print_ready_queue();
+
 	push_tcb_to_ready_queue(_thread_id, regs);
+
+	print_ready_queue();
 	
-	//_wait_thread aus waiting_queue löschen
+	//_waiting_thread aus waiting_queue löschen
 	if(waiting_queue->count == 1){
 		waiting_queue->curr = 0x0;
 	} else if(waiting_queue->count > 1){
-		_wait_thread->next->prev = _wait_thread->prev;
-		_wait_thread->prev->next = _wait_thread->next;
+		_waiting_thread->next->prev = _waiting_thread->prev;
+		_waiting_thread->prev->next = _waiting_thread->next;
 		waiting_queue->curr = waiting_queue->curr->next;
 	}
 
-	ready_queue->count++;
 	waiting_queue->count--;
 }

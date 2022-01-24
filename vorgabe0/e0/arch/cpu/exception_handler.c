@@ -34,6 +34,7 @@ struct _thread_create_context{
 	unsigned int count;
 	void (*unterprogramm)(unsigned char*);
 };
+unsigned int peniswurzel = 0;
 
 unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 	unsigned int svc_imm = instruction & bit_mask;
@@ -72,7 +73,7 @@ void software_interrupt(unsigned int regs[35]){
 				kprintf("put from $r0 char for me!\n");
 				//in $r0 liegt char für kprintf()
 				//register unsigned char char_send asm ("r0");
-				char_send = regs[34];
+				char_send = regs[22];
 				kprintf("%c", char_send);
 				break;
 				
@@ -82,7 +83,8 @@ void software_interrupt(unsigned int regs[35]){
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
 					received_char = buffer_pull(&uart_input_buffer);
-					asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
+					regs[22] = (unsigned int) received_char;
+					//asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
 					return;
 				} else {
 					kprintf("buffer count: %i, thread has to wait!\n", uart_input_buffer.count);
@@ -104,7 +106,7 @@ void software_interrupt(unsigned int regs[35]){
 				
 			case 45:
 				kprintf("make me sleep!\n");
-				sleep_time = regs[34];
+				sleep_time = regs[22];
 				if (sleep_time == 0){
 					sleep_time = 1;
 				}
@@ -115,6 +117,7 @@ void software_interrupt(unsigned int regs[35]){
 		print_reg_dump(regs, SVC);
 		while(1);
 	}
+	return;
 }
 
 
@@ -165,7 +168,9 @@ void irq(unsigned int regs[]){
 		check_for_waiting_threads(regs);
 		
 		//check_for_interrupts(buffer_pull(&uart_input_buffer), regs);
-		
+
+		peniswurzel = 12;
+
 		//kprintf("leaving exception_handler.. \n");
 		
 	}else if(sys_timer_pending){

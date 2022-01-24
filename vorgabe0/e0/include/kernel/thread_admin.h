@@ -68,6 +68,6 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int regs[]);
 void kill_thread(unsigned int regs[]);
 void wait_thread(unsigned int sleep_time, unsigned int regs[]);
-void wake_thread(unsigned char _send_char, struct list_elem* _temp, unsigned int regs[35]);
+void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]);
 
 #endif
