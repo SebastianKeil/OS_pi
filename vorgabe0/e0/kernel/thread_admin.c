@@ -226,7 +226,7 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 	}
 }
 
-unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char)){
+unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*)){
 
 	free_tcb->pc = (unsigned int) unterprogramm;
 	free_tcb->cpsr = USER_MODE;
@@ -278,7 +278,7 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 }
 
 
-void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char), unsigned int irq_regs[]){
+void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*), unsigned int irq_regs[]){
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;}
