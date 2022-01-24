@@ -60,37 +60,51 @@ syscall_sleep_thread()				->	asm volatile("svc #45");
 
 void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
+	
+		unsigned int sleep_time;
+		unsigned char received_char;
+		unsigned char char_send;
+		struct _thread_create_context *_thread_create_context_ptr;
+		
 		unsigned int svc_imm = get_imm(*(unsigned int*)(regs[21] - 4), BIT_MASK_24);
-		unsigned int sleep_time = regs[34];
-		unsigned char char_send = regs[34];
-		struct _thread_create_context *_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
 		switch(svc_imm){
 			case 42:
+				kprintf("put from $r0 char for me!\n");
+				//in $r0 liegt char für kprintf()
+				//register unsigned char char_send asm ("r0");
+				char_send = regs[34];
 				kprintf("%c", char_send);
 				break;
 				
 			case 43:
+				kprintf("get char for me!\n");
+				
+				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
-					unsigned char received_char = buffer_pull(&uart_input_buffer);
+					received_char = buffer_pull(&uart_input_buffer);
 					asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
 					return;
 				} else {
-					//thread muss auf uart warten (irq -> uart_pending)
-					//thread in waiting queue einreihen
+					kprintf("buffer count: %i, thread has to wait!\n", uart_input_buffer.count);
 					wait_thread(0, regs);
 				}
 				
 				break;
 				
 			case 69:
+				kprintf("kill me!\n");
 				kill_thread(regs);
 				break;
 				
 			case 44:
+				kprintf("create thread for me!\n");
+				_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
 			case 45:
+				kprintf("make me sleep!\n");
+				sleep_time = regs[34];
 				if (sleep_time == 0){
 					sleep_time = 1;
 				}

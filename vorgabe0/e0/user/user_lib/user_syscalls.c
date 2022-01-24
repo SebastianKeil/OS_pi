@@ -32,11 +32,12 @@ return a;
 }*/
 
 unsigned char syscall_get_char(void){
-	asm volatile 	("stmfd sp!, {r0}\t\n" 
-				 	"svc #43");
+	asm volatile 	("stmfd sp!, {r0}");
+	kprintf("syscall-libary speaking: we are asking for char\n");
+	asm volatile	("svc #43");
 	register unsigned char received_char asm ("r0");
 	asm volatile 	("ldmfd sp!, {r0}");
-	kprintf("%c", received_char);
+	kprintf("syscall-libary speaking: we received this char: %c\n", received_char);
 	return received_char;
 }
 
@@ -45,13 +46,18 @@ void syscall_kill_thread(){
 }
 
 void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
-	
+	//fill data struct
 	thread_create_context.data = data;
 	thread_create_context.count = count;
 	thread_create_context.unterprogramm = unterprogramm;
+	
+	//safe $r0 in stack and store data struct pointer in $r0
+
 	asm volatile	("stmfd sp!, {r0}");
 	asm volatile	("mov r0, %0" : : "r" (&thread_create_context));
+	//call svc for thread_create
 	asm volatile	("svc #44");
+	//load $r0 back from stack
 	asm volatile 	("ldmfd sp!, {r0}");
 }
 
