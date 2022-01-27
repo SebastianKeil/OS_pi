@@ -16,14 +16,14 @@ struct thread_create_context{
 } thread_create_context;
 
 unsigned char received_char;
-unsigned int pimmel_ptr = 0;
+unsigned int debug_ptr = 0;
 
 void syscall_put_char(unsigned char c){
 	unsigned int character = (unsigned int)c;
-	asm volatile 	("stmfd sp!, {r0}");
-	asm volatile	("mov r0, %0" : : "r" (character));
-	asm volatile	("svc #42");
-	asm volatile 	("ldmfd sp!, {r0}");
+	asm volatile 	("stmfd sp!, {r0}\t\n"
+					"mov r0, %0\t\n"
+					"svc #42 \t\n"
+					"ldmfd sp!, {r0}"  : : "r" (character));
 }
 
 
@@ -38,16 +38,15 @@ unsigned char syscall_get_char(void){
 	
 	kprintf("syscall-libary speaking: we are asking for char\n");
 	
-	asm volatile 	("stmfd sp!, {r0}");
-	pimmel_ptr = 16;
-	asm volatile	("svc #43");
-	asm volatile ("addi $sp, $sp, 16");
-	pimmel_ptr = 17;
-	asm volatile ("mov %0, r0" :"+r" (received_char):);
-	//volatile register unsigned char received_char asm ("r0");
-	asm volatile 	("ldmfd sp!, {r0}");
+	asm volatile 	(//"push {lr}\t\n"
+					"svc #43\t\n"
+					"mov %0, r0\t\n"
+					//"pop {pc}\t\n" 
+					:"+r" (received_char):);
+	//volatile register unsigned char received_cha  r asm ("r0");
 
 	kprintf("syscall-libary speaking: we received this char: %c\n", received_char);
+	//debug_ptr = 1;
 	return received_char;
 }
 
@@ -64,17 +63,17 @@ void syscall_create_thread(unsigned char* data, unsigned int count, void (*unter
 	
 	//safe $r0 in stack and store data struct pointer in $r0
 
-	asm volatile	("stmfd sp!, {r0}");
-	asm volatile	("mov r0, %0" : : "r" (&thread_create_context));
-	//call svc for thread_create
-	asm volatile	("svc #44");
-	//load $r0 back from stack
-	asm volatile 	("ldmfd sp!, {r0}");
+	asm volatile	(//"stmfd sp!, {r0}\t\n"
+					"mov r0, %0\t\n"
+					"svc #44\t\n"
+					//"ldmfd sp!, {r0}\t\n"
+					 : : "r" (&thread_create_context));
 }
 
 void syscall_sleep_thread(unsigned int length){
-	asm volatile	("stmfd sp!, {r0}");
-	asm volatile	("mov r0, %0" : : "r" (length));
-	asm volatile	("svc #45");
-	asm volatile 	("ldmfd sp!, {r0}");
+	asm volatile	(//"stmfd sp!, {r0}\t\n"
+					"mov r0, %0\t\n"
+					"svc #45\t\n"
+					//"ldmfd sp!, {r0}\t\n"
+					 : : "r" (length));
 }

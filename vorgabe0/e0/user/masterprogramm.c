@@ -15,7 +15,7 @@ void masterprogramm(unsigned char *void_char){
 
 		input_svc = syscall_get_char();
 
-		kprintf("masterprogramm speaking: received char, giong to create unterprogramm!\n");
+		kprintf("masterprogramm speaking: received char, going to create unterprogramm!\n");
 		syscall_create_thread(input_svc, 1, &unterprogramm);
 	}	
 }

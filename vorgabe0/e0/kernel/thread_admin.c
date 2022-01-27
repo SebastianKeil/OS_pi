@@ -28,6 +28,7 @@
 //_/_/_/_/_/_/_/  DATA /_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 unsigned int penisnudel = 21;
+unsigned int watch_ptr = 0;
 /*
 struct tcb{
 	//thread's context
@@ -389,6 +390,7 @@ void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, un
 	unsigned int _thread_id = _waiting_thread->context->id;
 	
 	//print_ready_queue();
+	watch_ptr = 12;
 
 	push_tcb_to_ready_queue(_thread_id, regs);
 
