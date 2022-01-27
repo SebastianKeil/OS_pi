@@ -37,16 +37,17 @@ return a;
 unsigned char syscall_get_char(void){
 	
 	kprintf("syscall-libary speaking: we are asking for char\n");
-	
-	asm volatile 	(//"push {lr}\t\n"
-					"svc #43\t\n"
+	debug_ptr = 1;
+	asm volatile 	("svc #43\t\n"
 					"mov %0, r0\t\n"
-					//"pop {pc}\t\n" 
-					:"+r" (received_char):);
+					:"+r" (received_char): : "r0");
 	//volatile register unsigned char received_cha  r asm ("r0");
-
+	
 	kprintf("syscall-libary speaking: we received this char: %c\n", received_char);
-	//debug_ptr = 1;
+	debug_ptr = 2;
+	kprintf("BLABLA %i\n", debug_ptr);
+	debug_ptr = 5;
+
 	return received_char;
 }
 
