@@ -8,7 +8,9 @@
 
 
 void masterprogramm(unsigned char *void_char){	
+	kprintf("entering masterprogramm..\n");
 	while(1){
+	kprintf("now asking for char..\n");
 	unsigned char input = syscall_get_char();
 	syscall_create_thread(input, 1, &unterprogramm);
 	}	
