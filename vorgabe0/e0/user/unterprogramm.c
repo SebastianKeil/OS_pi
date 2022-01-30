@@ -6,6 +6,7 @@
 
 #define LOWER_BOUND_UPPER_CASE 65
 #define UPPER_BOUND_UPPER_CASE 90
+#define LINEFEED (unsigned char) 10
 
 unsigned char char_for_unterprogramm;
 unsigned int buffer_count;
@@ -25,13 +26,17 @@ void print_answer(unsigned char *input){
 
 void print_answer_uppercase(unsigned char *input){
 	for(int i = 0; i < 10; i++){
-	syscall_put_char(*input);
-	sleep(BUSY_WAIT_COUNTER*20);
+		syscall_put_char(*input);
+		kprintf("got here\n");
+		sleep(BUSY_WAIT_COUNTER*20);
+		
 	}
+	syscall_put_char(LINEFEED);
 	return;
 }
 
 void unterprogramm(unsigned char *input){
+	kprintf("unterprogramm: \n\tgot '%c'\n", *input);
 	unsigned char character = *input;
 	unsigned int range = (unsigned int)character;
 

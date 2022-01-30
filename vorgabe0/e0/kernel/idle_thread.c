@@ -11,10 +11,17 @@ void sleeps(int ticks){
 }
 
 void idle_thread(){
-	//asm volatile ("wfi");
+	asm volatile ("wfi");
+	asm volatile ("b idle_thread");
+  	
+  	//wfi
+  	//b idle_thread
+	
+	/*
 	kprintf("\nentering idle thread..\n");
 	while(1){
 		//kprintf("power saving..\n");
 		sleeps(100000000);
 	}
+	*/
 }

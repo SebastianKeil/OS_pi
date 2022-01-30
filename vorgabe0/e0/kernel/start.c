@@ -60,7 +60,7 @@ void start_kernel(){
 	/*change to user mode*/
 		asm ("cps #0x10");
 		
-		void_char = 'v';
+		void_char = '#';
 		//initial thread
 		syscall_create_thread(&void_char, 0, &masterprogramm);
 		

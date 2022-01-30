@@ -27,8 +27,6 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/  DATA /_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-unsigned int penisnudel = 21;
-unsigned int watch_ptr = 0;
 /*
 struct tcb{
 	//thread's context
@@ -88,12 +86,16 @@ void print_ready_queue(){
 	kprintf("\n");
 	//kprintf("queue has %i active threads:\n", used_tcbs);
 	//kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
-	if(ready_queue->curr == 0x0) kprintf("  \t\t\tcurr->0x0\n");
-	unsigned int j = ready_queue->curr->context->id;
-	for(unsigned int i = 0; i < used_tcbs; i++){
-		print_list_elem(j);
-		j = threads[j].next->context->id;
-	}
+	if(ready_queue->curr == 0x0){
+		kprintf("  \t\t\tcurr->0x0\n");
+		}
+		else {
+			unsigned int j = ready_queue->curr->context->id;
+			for(unsigned int i = 0; i < ready_queue->count; i++){
+				print_list_elem(j);
+				j = threads[j].next->context->id;
+			}
+		}
 	kprintf("\n");
 }
 
@@ -167,14 +169,12 @@ void change_context(unsigned int regs[]){
 
 void scheduler(unsigned int regs[]){
 	//kprintf("\nscheduling %i threads\n", used_tcbs);
-	if(used_tcbs > 1){
+	if(ready_queue->count > 1){
 		change_context(regs);
 		kprintf("\n");
 		
 		//DEBUG
 		print_ready_queue();
-	}else if(ready_queue->curr->context->data == '#'){ // # = masterprogramm
-		load_context(regs, ready_queue->curr->next->context);
 	}
 	
 	
@@ -184,7 +184,7 @@ void scheduler(unsigned int regs[]){
 
 
 void check_for_waiting_threads(unsigned int regs[35]){
-	kprintf("checking waiting threads, waiting_queue->count: %i\n", waiting_queue->count);
+	kprintf("#scheduler: \n\tchecking waiting threads, waiting_queue: %i\n", waiting_queue->count);
 	if(waiting_queue->count == 0){
 		kprintf("no waiting thread!\n");
 		return;
@@ -194,13 +194,13 @@ void check_for_waiting_threads(unsigned int regs[35]){
 	struct list_elem *_temp = waiting_queue->curr;
 	for(unsigned int i = 0; i < waiting_queue->count; i++){
 		if(_temp->sleep_time == 0){
-			kprintf("found waiting thread: thread[%i]\n", _temp->context->id);
+			kprintf("\tfound waiting thread: thread[%i]\n", _temp->context->id);
 			wake_thread(buffer_pull(&uart_input_buffer), _temp, regs);
 			return;
 		}
 		_temp = _temp->next;
 	}
-	kprintf("no waiting thread!\n");
+	kprintf("no thread is waiting for char!\n");
 	return;
 }
 
@@ -330,71 +330,80 @@ void kill_thread(unsigned int regs[]){
 }
 
 void wait_thread(unsigned int sleep_time, unsigned int regs[]){
+	kprintf("\n********************* BEFORE ************************\n");
+	kprintf("waiting_queue: %i \nready_queue: %i \nready->curr: thread[%i]\n", waiting_queue->count, ready_queue->count, ready_queue->curr->context->id);
+	print_ready_queue();
+	kprintf("*****************************************************\n\n");
 	
-	kprintf("thread_admin speaking: going to make thread[%i] wait for %i..\n", ready_queue->curr->context->id, sleep_time);
-	ready_queue->curr->sleep_time = sleep_time; // (sleep_time ==0 && thread is in waiting_queue) -> thread is waiting for char
-												// (sleep_time  >0 && thread is in waiting_queue) -> thread is sleeping
+	
+	kprintf("#wait_thread: \n\tthread[%i] will wait for %i\n", ready_queue->curr->context->id, sleep_time);
+	
+	//set sleep_time and update tcb
+	ready_queue->curr->sleep_time = sleep_time;
 	save_context(regs);
-	struct list_elem *temp_curr = ready_queue->curr;
-	//TODO 
-	kprintf("before waiting_queue->count: %i\n", waiting_queue->count);
-	kprintf("before ready_queue->count: %i\n", ready_queue->count);
-	if(waiting_queue->count == 0){
-		//verschiebe ready_queue->curr zu waiting_queue->curr
-		waiting_queue->curr = ready_queue->curr;
-		waiting_queue->last = ready_queue->curr;
-		waiting_queue->curr->next = waiting_queue->curr;
-		waiting_queue->curr->prev = waiting_queue->curr;
-		
-	} else if(waiting_queue->count == 1){ 	
-		waiting_queue->curr->next = ready_queue->curr;
-		waiting_queue->curr->prev = ready_queue->curr;
-		ready_queue->curr->next = waiting_queue->curr;
-		ready_queue->curr->prev = waiting_queue->curr;
-		waiting_queue->last = ready_queue->curr;
-		
-	}else{
-		waiting_queue->last->next = ready_queue->curr;
-		ready_queue->curr->prev = waiting_queue->last;
-		ready_queue->curr->next = waiting_queue->curr;
-		waiting_queue->curr->prev = ready_queue->curr;
-		waiting_queue->last = ready_queue->curr;
-	}
 	
+	struct list_elem *temp_curr = ready_queue->curr;
 	//ready_queue neu sortieren
 	if(ready_queue->count == 1){
 		ready_queue->curr = 0x0;
 		regs[LR] = (unsigned int) &idle_thread;
 		
 	} else if(ready_queue->count > 1){
-		temp_curr->next->prev = temp_curr->prev;
-		temp_curr->prev->next = temp_curr->next;
-		ready_queue->curr = temp_curr->next;
+		ready_queue->curr->next->prev = ready_queue->curr->prev;
+		ready_queue->curr->prev->next = ready_queue->curr->next;
+		ready_queue->curr = ready_queue->curr->next;
 		load_context(regs, ready_queue->curr->context);
+	}
+	
+	
+	if(waiting_queue->count == 0){
+		//verschiebe ready_queue->curr zu waiting_queue->curr
+		waiting_queue->curr = temp_curr;
+		waiting_queue->last = temp_curr;
+		waiting_queue->curr->next = waiting_queue->curr;
+		waiting_queue->curr->prev = waiting_queue->curr;
+		
+	} else if(waiting_queue->count == 1){ 	
+		waiting_queue->curr->next = temp_curr;
+		waiting_queue->curr->prev = temp_curr;
+		waiting_queue->curr->next->next = waiting_queue->curr;
+		waiting_queue->curr->next->prev = waiting_queue->curr;
+		waiting_queue->last = waiting_queue->curr->next;
+		
+	}else{
+		waiting_queue->last->next = temp_curr;
+		waiting_queue->last->next->prev = waiting_queue->last;
+		waiting_queue->last->next->next = waiting_queue->curr;
+		waiting_queue->curr->prev = waiting_queue->last->next;
+		waiting_queue->last = temp_curr;
 	}
 	
 	ready_queue->count--;
 	waiting_queue->count++;
-	kprintf("now waiting_queue->count: %i\n", waiting_queue->count);
-	kprintf("now ready_queue->count: %i\n", ready_queue->count);
+
+	kprintf("********************* AFTER *************************\n");
+	kprintf("waiting_queue: %i \nready_queue: %i \nready->curr: thread[%i]\n", waiting_queue->count, ready_queue->count, ready_queue->curr->context->id);
+	print_ready_queue();
+	kprintf("*****************************************************\n\n");
 	return;
 }
 
 
 void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]){
-	//_wait_thread bekommt _send_char in $r0
-	kprintf("im going to wake thread[%i] with char: %c\n", _waiting_thread->context->id, _send_char);
+
+	kprintf("#wake_thread: \n\tim going to wake thread[%i] with char: %c\n", _waiting_thread->context->id, _send_char);
+	
+	//waiting thread bekommt send_char in $r0
 	_waiting_thread->context->registers[0] = (unsigned int) _send_char;
+	
+	kprintf("\n********************* BEFORE ************************\n");
+	kprintf("waiting_queue: %i \nready_queue: %i \nready->curr: thread[%i]\n", waiting_queue->count, ready_queue->count, ready_queue->curr->context->id);
+	print_ready_queue();
+	kprintf("*****************************************************\n");
 	
 	//_waiting_thread in ready_queue einordnen
 	unsigned int _thread_id = _waiting_thread->context->id;
-	
-	//print_ready_queue();
-	watch_ptr = 12;
-
 	push_tcb_to_ready_queue(_thread_id, regs);
-
-	print_ready_queue();
 	
 	//_waiting_thread aus waiting_queue löschen
 	if(waiting_queue->count == 1){
@@ -402,8 +411,14 @@ void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, un
 	} else if(waiting_queue->count > 1){
 		_waiting_thread->next->prev = _waiting_thread->prev;
 		_waiting_thread->prev->next = _waiting_thread->next;
-		waiting_queue->curr = waiting_queue->curr->next;
+		if(_waiting_thread == waiting_queue->curr){
+			waiting_queue->curr = _waiting_thread->next;
+		}
 	}
-
 	waiting_queue->count--;
+	
+	kprintf("\n********************* AFTER *************************\n");
+	kprintf("waiting_queue: %i \nready_queue: %i \nready->curr: thread[%i]\n", waiting_queue->count, ready_queue->count, ready_queue->curr->context->id);
+	print_ready_queue();
+	kprintf("*****************************************************\n\n");
 }

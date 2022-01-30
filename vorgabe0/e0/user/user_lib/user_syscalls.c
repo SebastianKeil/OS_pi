@@ -16,14 +16,20 @@ struct thread_create_context{
 } thread_create_context;
 
 unsigned char received_char;
-unsigned int debug_ptr = 0;
 
 void syscall_put_char(unsigned char c){
-	unsigned int character = (unsigned int)c;
-	asm volatile 	("stmfd sp!, {r0}\t\n"
-					"mov r0, %0\t\n"
-					"svc #42 \t\n"
-					"ldmfd sp!, {r0}"  : : "r" (character));
+	kprintf("svc_put_char: \n\toffering char\n");
+	
+	/*
+	asm volatile 	("mov r0, %0\t\n"
+					"svc #42\t\n"
+					: : "r" (c) );
+	*/
+					
+	asm volatile ("mov r0, %0" : : "r" (c) );
+	asm volatile ("svc #42");
+	//kprintf("end of syscall_put_char\n");
+	return;
 }
 
 
@@ -36,17 +42,13 @@ return a;
 
 unsigned char syscall_get_char(void){
 	
-	kprintf("syscall-libary speaking: we are asking for char\n");
-	debug_ptr = 1;
+	kprintf("svc_get_char: \n\tasking for char\n");
+	
 	asm volatile 	("svc #43\t\n"
 					"mov %0, r0\t\n"
 					:"+r" (received_char): : "r0");
-	//volatile register unsigned char received_cha  r asm ("r0");
 	
-	kprintf("syscall-libary speaking: we received this char: %c\n", received_char);
-	debug_ptr = 2;
-	kprintf("BLABLA %i\n", debug_ptr);
-	debug_ptr = 5;
+	kprintf("svc_get_char: \n\treceived this char: %c\n", received_char);
 
 	return received_char;
 }
@@ -56,7 +58,7 @@ void syscall_kill_thread(){
 }
 
 void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
-	kprintf("syscall_create_thread wurde aufgerufen. Pensi \n");
+	kprintf("svc_create_thread: \n\twurde mit %c aufgerufen\n", *data);
 	//fill data struct
 	thread_create_context.data = data;
 	thread_create_context.count = count;
