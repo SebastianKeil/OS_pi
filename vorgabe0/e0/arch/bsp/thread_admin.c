@@ -25,6 +25,7 @@
 //_/_/_/_/_/_/_/  DATA /_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
+
 struct tcb{
 	//thread's context
 	unsigned int id;
@@ -290,20 +291,6 @@ void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm
 	//kprintf("leaving create thread..\n");
 }
 
-/*void create_thread_simple(void (*unterprogramm)(unsigned char)){
-	if(!find_free_tcb()){
-		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
-		return;}
-	unsigned int thread_id = fill_tcb_simple(unterprogramm);
-	push_tcb_to_ready_queue_simple(thread_id);
-	used_tcbs ++;
-	find_free_tcb();
-	
-	//DEBUG
-	print_ready_queue();
-	//kprintf("leaving create thread..\n");
-}*/
-
 void kill_thread(unsigned int regs[]){
 	//killing the only thread
 	if(used_tcbs == 1){
@@ -377,7 +364,15 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 	waiting_queue->count++;
 }
 
+void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]){
+	//_wait_thread bekommt _send_char in $r0
+	kprintf("im going to wake thread[%i] with char: %c\n", _waiting_thread->context->id, _send_char);
+	_waiting_thread->context->registers[0] = (unsigned int) _send_char;
+	
+	//_waiting_thread in ready_queue einordnen
+	unsigned int _thread_id = _waiting_thread->context->id;
 
+}
 
 
 

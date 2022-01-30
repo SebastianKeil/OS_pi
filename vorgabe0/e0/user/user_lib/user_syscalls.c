@@ -1,5 +1,6 @@
 #include<stdarg.h>
-#include <kernel/kprintf.h>
+#include<kernel/kprintf.h>
+#include<user/user_lib/syscall_asm_getc.h>
 
 /*
 syscall_put_char()					->	asm volatile("svc #42");		
@@ -9,8 +10,10 @@ syscall_create_thread()				->	asm volatile("svc #44");
 syscall_sleep_thread()				->	asm volatile("svc #45");
 */
 
+extern unsigned char syscall_asm_getc();
+
 struct thread_create_context{ 
-	unsigned char* data;
+	unsigned char* data; 
 	unsigned int count;
 	void (*unterprogramm)(unsigned char*);
 } thread_create_context;
@@ -23,20 +26,8 @@ void syscall_put_char(unsigned char c){
 	asm volatile 	("ldmfd sp!, {r0}");
 }
 
-
-/*inline-ass beispiel aus VL3:
-
-int add(int a, int b){
-asm ("add %0, %0, %1" : "+r" (a) : "r" (b));
-return a;
-}*/
-
-unsigned char syscall_get_char(void){
-	asm volatile 	("stmfd sp!, {r0}\t\n" 
-				 	"svc #43");
-	register unsigned char received_char asm ("r0");
-	asm volatile 	("ldmfd sp!, {r0}");
-	kprintf("%c", received_char);
+unsigned char syscall_get_char(){
+	unsigned char received_char = syscall_asm_getc();
 	return received_char;
 }
 

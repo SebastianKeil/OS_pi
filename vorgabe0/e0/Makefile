@@ -77,7 +77,8 @@ kernel/idle_thread.c \
 user/masterprogramm.c \
 user/unterprogramm.c \
 user/user_lib/user_syscalls.c \
-#lib/unterprogramm.c \
+user/user_lib/syscall_asm_getc.S \
+
 
 
 # Hier separate user files hinzufügen

@@ -32,7 +32,7 @@ mrs		r0, spsr_fiq
 stmfd	sp!, {r0-r12}
 
 mrs		r5, lr_irq
-mrs		r4, lr_irq
+mrs		r4, sp_irq
 mrs		r3, spsr_irq
 mrs		r2, lr_und
 mrs		r1, sp_und
