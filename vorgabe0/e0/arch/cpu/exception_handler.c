@@ -83,7 +83,6 @@ void software_interrupt(unsigned int regs[35]){
 				if(uart_input_buffer.count > 0){
 					received_char = buffer_pull(&uart_input_buffer);
 					regs[22] = (unsigned int) received_char;
-					//asm volatile ("mov r0, %0\n\t" : : "r" (received_char));
 					return;
 				} else {
 					kprintf("\tbuffer count: %i, thread has to wait\n\n", uart_input_buffer.count);
@@ -116,7 +115,6 @@ void software_interrupt(unsigned int regs[35]){
 		print_reg_dump(regs, SVC);
 		while(1);
 	}
-	kprintf("reaching end of exception_handler\n");
 	return;
 }
 

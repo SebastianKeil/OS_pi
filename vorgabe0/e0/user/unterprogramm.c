@@ -18,8 +18,9 @@ void sleep(unsigned int ticks){
 
 void print_answer(unsigned char *input){
 	for(int i = 0; i < 10; i++){
-	syscall_put_char(*input);
-		syscall_sleep_thread(1);
+		syscall_put_char(*input);
+		sleep(BUSY_WAIT_COUNTER*20);
+		//syscall_sleep_thread(1);
 	}
 	return;
 }
@@ -27,7 +28,6 @@ void print_answer(unsigned char *input){
 void print_answer_uppercase(unsigned char *input){
 	for(int i = 0; i < 10; i++){
 		syscall_put_char(*input);
-		kprintf("got here\n");
 		sleep(BUSY_WAIT_COUNTER*20);
 		
 	}
@@ -36,11 +36,12 @@ void print_answer_uppercase(unsigned char *input){
 }
 
 void unterprogramm(unsigned char *input){
-	kprintf("unterprogramm: \n\tgot '%c'\n", *input);
+	kprintf("first unterprogramm: \n\tgot '%c'\n", *input);
 	unsigned char character = *input;
 	unsigned int range = (unsigned int)character;
 
 	if (range >= LOWER_BOUND_UPPER_CASE && range <= UPPER_BOUND_UPPER_CASE){
+		kprintf("\tgoing to pint uppercase");
 		print_answer_uppercase(input);
 		syscall_kill_thread();	
 		return;
