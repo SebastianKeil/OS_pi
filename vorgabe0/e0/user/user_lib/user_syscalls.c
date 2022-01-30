@@ -18,35 +18,23 @@ struct thread_create_context{
 unsigned char received_char;
 
 void syscall_put_char(unsigned char c){
-	kprintf("svc_put_char: \n\toffering char\n");
-	
-	/*
+	//kprintf("svc_put_char: \n\toffering char\n");
+
 	asm volatile 	("mov r0, %0\t\n"
 					"svc #42\t\n"
 					: : "r" (c) );
-	*/
-					
-	asm volatile ("mov r0, %0" : : "r" (c) );
-	asm volatile ("svc #42");
+
 	return;
 }
 
-
-/*inline-ass beispiel aus VL3:
-
-int add(int a, int b){
-asm ("add %0, %0, %1" : "+r" (a) : "r" (b));
-return a;
-}*/
-
 unsigned char syscall_get_char(void){
 	
-	kprintf("svc_get_char: \n\tasking for char\n");
+	//kprintf("svc_get_char: \n\tasking for char\n");
 	
 	asm volatile 	("svc #43\t\n"
 					"mov %0, r0\t\n"
 					:"+r" (received_char): : "r0");
-	kprintf("svc_get_char: \n\treceived this char: %c\n", received_char);
+	//kprintf("svc_get_char: \n\treceived this char: %c\n", received_char);
 
 	return received_char;
 }
@@ -56,7 +44,7 @@ void syscall_kill_thread(){
 }
 
 void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
-	kprintf("svc_create_thread: \n\twurde mit %c aufgerufen\n", *data);
+	//kprintf("svc_create_thread: \n\twurde mit %c aufgerufen\n", *data);
 	//fill data struct
 	thread_create_context.data = data;
 	thread_create_context.count = count;
