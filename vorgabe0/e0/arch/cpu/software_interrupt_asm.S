@@ -1,13 +1,6 @@
 .global software_interrupt_asm
 
 software_interrupt_asm:
-
-//TODO_/_/_/_/_/_/_/_/_/ TODO _/_/_/_/_/_/_/_/_/ TODO
-//falls svc für put char oder create_thread ausgelöst wurde, müssen die entsprecheneden parameter (in $r1 als struct*?)
-//abgelegt und weitergegeben werden, da im exeption_handler.c diese daten erwartet werden!
-//TODO_/_/_/_/_/_/_/_/_/ TODO _/_/_/_/_/_/_/_/_/ TODO
-
-
 //Undef/SVC in Decode erkannt also auslösende Instruktion + 4, 
 //aber Instruktion soll übersprungen werden => keine Manipulation vom LR/PC notwendig
 sub 	r14, r14, #0  	//Offset abziehen für nahtlose Fortführung
@@ -32,7 +25,7 @@ mrs		r0, spsr_fiq
 stmfd	sp!, {r0-r12}
 
 mrs		r5, lr_irq
-mrs		r4, lr_irq
+mrs		r4, sp_irq
 mrs		r3, spsr_irq
 mrs		r2, lr_und
 mrs		r1, sp_und
@@ -41,22 +34,21 @@ stmfd	sp!, {r0-r5}
 
 mov		r0, sp //give sp to c function
 
-
 bl 		software_interrupt
-//hier gehts noch nicht hin :)
-//ldmfd	sp!, {r0 - r7} 	//remove unnecessary items from stack
-//ldmfd	sp!, {r0- r12} 
-//ldmfd	sp!, {lr}		//load necesessary registers before 
-//ldmfd	sp!, {r0- r12} 
-//movs	pc, lr
+
 
 ldmfd	sp!, {r0 - r7}
-ldmfd	sp!, {r0 - r8}  //remove unnecessary items from stack
+ldmfd	sp!, {r0 - r6}  //remove unnecessary items from stack
+
+ldmfd	sp!, {r1}		//load sp_usr
+msr 	sp_usr, r1 		//set sp_usr to sp of coming thread
+
+ldmfd	sp!, {r1}		//remove
 
 ldmfd	sp!, {r0}		//load new spsr
 msr		SPSR_cxsf, r0
 
-ldmfd	sp!, {r0- r2} 	// remove unnecessary items from stack
+ldmfd	sp!, {r0 - r2} 	// remove unnecessary items from stack
 
 ldmfd	sp!, {lr}		//load necesessary registers before 
 ldmfd	sp!, {r0- r12} 

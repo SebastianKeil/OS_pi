@@ -1,6 +1,8 @@
 #include<stdarg.h>
 #include <kernel/kprintf.h>
 
+extern unsigned char syscall_get_char_asm(void); 
+
 /*
 syscall_put_char()					->	asm volatile("svc #42");		
 syscall_get_char()					->	asm volatile("svc #43");
@@ -23,21 +25,23 @@ void syscall_put_char(unsigned char c){
 	asm volatile 	("mov r0, %0\t\n"
 					"svc #42\t\n"
 					: : "r" (c) );
-
 	return;
 }
 
 unsigned char syscall_get_char(void){
 	
 	//kprintf("svc_get_char: \n\tasking for char\n");
-	
+	/*
 	asm volatile 	("svc #43\t\n"
 					"mov %0, r0\t\n"
 					:"+r" (received_char): : "r0");
+	*/
 	//kprintf("svc_get_char: \n\treceived this char: %c\n", received_char);
 
+	received_char = syscall_get_char_asm();
 	return received_char;
 }
+
 
 void syscall_kill_thread(){
 	asm volatile 	("svc #69");
@@ -45,12 +49,11 @@ void syscall_kill_thread(){
 
 void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
 	//kprintf("svc_create_thread: \n\twurde mit %c aufgerufen\n", *data);
+	
 	//fill data struct
 	thread_create_context.data = data;
 	thread_create_context.count = count;
 	thread_create_context.unterprogramm = unterprogramm;
-	
-	//safe $r0 in stack and store data struct pointer in $r0
 
 	asm volatile	(//"stmfd sp!, {r0}\t\n"
 					"mov r0, %0\t\n"

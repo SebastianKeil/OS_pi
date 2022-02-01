@@ -37,10 +37,14 @@ mov		r0, sp //give sp to c function
 
 bl 		irq //evtl mov ldr statt bl	
 
-//auf dem stack liegt das SPSR vom tcb, das muss in das aktuelle SPSR vom irq geschrieben werden,
-//damit unten bei "movs	pc, lr" das richtige SPSR ins CPSR geladen wird
+
 ldmfd	sp!, {r0 - r7}
-ldmfd	sp!, {r0 - r8}  //remove unnecessary items from stack
+ldmfd	sp!, {r0 - r6}  //remove unnecessary items from stack
+
+ldmfd	sp!, {r1}		//load sp_usr
+msr 	sp_usr, r1 		//set sp_usr to sp of coming thread
+
+ldmfd	sp!, {r1}		//remove
 
 ldmfd	sp!, {r0}		//load new spsr
 msr		SPSR_cxsf, r0

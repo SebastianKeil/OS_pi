@@ -8,6 +8,15 @@
 #include <kernel/thread_admin.h>
 #include <arch/cpu/check_interrupts.h>
 
+
+/*	Layout vom regs[35] Array: R0=regs[22]
+	regs[34-22]		R12-R0
+	regs[21]		LR
+	regs[20]		PC
+	regs[19]		SP
+	regs[18-0]		Daten für den Registerprint		
+*/
+
 #define UND 1
 #define SVC 2
 #define PRE 3
@@ -79,6 +88,7 @@ void software_interrupt(unsigned int regs[35]){
 				
 			case 43:
 				kprintf("software_interrupt 43: \n\tcurrent thread asking for char\n");
+				kprintf("\tstack of curr: %p\n", regs[15]);
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
 					received_char = buffer_pull(&uart_input_buffer);
@@ -98,7 +108,9 @@ void software_interrupt(unsigned int regs[35]){
 				
 			case 44:
 				_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
+				
 				kprintf("software_interrupt44: \n\tcreate thread with %c\n", *(_thread_create_context_ptr->data));
+				
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
