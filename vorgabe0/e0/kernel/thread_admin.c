@@ -82,7 +82,7 @@ void print_list_elem(unsigned int _j){
 }	
 
 void print_ready_queue(){
-	//return;
+	return;
 	kprintf("\n");
 	//kprintf("queue has %i active threads:\n", used_tcbs);
 	//kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
@@ -153,13 +153,13 @@ void save_context(unsigned int regs[]){
 	(ready_queue->curr->context->sp) = regs[SP];
 	(ready_queue->curr->context->cpsr) = regs[CPSR];
 	kmemcpy(&(ready_queue->curr->context->registers), &regs[22], 13 * sizeof(unsigned int));
-	kprintf("#save_context: \n\tsaved thread[%i] \n\tstackpointer is at %p\n", ready_queue->curr->context->id, ready_queue->curr->context->sp);
+	//kprintf("#save_context: \n\tsaved thread[%i] \n\tstackpointer is at %p\n", ready_queue->curr->context->id, ready_queue->curr->context->sp);
 }
 
 
 void load_context(unsigned int regs[], struct tcb* context){
 
-	kprintf("#load_context: \n\tloading thread[%i] \n\tstackpointer is at %p\n", context->id, context->sp);
+	//kprintf("#load_context: \n\tloading thread[%i] \n\tstackpointer is at %p\n", context->id, context->sp);
 	regs[LR] = context->pc;
 	regs[SP] = context->sp;
 	regs[CPSR] = context->cpsr;
@@ -191,7 +191,7 @@ void scheduler(unsigned int regs[]){
 
 
 void check_for_waiting_threads(unsigned int regs[35]){
-	kprintf("#scheduler: \n\tchecking waiting threads, waiting_queue: %i\n", waiting_queue->count);
+	//kprintf("#scheduler: \n\tchecking waiting threads, waiting_queue: %i\n", waiting_queue->count);
 	if(waiting_queue->count == 0){
 		kprintf("no waiting thread!\n");
 		return;
@@ -201,7 +201,7 @@ void check_for_waiting_threads(unsigned int regs[35]){
 	struct list_elem *_temp = waiting_queue->curr;
 	for(unsigned int i = 0; i < waiting_queue->count; i++){
 		if(_temp->sleep_time == 0){
-			kprintf("\tfound waiting thread: thread[%i]\n", _temp->context->id);
+			//kprintf("\tfound waiting thread: thread[%i]\n", _temp->context->id);
 			wake_thread(buffer_pull(&uart_input_buffer), _temp, regs);
 			return;
 		}
@@ -333,7 +333,7 @@ void kill_thread(unsigned int regs[]){
 
 void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 
-	kprintf("#wait_thread: \n\tthread[%i] will wait for %i\n", ready_queue->curr->context->id, sleep_time);
+	//kprintf("#wait_thread: \n\tthread[%i] will wait for %i\n", ready_queue->curr->context->id, sleep_time);
 	
 	//set sleep_time and update tcb
 	ready_queue->curr->sleep_time = sleep_time;
@@ -385,8 +385,8 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 
 void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]){
 
-	kprintf("#wake_thread: \n\tim going to wake thread[%i] with char: %c\n", _waiting_thread->context->id, _send_char);
-	kprintf("\twaiting thread[%i] stackpointer is at %p\n", _waiting_thread->context->id, _waiting_thread->context->sp);
+	//kprintf("#wake_thread: \n\tim going to wake thread[%i] with char: %c\n", _waiting_thread->context->id, _send_char);
+	//kprintf("\twaiting thread[%i] stackpointer is at %p\n", _waiting_thread->context->id, _waiting_thread->context->sp);
 	
 	//waiting thread bekommt send_char in $r0
 	_waiting_thread->context->registers[0] = (unsigned int) _send_char;

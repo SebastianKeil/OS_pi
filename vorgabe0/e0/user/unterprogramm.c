@@ -36,7 +36,7 @@ void print_answer_uppercase(unsigned char *input){
 }
 
 void unterprogramm(unsigned char *input){
-	kprintf("first unterprogramm: \n\tgot '%c'\n", *input);
+	//kprintf("first unterprogramm: \n\tgot '%c'\n", *input);
 	unsigned char character = *input;
 	unsigned int range = (unsigned int)character;
 

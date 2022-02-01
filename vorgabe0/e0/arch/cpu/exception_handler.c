@@ -80,15 +80,15 @@ void software_interrupt(unsigned int regs[35]){
 		
 		switch(svc_imm){
 			case 42:
-				kprintf("software_interrupt 42: \n\tcurrent thread offering char %c\n", (unsigned char) regs[22]);
+				//kprintf("software_interrupt 42: \n\tcurrent thread offering char %c\n", (unsigned char) regs[22]);
 				//in $r0 liegt char für kprintf()
 				char_send = (unsigned char) regs[22];
 				kprintf("%c", char_send);
 				break;
 				
 			case 43:
-				kprintf("software_interrupt 43: \n\tcurrent thread asking for char\n");
-				kprintf("\tstack of curr: %p\n", regs[15]);
+				//kprintf("software_interrupt 43: \n\tcurrent thread asking for char\n");
+				//kprintf("\tstack of curr: %p\n", regs[15]);
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
 					received_char = buffer_pull(&uart_input_buffer);
@@ -109,7 +109,7 @@ void software_interrupt(unsigned int regs[35]){
 			case 44:
 				_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
 				
-				kprintf("software_interrupt44: \n\tcreate thread with %c\n", *(_thread_create_context_ptr->data));
+				//kprintf("software_interrupt44: \n\tcreate thread with %c\n", *(_thread_create_context_ptr->data));
 				
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
@@ -171,10 +171,10 @@ void irq(unsigned int regs[]){
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
 		uart_data = uart_read();
-		kprintf("irq: \n\t[%c] was pressed, check if any threads are waiting\n", uart_data);
+		//kprintf("irq: \n\t[%c] was pressed, check if any threads are waiting\n", uart_data);
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_waiting_threads(regs);
-		kprintf("irq again: \n\tin registers[0] (regs[22]) is %c\n", regs[22]);
+		//kprintf("irq again: \n\tin registers[0] (regs[22]) is %c\n", regs[22]);
 		
 	}else if(sys_timer_pending){
 		kprintf("!");

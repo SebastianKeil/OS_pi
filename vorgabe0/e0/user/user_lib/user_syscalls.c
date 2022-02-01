@@ -29,14 +29,6 @@ void syscall_put_char(unsigned char c){
 }
 
 unsigned char syscall_get_char(void){
-	
-	//kprintf("svc_get_char: \n\tasking for char\n");
-	/*
-	asm volatile 	("svc #43\t\n"
-					"mov %0, r0\t\n"
-					:"+r" (received_char): : "r0");
-	*/
-	//kprintf("svc_get_char: \n\treceived this char: %c\n", received_char);
 
 	received_char = syscall_get_char_asm();
 	return received_char;
