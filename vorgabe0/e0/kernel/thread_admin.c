@@ -82,7 +82,7 @@ void print_list_elem(unsigned int _j){
 }	
 
 void print_ready_queue(){
-	return;
+	//return;
 	kprintf("\n");
 	//kprintf("queue has %i active threads:\n", used_tcbs);
 	//kprintf("free_tcb at: tcb[%i]\n", free_tcb->id);
@@ -176,10 +176,9 @@ void change_context(unsigned int regs[]){
 	ready_queue->last = ready_queue->curr->prev;
 }
 
-unsigned int sleeping_threads_count;
+
 unsigned int sleeping_threads[32];
 unsigned int sleeping_threads_free = 0;
-
 
 void update_sleeping_threads(unsigned int regs[]){
 
@@ -200,6 +199,7 @@ void scheduler(unsigned int regs[]){
 	update_sleeping_threads(regs);
 	
 	if(ready_queue->count > 1){
+		kprintf("going to schedul thread[%i] for thread[%i]", ready_queue->curr->next-> context->id, ready_queue->curr->context->id);
 		change_context(regs);
 		kprintf("\n");
 		
@@ -329,7 +329,7 @@ void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)
 	find_free_tcb();
 	
 	//DEBUG
-	print_ready_queue();
+	//print_ready_queue();
 }
 
 void kill_thread(unsigned int regs[]){
@@ -354,7 +354,7 @@ void kill_thread(unsigned int regs[]){
 	
 	
 	//DEBUG
-	print_ready_queue();
+	//print_ready_queue();
 	
 	return;
 }
@@ -385,21 +385,21 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 		//verschiebe ready_queue->curr zu waiting_queue->curr
 		waiting_queue->curr = temp_curr;
 		waiting_queue->last = temp_curr;
-		waiting_queue->curr->next = waiting_queue->curr;
-		waiting_queue->curr->prev = waiting_queue->curr;
+		waiting_queue->curr->next = temp_curr;
+		waiting_queue->curr->prev = temp_curr;
 		
 	} else if(waiting_queue->count == 1){ 	
 		waiting_queue->curr->next = temp_curr;
 		waiting_queue->curr->prev = temp_curr;
-		waiting_queue->curr->next->next = waiting_queue->curr;
-		waiting_queue->curr->next->prev = waiting_queue->curr;
-		waiting_queue->last = waiting_queue->curr->next;
+		temp_curr->next = waiting_queue->curr;
+		temp_curr->prev = waiting_queue->curr;
+		waiting_queue->last = temp_curr;
 		
 	}else{
 		waiting_queue->last->next = temp_curr;
-		waiting_queue->last->next->prev = waiting_queue->last;
-		waiting_queue->last->next->next = waiting_queue->curr;
-		waiting_queue->curr->prev = waiting_queue->last->next;
+		temp_curr->prev = waiting_queue->last;
+		temp_curr->next = waiting_queue->curr;
+		waiting_queue->curr->prev = temp_curr;
 		waiting_queue->last = temp_curr;
 	}
 	
@@ -421,7 +421,7 @@ void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, un
 		_waiting_thread->context->registers[0] = (unsigned int) _send_char;
 	}
 	
-	print_ready_queue();
+	//print_ready_queue();
 	
 	//_waiting_thread in ready_queue einordnen
 	unsigned int _thread_id = _waiting_thread->context->id;
