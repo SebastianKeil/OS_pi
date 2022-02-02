@@ -176,9 +176,29 @@ void change_context(unsigned int regs[]){
 	ready_queue->last = ready_queue->curr->prev;
 }
 
+unsigned int sleeping_threads_count;
+unsigned int sleeping_threads[32];
+unsigned int sleeping_threads_free = 0;
+
+
+void update_sleeping_threads(unsigned int regs[]){
+
+	struct list_elem *_temp = waiting_queue->curr;
+	for(unsigned int i = 0; i < waiting_queue->count; i++){
+		if(_temp->sleep_time == 1){
+			wake_thread('#', _temp, regs);
+		}
+		if(_temp->sleep_time > 1){
+			_temp->sleep_time --;
+		}
+		_temp = _temp->next;
+	}
+}
 
 void scheduler(unsigned int regs[]){
-
+	
+	update_sleeping_threads(regs);
+	
 	if(ready_queue->count > 1){
 		change_context(regs);
 		kprintf("\n");
@@ -186,6 +206,7 @@ void scheduler(unsigned int regs[]){
 		//DEBUG
 		print_ready_queue();
 	}
+	
 	return;
 }
 
@@ -193,7 +214,7 @@ void scheduler(unsigned int regs[]){
 void check_for_waiting_threads(unsigned int regs[35]){
 	//kprintf("#scheduler: \n\tchecking waiting threads, waiting_queue: %i\n", waiting_queue->count);
 	if(waiting_queue->count == 0){
-		kprintf("no waiting thread!\n");
+		//kprintf("no waiting thread!\n");
 		return;
 	}
 	
@@ -275,11 +296,18 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 	
 	//2 or more threads active
 	} else{
+		ready_queue->curr->next->prev = &threads[thread_id];
+		threads[thread_id].next = ready_queue->curr->next;
+		ready_queue->curr->next = &threads[thread_id];
+		threads[thread_id].prev = ready_queue->curr;
+	
+		/*
 		ready_queue->last->next = &threads[thread_id];
 		threads[thread_id].prev = ready_queue->last;
 		threads[thread_id].next = ready_queue->curr;
 		ready_queue->curr->prev = &threads[thread_id];
 		ready_queue->last = &threads[thread_id];
+		*/
 	}
 	
 	ready_queue->count ++;
@@ -389,7 +417,9 @@ void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, un
 	//kprintf("\twaiting thread[%i] stackpointer is at %p\n", _waiting_thread->context->id, _waiting_thread->context->sp);
 	
 	//waiting thread bekommt send_char in $r0
-	_waiting_thread->context->registers[0] = (unsigned int) _send_char;
+	if(_send_char != '#'){
+		_waiting_thread->context->registers[0] = (unsigned int) _send_char;
+	}
 	
 	print_ready_queue();
 	

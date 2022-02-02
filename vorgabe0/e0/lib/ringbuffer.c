@@ -59,7 +59,10 @@ unsigned char buffer_pull(struct input_buffer *buffer){
 	
 	pulled_char = buffer->data[buffer->read];
 	buffer->count --;
-	if(buffer->count == 0) return pulled_char;
+	if(buffer->count == 0){ 
+		buffer->read ++;
+		return pulled_char;
+	}
 	
 	//kprintf("buffer count after pull: %i/%i\n", buffer->count, UART_INPUT_BUFFER_SIZE);
 	

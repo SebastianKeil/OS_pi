@@ -55,6 +55,7 @@ void init_thread_slots();
 void safe_context(unsigned int regs[]);
 void load_context(unsigned int regs[], struct tcb* context);
 void change_context(unsigned int regs[35]);
+void update_sleeping_threads(unsigned int regs[]);
 void scheduler(unsigned int regs[35]);
 void check_for_waiting_threads(unsigned int regs[35]);
 
