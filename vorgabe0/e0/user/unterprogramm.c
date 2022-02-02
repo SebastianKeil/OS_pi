@@ -20,7 +20,7 @@ void print_answer(unsigned char *input){
 	for(int i = 0; i < 10; i++){
 		syscall_put_char(*input);
 		//sleep(BUSY_WAIT_COUNTER*20);
-		syscall_sleep_thread(1);
+		syscall_sleep_thread(3);
 	}
 	return;
 }

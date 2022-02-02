@@ -296,18 +296,18 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 	
 	//2 or more threads active
 	} else{
-		ready_queue->curr->next->prev = &threads[thread_id];
-		threads[thread_id].next = ready_queue->curr->next;
-		ready_queue->curr->next = &threads[thread_id];
-		threads[thread_id].prev = ready_queue->curr;
-	
-		/*
-		ready_queue->last->next = &threads[thread_id];
-		threads[thread_id].prev = ready_queue->last;
-		threads[thread_id].next = ready_queue->curr;
-		ready_queue->curr->prev = &threads[thread_id];
-		ready_queue->last = &threads[thread_id];
-		*/
+		if(threads[thread_id].sleep_time == 0){
+			ready_queue->curr->next->prev = &threads[thread_id];
+			threads[thread_id].next = ready_queue->curr->next;
+			ready_queue->curr->next = &threads[thread_id];
+			threads[thread_id].prev = ready_queue->curr;
+		}else{
+			ready_queue->last->next = &threads[thread_id];
+			threads[thread_id].prev = ready_queue->last;
+			threads[thread_id].next = ready_queue->curr;
+			ready_queue->curr->prev = &threads[thread_id];
+			ready_queue->last = &threads[thread_id];
+		}
 	}
 	
 	ready_queue->count ++;

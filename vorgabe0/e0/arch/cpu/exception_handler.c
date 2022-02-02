@@ -118,7 +118,7 @@ void software_interrupt(unsigned int regs[35]){
 				break;
 				
 			case 45:
-				kprintf("make me sleep!\n");
+				//kprintf("make me sleep!\n");
 				
 				sleep_time = regs[22];
 				if (sleep_time == 0){
