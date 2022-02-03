@@ -35,8 +35,9 @@ struct list{
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/ DEBUG /_/_/_/_/_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-void print_list_elem(unsigned int _j);
+void print_list_elem(unsigned int _j, struct list* queue);
 void print_ready_queue(void);
+void print_waiting_queue(void);
 
 
 //////////////////////_/
@@ -67,6 +68,7 @@ void decrease_sp(unsigned int* _sp, unsigned int size);
 unsigned int fill_tcb(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*));
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int regs[]);
+unsigned int ready_threads_in_waiting();
 void kill_thread(unsigned int regs[]);
 void wait_thread(unsigned int sleep_time, unsigned int regs[]);
 void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]);
