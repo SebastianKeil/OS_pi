@@ -36,11 +36,13 @@ L2:
 static unsigned int lvl1_table[4096] __attribute__((aligned(0x4000)));
 
 void initalize_mmu(){
-
+	for(int i = 0; i++, i < 4096){
+		lvl1_table[i] = 0;
+	}
 	return;
 }
 
-void set_bits(){
+void set_bits(unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int xn_bit){
 
 	return;
 }
