@@ -59,6 +59,29 @@ _bsprak:
 	/* set VBAR in CP15 */
 	ldr r0, =_ivt
 	mcr p15, 0, r0, c12, c0, 0
+
+
+	/* setup MMU */
+	//TTBR0
+	push {r7, lr}
+	ldr lr, =_jump
+	ldr pc, _initialize_mmu
+	_initialize_mmu: 	.word initialize_mmu
+_jump:
+	pop {r7, lr}
+	//ldr r0, lvl1_table
+	//mcr p15, 0, r0, c2, c0, 0
+	//SCTLR
+	mrc p15, 0, r0, c1, c0, 0
+	add r0, #0
+	mcr p15, 0, r0, c1, c0, 0
+	//TTBCR
+	mov r0, #0
+	mcr p15, 0, r0, c2, c0, 2
+	//DACR
+	mov r0, #1
+	mcr p15, 0, r0, c3, c0, 0
+
 	
 	/* change to user mode */
 	//cps #0x10	//nicht in den usermode!

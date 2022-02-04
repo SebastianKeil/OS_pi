@@ -5,7 +5,7 @@
 #define NG_BIT 17//0
 #define S_BIT 16//0
 #define XN_BIT 4//nur lvl1
-#define XN_BIT_LVL2 
+#define XN_BIT_LVL2
 #define C_BIT 3 //0
 #define B_BIT 2 //0
 #define PXN_BIT 2//für lvl2 übernehmen
@@ -35,8 +35,10 @@ L2:
 
 static unsigned int lvl1_table[4096] __attribute__((aligned(0x4000)));
 
-void initalize_mmu(){
-	for(int i = 0; i++, i < 4096){
+void initialize_mmu(){
+
+	asm volatile ("mcr p15, 0, %0, c2, c0, 0" : : "r" (&lvl1_table));
+	for(int i = 0; i++; i < 4096){
 		lvl1_table[i] = 0;
 	}
 	return;
