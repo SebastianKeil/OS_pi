@@ -69,18 +69,20 @@ _bsprak:
 	_initialize_mmu: 	.word initialize_mmu
 _jump:
 	pop {r7, lr}
-	//ldr r0, lvl1_table
-	//mcr p15, 0, r0, c2, c0, 0
-	//SCTLR
-	mrc p15, 0, r0, c1, c0, 0
-	add r0, #0
-	mcr p15, 0, r0, c1, c0, 0
+
 	//TTBCR
 	mov r0, #0
 	mcr p15, 0, r0, c2, c0, 2
+	
 	//DACR
 	mov r0, #1
 	mcr p15, 0, r0, c3, c0, 0
+	
+	//SCTLR
+	mrc p15, 0, r0, c1, c0, 0
+	add r0, #1
+	mcr p15, 0, r0, c1, c0, 0
+
 
 	
 	/* change to user mode */
