@@ -23,14 +23,19 @@ void increment_counter() {
 
 
 void start_kernel(){
-	
+	kprintf("Pisse \n");
+	//SCTLR mmu einschalten
+	asm volatile 	("mrc p15, 0, r7, c1, c0, 0\t\n"
+					"add r7, #1\t\n"
+					"mcr p15, 0, r7, c1, c0, 0" : : : "r7");
+
 	kprintf("\n\n");
 	kprintf("*****************************************************\n");
 	kprintf("******************** KERNEL SETUP *******************\n");
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
-	print_register_dump = 0;
+	//print_register_dump = 0;
 	
 	disable_uart_fifo();
 	set_uart_receive_interrupt();

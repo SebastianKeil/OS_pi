@@ -43,18 +43,18 @@ _bsprak:
 	sp_irq 0x25000   +4096
 	sp_fiq 0x26000   +4096*/
 		
-	ldr 	sp,	=0x20000
-	ldr		r0, =0x21000
+	ldr 	sp,	=0x3FFFF8
+	ldr		r0, =0x3FEFF8
 	msr 	sp_und, r0
-	/* user mode gets more space*/
-	ldr		r0, =0x22000
-	msr 	sp_usr, r0 
-	ldr		r0, =0x24000
+	ldr		r0, =0x3FDFF8
 	msr 	sp_abt, r0 
-	ldr		r0, =0x25000
+	ldr		r0, =0x3FCFF8
 	msr 	sp_irq, r0
-	ldr		r0, =0x26000
+	ldr		r0, =0x3FBFF8
 	msr 	sp_fiq, r0
+		/* user mode gets more space*/
+	ldr		r0, =0x7FFFF8
+	msr 	sp_usr, r0 
 
 	/* set VBAR in CP15 */
 	ldr r0, =_ivt
@@ -77,12 +77,6 @@ _jump:
 	//DACR
 	mov r0, #1
 	mcr p15, 0, r0, c3, c0, 0
-	
-	//SCTLR
-	mrc p15, 0, r0, c1, c0, 0
-	add r0, #1
-	mcr p15, 0, r0, c1, c0, 0
-
 
 	
 	/* change to user mode */

@@ -54,34 +54,27 @@ unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, u
 void initialize_mmu(){
 
 	asm volatile ("mcr p15, 0, %0, c2, c0, 0" : : "r" (&lvl1_table));
-	for(int i = 0; i < 2047; i++){
+	for(unsigned int i = 0; i < 2047; i++){
 		unsigned int temp = 1024 * 1024 * i;
 		
-		//NO ACCESS
-		if(i < 1){
-		lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1); 
-		
-		}	//Sys 		Usr
-		//TEXT
-		if(i < 2){lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1); continue;}	//Sys L 	Usr 
-		//RODATA
-		if(i < 3){lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1); continue;}	//Sys L   	Usr 	XN
-		//BSS		 
-		if(i < 4){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1); continue;}	//Sys L/S 	Usr 	XN
-		//USER_TEXT
-		if(i < 5){lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1); continue;}	//Sys L   	Usr L 	pXN
-		//USER_RODATA
-		if(i < 6){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1); continue;}	//Sys L   	Usr L 	XN
-		//USER_DATA + USER_BSS
-		if(i < 8){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1); continue;}	//Sys L/S 	USR L/S XN
-		//UART, 
-		if(i > 1009 && i < 1012){
-		 	lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1); continue;}		//Sys L/S 	Usr 	XN	
-		//FAULT
-		//lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1);				 	//Sys 		Usr 	
-
-
-		
+		//NO ACCESS		//Sys 		Usr
+		if(i < 1){lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1);}	
+		//TEXT 			//Sys L 	Usr 
+		else if(i < 2){lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1);}	
+		//RODATA 		//Sys L   	Usr 	XN
+		else if(i < 3){lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1);}
+		//BSS			//Sys L/S 	Usr 	XN
+		else if(i < 4){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
+		//USR_TEXT 		//Sys L   	Usr L 	pXN
+		else if(i < 5){lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1);}
+		//USR_RODATA	//Sys L   	Usr L 	XN
+		else if(i < 6){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1);}	
+		//USR_DATA/BSS 	//Sys L/S 	USR L/S XN
+		else if(i < 8){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}	
+		//HARDWARE		//Sys L/S 	Usr 	XN	
+		else if(i > 1007 && i < 1013){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
+		//FAULT			//Sys 		Usr 	
+		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);}				 	
 
 		//Vollzugriff
 		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
@@ -89,3 +82,35 @@ void initialize_mmu(){
 	return;
 }
 
+/*
+
+00000000000000000000000000000000
+0000000000      A   AA     X  SP
+00000000000000000000000000000010
+00000000100000001000010000000010
+00000000100000001000010000010010
+00000000001100000000010000010010
+00000000010000001000110000000011
+00000000010100001000110000010010
+00000000011000000000110000010010
+00000000011100000000110000010010
+00000000100000000000000000000000
+00000000100100000000000000000000
+
+
+000000000000000000000010, 
+000100001000010000000010, 
+001000001000010000010010, 
+001100000000010000010010, 
+010000001000110000000011, 
+010100001000110000010010, 
+011000000000110000010010, 
+011100000000110000010010, 
+100000000000000000000000, 
+100100000000000000000000, 
+ 0 <repeats 4086 times>}
+
+
+
+
+*/

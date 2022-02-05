@@ -54,7 +54,7 @@ SECTIONS
 	build/user/user_lib/*(.data .data.*)
 	}
 
-	. = 0x000800000;
+	. = 0x00800000;
 	.user_bss :{ 
 	build/user/*(.bss .bss.*)
 	build/user/user_lib/*(.bss .bss.*)

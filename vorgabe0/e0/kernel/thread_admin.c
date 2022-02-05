@@ -11,7 +11,7 @@
 #define USER_MODE 0x10
 
 #define THREAD_COUNT	32
-#define USER_STACK_BASE 0x27000
+#define USER_STACK_BASE 0x7FEFF8
 #define USER_STACK_SIZE 0x1000
 
 /*	Layout vom regs[35] Array: R0=regs[22]
