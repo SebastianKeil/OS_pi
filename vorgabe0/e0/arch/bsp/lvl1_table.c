@@ -56,27 +56,35 @@ void initialize_mmu(){
 	asm volatile ("mcr p15, 0, %0, c2, c0, 0" : : "r" (&lvl1_table));
 	for(int i = 0; i < 2047; i++){
 		unsigned int temp = 1024 * 1024 * i;
-		// //FAULT
-		// lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1); //Sys 		Usr
-		// //TEXT
-		// lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1); //Sys L 		Usr 
-		// //RODATA
-		// lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1); //Sys L   	Usr 	XN
-		// //BSS		 
-		// lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1); //Sys L/S 	Usr 	XN
-		// //USER_TEXT
-		// lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1); //Sys L   	Usr L 	pXN
-		// //USER_RODATA
-		// lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1); //Sys L   	Usr L 	XN
-		// //USER_DATA + USER_BSS
-		// lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1); //Sys L/S 	USR L/S XN
 		
-		// lvl1_table[i] = set_bits(temp, 0, 1, 0, 0, 0, 1); //Sys L/S 	Usr L
-		// lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1); //Sys L/S USR L/S XN!		Niemand kann ausführen
-		// lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 1, 1); //Sys L/S USR L/S pXN!	Sys kann nicht ausführen
+		//NO ACCESS
+		if(i < 1){
+		lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1); 
+		
+		}	//Sys 		Usr
+		//TEXT
+		if(i < 2){lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1); continue;}	//Sys L 	Usr 
+		//RODATA
+		if(i < 3){lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1); continue;}	//Sys L   	Usr 	XN
+		//BSS		 
+		if(i < 4){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1); continue;}	//Sys L/S 	Usr 	XN
+		//USER_TEXT
+		if(i < 5){lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1); continue;}	//Sys L   	Usr L 	pXN
+		//USER_RODATA
+		if(i < 6){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1); continue;}	//Sys L   	Usr L 	XN
+		//USER_DATA + USER_BSS
+		if(i < 8){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1); continue;}	//Sys L/S 	USR L/S XN
+		//UART, 
+		if(i > 1009 && i < 1012){
+		 	lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1); continue;}		//Sys L/S 	Usr 	XN	
+		//FAULT
+		//lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1);				 	//Sys 		Usr 	
 
 
-		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
+		
+
+		//Vollzugriff
+		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
 	}
 	return;
 }

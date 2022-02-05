@@ -12,7 +12,7 @@ SECTIONS
 	build/kernel/*(.text .text.*)
 	}
 
-	. = 0x000700000;
+	. = 0x000200000;
 	.rodata :{ 
 	build/arch/*(.rodata .rodata.*)
 	build/cpu/*(.rodata .rodata.*)
@@ -20,7 +20,7 @@ SECTIONS
 	build/kernel/*(.rodata .rodata.*)
 	}
 
-	. = 0x000800000;
+	. = 0x000300000;
 	.data :{ 
 	build/arch/*(.data .data.*)
 	build/cpu/*(.data .data.*)
@@ -28,7 +28,7 @@ SECTIONS
 	build/kernel/*(.data .data.*)
 	}
 
-	. = 0x000900000;
+	. = 0x000400000;
 	.bss :{ 
 	build/arch/*(.bss .bss.*)
 	build/cpu/*(.bss .bss.*)
@@ -36,25 +36,25 @@ SECTIONS
 	build/kernel/*(.bss .bss.*)
 	}
 
-	. = 0x001000000;
+	. = 0x000500000;
 	.user_text :{ 
 	build/user/*(.text .text.*)
 	build/user/user_lib/*(.text .text.*)
 	}
 
-	. = 0x001100000;
+	. = 0x000600000;
 	.user_rodata :{
 	build/user/*(.rodata .rodata.*)
 	build/user/user_lib/*(.rodata .rodata.*)
 	}
 
-	. = 0x001200000;
+	. = 0x000700000;
 	.user_data :{ 
 	build/user/*(.data .data.*)
 	build/user/user_lib/*(.data .data.*)
 	}
 
-	. = 0x001300000;
+	. = 0x000800000;
 	.user_bss :{ 
 	build/user/*(.bss .bss.*)
 	build/user/user_lib/*(.bss .bss.*)
