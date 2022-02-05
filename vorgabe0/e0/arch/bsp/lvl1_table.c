@@ -9,6 +9,7 @@
 #define XN_BIT_LVL2
 #define C_BIT 3 //0
 #define B_BIT 2 //0
+#define SEC_BIT 1
 #define PXN_BIT 0//für lvl2 übernehmen
 #define AP0_BIT 10
 #define AP1_BIT 11
@@ -39,12 +40,13 @@ L2:
 static unsigned int lvl1_table[4096] __attribute__((aligned(0x4000)));
 
 unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int xn_bit, unsigned int pxn_bit, unsigned int sec_bit){
+
 	temp = (ap_0 == 0) ? temp : SET_BIT_1(temp, AP0_BIT);
 	temp = (ap_1 == 0) ? temp : SET_BIT_1(temp, AP1_BIT);
 	temp = (ap_2 == 0) ? temp : SET_BIT_1(temp, AP2_BIT);
 	temp = (xn_bit == 0) ? temp : SET_BIT_1(temp, XN_BIT);
 	temp = (pxn_bit == 0) ? temp : SET_BIT_1(temp, PXN_BIT);
-	temp = (sec_bit == 0) ? temp : SET_BIT_1(temp, 1);
+	temp = (sec_bit == 0) ? temp : SET_BIT_1(temp, SEC_BIT);
 
 	return temp;
 }
@@ -53,9 +55,28 @@ void initialize_mmu(){
 
 	asm volatile ("mcr p15, 0, %0, c2, c0, 0" : : "r" (&lvl1_table));
 	for(int i = 0; i < 2047; i++){
-		 unsigned int temp = 1024 * 1024 * i;
-		 //temp |= (3 << 10);
-		 lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
+		unsigned int temp = 1024 * 1024 * i;
+		// //FAULT
+		// lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1); //Sys 		Usr
+		// //TEXT
+		// lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1); //Sys L 		Usr 
+		// //RODATA
+		// lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1); //Sys L   	Usr 	XN
+		// //BSS		 
+		// lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1); //Sys L/S 	Usr 	XN
+		// //USER_TEXT
+		// lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1); //Sys L   	Usr L 	pXN
+		// //USER_RODATA
+		// lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1); //Sys L   	Usr L 	XN
+		// //USER_DATA + USER_BSS
+		// lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1); //Sys L/S 	USR L/S XN
+		
+		// lvl1_table[i] = set_bits(temp, 0, 1, 0, 0, 0, 1); //Sys L/S 	Usr L
+		// lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1); //Sys L/S USR L/S XN!		Niemand kann ausführen
+		// lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 1, 1); //Sys L/S USR L/S pXN!	Sys kann nicht ausführen
+
+
+		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
 	}
 	return;
 }
