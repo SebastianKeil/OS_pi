@@ -19,7 +19,6 @@ void sleep(unsigned int ticks){
 void print_answer(unsigned char *input){
 	for(int i = 0; i < 3; i++){
 		syscall_put_char(*input);
-		//sleep(BUSY_WAIT_COUNTER*20);
 		syscall_sleep_thread(5);
 	}
 	return;
@@ -28,8 +27,7 @@ void print_answer(unsigned char *input){
 void print_answer_uppercase(unsigned char *input){
 	for(int i = 0; i < 5; i++){
 		syscall_put_char(*input);
-		//sleep(BUSY_WAIT_COUNTER*20);
-		syscall_sleep_thread(1);
+		sleep(BUSY_WAIT_COUNTER*20);
 		
 	}
 	syscall_put_char(LINEFEED);
@@ -53,39 +51,8 @@ void unterprogramm(unsigned char *input){
 		syscall_kill_thread();	
 		return;
 	}
-
-	/*
-	n: lesender Zugriff auf Null-Pointer.
-	p: Sprung auf Null-Pointer.
-	d: lesender Zugriff auf Kernel-Daten.
-	k: lesender Zugriff auf Kernel-Code.
-	K: lesender Zugriff auf Kernel-Stack.
-	g: lesender Zugriff auf Peripherie-Gerät, z.B. UART.
-	c: schreibender Zugriff auf eigenen Code.
-	s: Stack-Overflow.
-	u: lesender Zugriff auf nicht zugeordnete Adresse.
-	x: Sprung auf eigene Daten oder Stack.
-	*/
-
-	//check if correct char
-	unsigned int debug_char = 0;
-	if(debug_char){
-		syscall_put_char(LINEFEED);
-		syscall_put_char(character);
-		syscall_put_char(' ');
-		syscall_put_char('w');
-		syscall_put_char('a');
-		syscall_put_char('s');
-		syscall_put_char(' ');
-		syscall_put_char('e');
-		syscall_put_char('n');
-		syscall_put_char('t');
-		syscall_put_char('e');
-		syscall_put_char('r');
-		syscall_put_char('e');
-		syscall_put_char('d');
-		syscall_put_char(LINEFEED);
-	}
+	
+	
 	switch(character){
 		case 'n':			//lesender Zugriff auf Null-Pointer
 			asm volatile 	("ldr r0, =0x0\t\n"

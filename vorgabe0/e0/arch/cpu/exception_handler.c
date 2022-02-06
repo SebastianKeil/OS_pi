@@ -139,7 +139,7 @@ void software_interrupt(unsigned int regs[35]){
 void prefetch_abort(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 		kprintf("kill thread because prefetch abort\n");
-		print_reg_dump(regs, PRE); //remove!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//print_reg_dump(regs, PRE); //remove!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		kill_thread(regs);
 	} else {
 	print_reg_dump(regs, PRE);
