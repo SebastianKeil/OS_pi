@@ -19,42 +19,6 @@
 #define AP2_LVL2_BIT 9
 #define SMALL_PAGE_BIT 1
 
-/* 	Aufbau MMU:
-
-AP[2:0] priv. Modus User-Modus 	Kommentar
-000 	No access 	No access 	kein Zugriff
-001 	Read/write 	No access 	System-Zugriff
-101 	Read-only 	No access 	System-Nur-Lesen
-111 	Read-only 	Read-only 	Beide-Nur-Lesen
-010 	Read/write 	Read-only 	Nur-Lesen
-011 	Read/write 	Read/write 	Vollzugriff
-
-L1:
-	Fault:		letzte Bits 00
-	Zeiger:		letzte Bits 01 zeigt auf L2-Tabelle
-	Section:	letzte Bits 1* 
-
-L2:
-	Fault:		letzte Bits 00
-	Large:		letzte Bits 01 Bits sitzen evtl anders!!!
-	Small:		letzte Bits 1*
- */
-
-
-/* 	MEMORY LAYOUT
-	sp_svc 0x3FFFF8 	4194296
-	sp_und 0x3FEFF8 	  +4096 = 4190200
-	sp_abt 0x3FDFF8  	  +4096 = 4186104
-	sp_irq 0x3FCFF8  	  +4096 = 4182008
-	sp_fiq 0x3FBFF8  	  +4096 = 4177912
-	
-	sp_usr 0x7FFFF8    			= 8388600
-*/
-
-//#define USER_STACK_BASE 0x7FEFF8
-//#define USER_STACK_SIZE 0x1000
-//tcbs[i].sp = USER_STACK_BASE - (i * USER_STACK_SIZE);
-
 
 
 static unsigned int lvl1_table[4096] __attribute__((aligned(0x4000)));
