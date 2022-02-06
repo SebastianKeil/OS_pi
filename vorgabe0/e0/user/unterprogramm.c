@@ -1,4 +1,3 @@
-#include <kernel/kprintf.h>
 #include <config.h>
 #include <lib/regcheck.h>
 #include <lib/unterprogramm.h>
@@ -18,9 +17,7 @@ void sleep(unsigned int ticks){
 
 void print_answer(unsigned char *input){
 	for(int i = 0; i < 3; i++){
-		kprintf("\t\t\t\t\t\t");
 		syscall_put_char(*input);
-		kprintf("%i\n", i);
 		//sleep(BUSY_WAIT_COUNTER*20);
 		syscall_sleep_thread(5);
 	}
@@ -29,7 +26,6 @@ void print_answer(unsigned char *input){
 
 void print_answer_uppercase(unsigned char *input){
 	for(int i = 0; i < 5; i++){
-		kprintf("\t\t\t\t\t\t");
 		syscall_put_char(*input);
 		//sleep(BUSY_WAIT_COUNTER*20);
 		syscall_sleep_thread(1);
@@ -40,7 +36,6 @@ void print_answer_uppercase(unsigned char *input){
 }
 
 void unterprogramm(unsigned char *input){
-	kprintf("first unterprogramm: \n\tgot '%c'\n", *input);
 	unsigned char character = *input;
 	unsigned int range = (unsigned int)character;
 
@@ -58,33 +53,27 @@ void unterprogramm(unsigned char *input){
 	switch(character){
 		case 's':
 			//supervisor call
-			//kprintf("test: supervisor interrupt by thread\n");
 			asm volatile("svc #1");	 
 			break;
 		case 'p':
 			//prefetch abort
-			//kprintf("test: prefetch interrupt by thread\n");
 			asm volatile("bkpt #2");
 			break;
 		case 'a':
 			//data abort
-			//kprintf("test: data abort by thread\n");
 			//asm volatile("bkpt #0");
 			asm volatile("mov r0, #0x1 \n ldr r0, [r0]");
 			break;
 		case 'u':
 			//undefined instruction
-			//kprintf("test: undefined interrupt by thread\n");
 			asm volatile("udf");
 			break;
 		case 'c':
 			//register checker ausführen
-			//kprintf("test: register checker\n");
 			register_checker();
 			syscall_kill_thread();
 			break;
 		default:
-			//kprintf("unterprogramm laeuft mit: %c\n", input);
 			print_answer(input);
 			syscall_kill_thread();
 			break;

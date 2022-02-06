@@ -88,17 +88,17 @@ void software_interrupt(unsigned int regs[35]){
 				break;
 				
 			case 43:
-				kprintf("software_interrupt 43: \n\tcurrent thread asking for char\n");
+				//kprintf("software_interrupt 43: \n\tcurrent thread asking for char\n");
 				//kprintf("\tstack of curr: %p\n", regs[15]);
 				
 				//char must be in $r0 when returning
 				if(uart_input_buffer.count > 0){
 					unsigned char buffered_char = buffer_pull(&uart_input_buffer);
-					kprintf("\tbuffer count: %i, thread gets '%c'\n\n", uart_input_buffer.count, buffered_char);
+					//kprintf("\tbuffer count: %i, thread gets '%c'\n\n", uart_input_buffer.count, buffered_char);
 					regs[22] = (unsigned int) buffered_char;
 					return;
 				} else {
-					kprintf("\tbuffer count: %i, thread has to wait\n\n", uart_input_buffer.count);
+					//kprintf("\tbuffer count: %i, thread has to wait\n\n", uart_input_buffer.count);
 					
 					wait_thread(0, regs);
 				}
@@ -106,24 +106,24 @@ void software_interrupt(unsigned int regs[35]){
 				break;
 				
 			case 69:
-				kprintf("kill me\n");
+				//kprintf("kill me\n");
 				
 				kill_thread(regs);
 				break;
 				
 			case 44:
 				_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
-				kprintf("software_interrupt44: \n\tcreate thread with %c\n", *(_thread_create_context_ptr->data));
+				//kprintf("software_interrupt44: \n\tcreate thread with %c\n", *(_thread_create_context_ptr->data));
 				
 				create_thread(_thread_create_context_ptr->data, _thread_create_context_ptr->count, _thread_create_context_ptr->unterprogramm, regs);
 				break;
 				
 			case 45:
-				kprintf("make me sleep!\n");
+				//kprintf("make me sleep!\n");
 				
 				sleep_time = regs[22];
 				if (sleep_time == 0){
-					kprintf("sleep time cant be 0, set to 1 (min)\n");
+					//kprintf("sleep time cant be 0, set to 1 (min)\n");
 					sleep_time = 1;
 				}
 				wait_thread(sleep_time, regs);
@@ -178,7 +178,7 @@ void irq(unsigned int regs[]){
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
 		uart_data = uart_read();
-		kprintf("irq: \n\t[%c] was pressed, check if any threads are waiting\n", uart_data);
+		//kprintf("irq: \n\t[%c] was pressed, check if any threads are waiting\n", uart_data);
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_waiting_threads(regs);
 		//kprintf("irq again: \n\tin registers[0] (regs[22]) is %c\n", regs[22]);

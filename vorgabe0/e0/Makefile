@@ -75,16 +75,14 @@ lib/utilities.c \
 kernel/thread_admin.c \
 lib/kmemcpy.c \
 kernel/idle_thread.c \
+arch/bsp/lvl1_table.c \
+
+# Hier separate user files hinzufügen
+USRC = user/main.c \
 user/masterprogramm.c \
 user/unterprogramm.c \
 user/user_lib/user_syscalls.c \
 user/user_lib/user_syscalls_asm.S \
-arch/bsp/lvl1_table.c \
-
-
-
-# Hier separate user files hinzufügen
-USRC = user/main.c
 
 # Wenn ihr zuhause arbeitet, hier das TFTP-Verzeichnis eintragen
 TFTP_PATH = /srv/tftp

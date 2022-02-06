@@ -1,5 +1,4 @@
 #include<stdarg.h>
-#include <kernel/kprintf.h>
 
 extern unsigned char syscall_get_char_asm(void); 
 extern void syscall_sleep_thread_asm(void); 
@@ -15,13 +14,12 @@ syscall_sleep_thread()				->	asm volatile("svc #45");
 struct thread_create_context{ 
 	unsigned char* data;
 	unsigned int count;
-	void (*unterprogramm)(unsigned char*);
+	void (*programm)(unsigned char*);
 } thread_create_context;
 
 unsigned char received_char;
 
 void syscall_put_char(unsigned char c){
-	//kprintf("svc_put_char: \n\toffering char\n");
 
 	asm volatile 	("mov r0, %0\t\n"
 					"svc #42\t\n"
@@ -40,13 +38,11 @@ void syscall_kill_thread(){
 	asm volatile 	("svc #69");
 }
 
-void syscall_create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*)){
-	kprintf("svc_create_thread: \n\twurde mit %c aufgerufen\n", *data);
-	
-	//fill data struct
+void syscall_create_thread(unsigned char* data, unsigned int count, void (*programm)(unsigned char*)){
+
 	thread_create_context.data = data;
 	thread_create_context.count = count;
-	thread_create_context.unterprogramm = unterprogramm;
+	thread_create_context.programm = programm;
 
 	asm volatile	(//"stmfd sp!, {r0}\t\n"
 					"mov r0, %0\t\n"

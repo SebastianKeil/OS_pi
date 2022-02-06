@@ -16,18 +16,33 @@
 
 volatile unsigned int counter = 0;
 unsigned char void_char;
+struct thread_create_context_kernel{ 
+	unsigned char* data;
+	unsigned int count;
+	void (*programm)(unsigned char*);
+} thread_create_context_kernel;
+
+void __attribute__((weak))syscall_create_thread(unsigned char* data, unsigned int count, void (*programm)(unsigned char*)){
+	
+	thread_create_context_kernel.data = data;
+	thread_create_context_kernel.count = count;
+	thread_create_context_kernel.programm = programm;
+
+	asm volatile	("mov r0, %0\t\n"
+					"svc #44\t\n"
+					 : : "r" (&thread_create_context_kernel));
+}
 
 void increment_counter() {
 	counter++;
 }
 
+void __attribute__((weak)) masterprogramm(unsigned char *void_char){	
+	kprintf("\nläuft! %c\n", *void_char);
+	return;
+	}
 
 void start_kernel(){
-	kprintf("Pisse \n");
-	//SCTLR mmu einschalten
-	asm volatile 	("mrc p15, 0, r7, c1, c0, 0\t\n"
-					"add r7, #1\t\n"
-					"mcr p15, 0, r7, c1, c0, 0" : : : "r7");
 
 	kprintf("\n\n");
 	kprintf("*****************************************************\n");
@@ -35,7 +50,7 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
-	//print_register_dump = 0;
+	print_register_dump = 0;
 	
 	disable_uart_fifo();
 	set_uart_receive_interrupt();
@@ -62,6 +77,11 @@ void start_kernel(){
 	kprintf("Hallo ich bin der Kernel, starte print-threads: \n\n");
 	kprintf("\n");
 	
+	//SCTLR mmu einschalten
+	asm volatile 	("mrc p15, 0, r7, c1, c0, 0\t\n"
+					"add r7, #1\t\n"
+					"mcr p15, 0, r7, c1, c0, 0" : : : "r7");
+
 	/*change to user mode*/
 		asm ("cps #0x10");
 		
@@ -69,9 +89,6 @@ void start_kernel(){
 		//initial thread
 		syscall_create_thread(&void_char, 0, &masterprogramm);
 		
-		//create_thread_simple(&masterprogramm);
-
-
 	// Endless counter
 	for (;;) {
 		increment_counter();
