@@ -44,21 +44,12 @@ void syscall_create_thread(unsigned char* data, unsigned int count, void (*progr
 	thread_create_context.count = count;
 	thread_create_context.programm = programm;
 
-	asm volatile	(//"stmfd sp!, {r0}\t\n"
-					"mov r0, %0\t\n"
-					"svc #44\t\n"
-					//"ldmfd sp!, {r0}\t\n"
-					 : : "r" (&thread_create_context));
+	asm volatile	("mov r0, %0" : : "r" (&thread_create_context));
+	syscall_create_thread_asm();
 }
 
 void syscall_sleep_thread(unsigned int length){
-	/*
-	asm volatile	(//"stmfd sp!, {r0}\t\n"
-					"mov r0, %0\t\n"
-					"svc #45\t\n"
-					//"ldmfd sp!, {r0}\t\n"
-					 : : "r" (length));
-	*/
+
 	asm volatile ("mov r0, %0" : : "r" (length));
 	syscall_sleep_thread_asm();
 	

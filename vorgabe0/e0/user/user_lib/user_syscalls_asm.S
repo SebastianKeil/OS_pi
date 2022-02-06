@@ -12,3 +12,9 @@ syscall_sleep_thread_asm:
 	push {r2, lr}
 	svc #45
 	pop {r2, pc} 
+	
+.globl syscall_create_thread_asm
+syscall_create_thread_asm:
+	push {r2, lr}
+	svc #44
+	pop {r2, pc} 
