@@ -59,15 +59,8 @@ void initialize_mmu(){
 		
 		//FAULT .INIT	//Sys 		Usr 		
 		if(i < 1){lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);}
-
-
-		//HIER IST NOCH EIN FEHLER! Zugriff auf 0x010, welches interessanterweise
-		//die Instruktion für UserModus ist (cps 0x10)
 		//TEXT 			//Sys L 	Usr 
-		else if(i < 2){lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1);
-		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);}	
-
-
+		else if(i < 2){lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1);}	
 		//RODATA 		//Sys L   	Usr 	XN
 		else if(i < 3){lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1);}
 		//BSS			//Sys L/S 	Usr 	XN
@@ -75,25 +68,28 @@ void initialize_mmu(){
 
 
 
-
+		//HIER IST NOCH EIN FEHLER! interessanterweise ist
+		//die Instruktion für UserModus (cps 0x10) die Fehlermeldung steht im print
+		//dem sollte man aber auch nicht unbedingt trauen! 
 		//USR_TEXT 		//Sys L   	Usr L 	pXN
 		else if(i < 5){lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1);
 		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
 	}
+		//HIER IST NOCH EIN FEHLER
 		//USR_RODATA	//Sys L   	Usr L 	XN
 		else if(i < 6){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1);
-		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
+		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
 	}	
+		
+
 		//USR_DATA/BSS 	//Sys L/S 	USR L/S XN
-		else if(i < 8){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);
-		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
-	}	
+		else if(i < 8){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}	
 		//HARDWARE		//Sys L/S 	Usr 	XN	
-		else if(i > 1007 && i < 1013){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);
-		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
-		}
+		else if(i > 1008 && i < 1012){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
 		//FAULT			//Sys 		Usr 	
-		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 1);
+		
+		//HIER IST NOCH EIN FEHLER
+		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);
 		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
 	}				 	
 

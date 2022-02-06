@@ -10,6 +10,7 @@
 #define CPSR	17
 #define USER_MODE 0x10
 #define SVC_MODE 0x13
+#define SYS_MODE 0x1F
 
 #define THREAD_COUNT	32
 #define USER_STACK_BASE 0x7FEFF8
@@ -350,9 +351,8 @@ void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)
 	//kprintf("create_thread: \n\tgoing to create_thread with %c\n", *data);
 	
 	if(!find_free_tcb()){
-		//kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
+		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;}
-		
 	//DEBUG
 	//print_ready_queue();
 	
@@ -396,7 +396,7 @@ void kill_thread(unsigned int regs[]){
 		}else{
 			//kprintf("going to load idle_thread\n");
 			regs[LR] = (unsigned int) &idle_thread;
-			regs[CPSR] = SVC_MODE;
+			regs[CPSR] = SYS_MODE;
 			used_tcbs--;
 			ready_queue->count--;
 		}
@@ -414,12 +414,8 @@ void kill_thread(unsigned int regs[]){
 		used_tcbs--;
 		ready_queue->count--;
 	}
-	
-	
-	
 	//DEBUG
 	//print_ready_queue();
-	
 	return;
 }
 
@@ -436,7 +432,7 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 	if(ready_queue->count == 1){
 		ready_queue->curr = 0x0;
 		regs[LR] = (unsigned int) &idle_thread;
-		regs[CPSR] = SVC_MODE;
+		regs[CPSR] = SYS_MODE;
 		
 	} else if(ready_queue->count > 1){
 		ready_queue->curr->next->prev = ready_queue->curr->prev;
@@ -476,7 +472,6 @@ void wait_thread(unsigned int sleep_time, unsigned int regs[]){
 	print_waiting_queue();
 	return;
 }
-
 
 void wake_thread(unsigned char _send_char, struct list_elem* _waiting_thread, unsigned int regs[35]){
 

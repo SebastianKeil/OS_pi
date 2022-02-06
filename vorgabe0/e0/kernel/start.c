@@ -9,38 +9,20 @@
 #include <arch/cpu/shared.h>
 #include <kernel/idle_thread.h>
 #include <kernel/thread_admin.h>
-#include <user/masterprogramm.h>
-#include <user/user_lib/user_syscalls.h>
-
-
 
 volatile unsigned int counter = 0;
 unsigned char void_char;
-struct thread_create_context_kernel{ 
-	unsigned char* data;
-	unsigned int count;
-	void (*programm)(unsigned char*);
-} thread_create_context_kernel;
-
-void __attribute__((weak))syscall_create_thread(unsigned char* data, unsigned int count, void (*programm)(unsigned char*)){
-	
-	thread_create_context_kernel.data = data;
-	thread_create_context_kernel.count = count;
-	thread_create_context_kernel.programm = programm;
-
-	asm volatile	("mov r0, %0\t\n"
-					"svc #44\t\n"
-					 : : "r" (&thread_create_context_kernel));
-}
 
 void increment_counter() {
 	counter++;
 }
 
-void __attribute__((weak)) masterprogramm(unsigned char *void_char){	
-	kprintf("\nläuft! %c\n", *void_char);
+void __attribute__((weak))create_masterprogram_thread(){
 	return;
-	}
+}
+// void __attribute__((weak))masterprogram(){
+// 	return;
+// }
 
 void start_kernel(){
 
@@ -82,19 +64,21 @@ void start_kernel(){
 					"add r7, #1\t\n"
 					"mcr p15, 0, r7, c1, c0, 0" : : : "r7");
 
-	/*change to user mode*/
-		asm ("cps #0x10");
-		
-		void_char = '#';
+
+	unsigned int cpsr_for_user_mode = 0x10;
+	asm volatile	("msr SPSR_cxsf, %0\t\n"
+					"ldr lr, =create_masterprogram_thread\t\n"
+					"movs pc, lr\t\n"
+					 : : "r" (cpsr_for_user_mode));
+	
+		//void_char = '#';
 		//initial thread
-		syscall_create_thread(&void_char, 0, &masterprogramm);
+		//syscall_create_thread(&void_char, 0, &masterprogramm);
 		
 	// Endless counter
 	for (;;) {
 		increment_counter();
-		
-		/*change to user mode*/
-		//asm ("cps #0x10");
+
 		
 		//initial thread
 		//create_thread_simple(&masterprogramm);
