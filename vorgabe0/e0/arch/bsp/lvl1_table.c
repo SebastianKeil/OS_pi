@@ -72,7 +72,7 @@ void initialize_mmu(){
 		//USR_RODATA	//Sys L   	Usr L 	XN
 		else if(i < 7){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1);}	
 		//USR_DATA/BSS 	//Sys L/S 	USR L/S XN
-		else if(i < 8){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}	
+		else if(i < 9){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}	
 		//HARDWARE		//Sys L/S 	Usr 	XN	
 		else if(i > 1008 && i < 1012){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
 		
@@ -80,7 +80,7 @@ void initialize_mmu(){
 		//HIER IST NOCH EIN FEHLER
 		//FAULT			//Sys 		Usr 	
 		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);
-		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
+		lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
 	}				 	
 
 		//Vollzugriff
