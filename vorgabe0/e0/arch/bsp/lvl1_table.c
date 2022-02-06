@@ -75,12 +75,11 @@ unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, u
 
 	return temp;
 }
-1000000000
-1000000000
 
-unsigned int set_l2(unsigned int temp){
-	
-	return temp;
+unsigned int set_l2(unsigned int lvl2_table[256]){
+	for(int i = 0; i < 256; i++){
+		lvl2_table[i] = 1024 * 4 * i;
+	}
 }
 
 void initialize_mmu(){
