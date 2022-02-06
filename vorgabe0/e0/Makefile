@@ -76,7 +76,6 @@ kernel/thread_admin.c \
 lib/kmemcpy.c \
 kernel/idle_thread.c \
 arch/bsp/lvl1_table.c \
-arch/bsp/lvl2_table.c \
 
 # Hier separate user files hinzufügen
 USRC = \
