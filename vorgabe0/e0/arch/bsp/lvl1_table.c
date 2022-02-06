@@ -75,6 +75,8 @@ unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, u
 
 	return temp;
 }
+1000000000
+1000000000
 
 unsigned int set_l2(unsigned int temp){
 	
@@ -107,7 +109,8 @@ void initialize_mmu(){
 		//32TCB STACKS	//Sys L/S	USR L/S XN
 		else if(i < 41){
 			unsigned int lvl2_address = &lvl2_tables[i - 9][0];
-			lvl1_table[i] = set_l2(temp, 1, 1, 0, 1, 0, 1);
+			lvl2_address = SET_BIT_1(lvl2_address, 2);
+			lvl1_table[i] = SET_BIT_1(lvl2_address, 0);
 		}
 			
 		//HARDWARE		//Sys L/S 	Usr 	XN	
