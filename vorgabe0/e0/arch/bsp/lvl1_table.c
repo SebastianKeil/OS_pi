@@ -47,15 +47,12 @@ unsigned int set_bits_lvl2(unsigned int temp, unsigned int ap_0, unsigned int ap
 	return temp;
 }
 
-//unsigned int fetzt = 0;
-void initialize_l2_entry(unsigned int lvl2_table[256], unsigned int temp){
+void initialize_l2_entry(unsigned int lvl2_table[256], unsigned int base_address){
 	for(int i = 0; i < 256; i++){
-		temp += (1024 * 4);
-		//kprintf("\n Eintrag in tcb %i an Stelle %i lautet:\n %x \n", fetzt, i, temp);
+		unsigned int temp  = base_address + (1024 * 4 * i);
 		lvl2_table[i] = set_bits_lvl2(temp, 1, 1, 0, 1, 1);
 		if(i == 0){lvl2_table[i] = set_bits_lvl2(temp, 0, 0, 0, 0, 1);}
 	}
-	//fetzt++;
 	return;
 }
 
@@ -87,7 +84,7 @@ void initialize_mmu(){
 			unsigned int lvl2_address = (unsigned int)&lvl2_tables[i - 9][0];
 			lvl2_address = SET_BIT_1(lvl2_address, 2);
 			lvl1_table[i] = SET_BIT_1(lvl2_address, 0);
-			initialize_l2_entry(lvl2_tables[i - 9],(temp - 1024 * 4));
+			initialize_l2_entry(lvl2_tables[i - 9],temp);
 		}
 			
 		//HARDWARE		//Sys L/S 	Usr 	XN	
