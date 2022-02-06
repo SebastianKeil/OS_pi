@@ -37,7 +37,32 @@ L2:
 	Small:		letzte Bits 1*
  */
 
+
+/* 	MEMORY LAYOUT
+	sp_svc 0x3FFFF8 	4194296
+	sp_und 0x3FEFF8 	  +4096 = 4190200
+	sp_abt 0x3FDFF8  	  +4096 = 4186104
+	sp_irq 0x3FCFF8  	  +4096 = 4182008
+	sp_fiq 0x3FBFF8  	  +4096 = 4177912
+	
+	sp_usr 0x7FFFF8    			= 8388600
+*/
+
+//#define USER_STACK_BASE 0x7FEFF8
+//#define USER_STACK_SIZE 0x1000
+//tcbs[i].sp = USER_STACK_BASE - (i * USER_STACK_SIZE);
+
+
+
 static unsigned int lvl1_table[4096] __attribute__((aligned(0x4000)));
+static unsigned int lvl2_tables[32][256] __attribute__((aligned(0x4000)));
+
+
+void set_guard_pages(){
+	for(int i = 0; i < 32; i++){
+		
+	}
+}
 
 unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int xn_bit, unsigned int pxn_bit, unsigned int sec_bit){
 
@@ -48,6 +73,11 @@ unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, u
 	temp = (pxn_bit == 0) ? temp : SET_BIT_1(temp, PXN_BIT);
 	temp = (sec_bit == 0) ? temp : SET_BIT_1(temp, SEC_BIT);
 
+	return temp;
+}
+
+unsigned int set_l2(unsigned int temp){
+	
 	return temp;
 }
 
@@ -72,11 +102,17 @@ void initialize_mmu(){
 		//USR_RODATA	//Sys L   	Usr L 	XN
 		else if(i < 7){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1);}	
 		//USR_DATA/BSS 	//Sys L/S 	USR L/S XN
-		else if(i < 9){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}	
+		else if(i < 9){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}
+		
+		//32TCB STACKS	//Sys L/S	USR L/S XN
+		else if(i < 41){
+			unsigned int lvl2_address = &lvl2_tables[i - 9][0];
+			lvl1_table[i] = set_l2(temp, 1, 1, 0, 1, 0, 1);
+		}
+			
 		//HARDWARE		//Sys L/S 	Usr 	XN	
 		else if(i > 1007 && i < 1012){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
 		
-
 		//HIER IST NOCH EIN FEHLER
 		//FAULT			//Sys 		Usr 	
 		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);

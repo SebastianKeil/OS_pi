@@ -13,8 +13,8 @@
 #define SYS_MODE 0x1F
 
 #define THREAD_COUNT	32
-#define USER_STACK_BASE 0x7FEFF8
-#define USER_STACK_SIZE 0x1000
+#define USER_STACK_BASE 0x900000
+#define USER_STACK_SIZE 0x100000
 
 /*	Layout vom regs[35] Array: R0=regs[22]
 	regs[34-22]		R12-R0
