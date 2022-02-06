@@ -50,35 +50,58 @@ void unterprogramm(unsigned char *input){
 	}
 	
 	/*
+	n: lesender Zugriff auf Null-Pointer.
+	p: Sprung auf Null-Pointer.
+	d: lesender Zugriff auf Kernel-Daten.
+	k: lesender Zugriff auf Kernel-Code.
+	K: lesender Zugriff auf Kernel-Stack.
+	g: lesender Zugriff auf Peripherie-Gerät, z.B. UART.
+	c: schreibender Zugriff auf eigenen Code.
+	s: Stack-Overflow.
+	u: lesender Zugriff auf nicht zugeordnete Adresse.
+	x: Sprung auf eigene Daten oder Stack.
+	*/
+	
 	switch(character){
-		case 's':
-			//supervisor call
-			asm volatile("svc #1");	 
+		case 'n':
+			//lesender Zugriff auf Null-Pointer
+			kprintf("going to read from NULL");
+			unsigned int dummy = *(unsigned int*) 0x0;
 			break;
 		case 'p':
-			//prefetch abort
-			asm volatile("bkpt #2");
+			//Sprung auf Null-Pointer
+			kprintf("going to jump to NULL");
+			asm ("ldr pc, =0x0");
 			break;
-		case 'a':
-			//data abort
-			//asm volatile("bkpt #0");
-			asm volatile("mov r0, #0x1 \n ldr r0, [r0]");
+		case 'd':
+			//lesender Zugriff auf Kernel-Daten
 			break;
-		case 'u':
-			//undefined instruction
-			asm volatile("udf");
+		case 'k':
+			//lesender Zugriff auf Kernel-Code
+			break;
+		case 'K':
+			//lesender Zugriff auf Kernel-Stack
+			break;
+		case 'g':
+			//lesender Zugriff auf Peripherie-Gerät, z.B. UART
 			break;
 		case 'c':
-			//register checker ausführen
-			register_checker();
-			syscall_kill_thread();
+			//schreibender Zugriff auf eigenen Code
+			break;
+		case 's':
+			//Stack-Overflow
+			break;
+		case 'u':
+			//lesender Zugriff auf nicht zugeordnete Adresse
+			break;
+		case 'x':
+			//Sprung auf eigene Daten oder Stack
 			break;
 		default:
 			print_answer(input);
 			syscall_kill_thread();
 			break;
 	}
-	*/
 	
 }
 
