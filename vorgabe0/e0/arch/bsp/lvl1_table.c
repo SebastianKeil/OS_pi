@@ -83,15 +83,15 @@ unsigned int set_bits_lvl2(unsigned int temp, unsigned int ap_0, unsigned int ap
 	return temp;
 }
 
-unsigned int fetzt = 0;
+//unsigned int fetzt = 0;
 void initialize_l2_entry(unsigned int lvl2_table[256], unsigned int temp){
 	for(int i = 0; i < 256; i++){
 		temp += (1024 * 4);
-		kprintf("\n Eintrag in tcb %i an Stelle %i lautet:\n %x \n", fetzt, i, temp);
+		//kprintf("\n Eintrag in tcb %i an Stelle %i lautet:\n %x \n", fetzt, i, temp);
 		lvl2_table[i] = set_bits_lvl2(temp, 1, 1, 0, 1, 1);
-		if(i == 255){lvl2_table[i] = set_bits_lvl2(temp, 0, 0, 0, 0, 1);}
+		if(i == 0){lvl2_table[i] = set_bits_lvl2(temp, 0, 0, 0, 0, 1);}
 	}
-	fetzt++;
+	//fetzt++;
 	return;
 }
 
