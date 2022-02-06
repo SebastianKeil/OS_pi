@@ -70,6 +70,7 @@ void unterprogramm(unsigned char *input){
 	//check if correct char
 	unsigned int debug_char = 0;
 	if(debug_char){
+		syscall_put_char(LINEFEED);
 		syscall_put_char(character);
 		syscall_put_char(' ');
 		syscall_put_char('w');
@@ -83,6 +84,7 @@ void unterprogramm(unsigned char *input){
 		syscall_put_char('r');
 		syscall_put_char('e');
 		syscall_put_char('d');
+		syscall_put_char(LINEFEED);
 	}
 	switch(character){
 		case 'n':			//lesender Zugriff auf Null-Pointer
@@ -120,7 +122,10 @@ void unterprogramm(unsigned char *input){
 			break;
 
 		case 's':			//Stack-Overflow
-			
+			asm volatile 	("loop1:\t\n" 
+							"push {r0-r12}\t\n"
+							"bl loop1\t\n"
+							: : : "memory");			
 			break;
 
 		case 'u':			//lesender Zugriff auf nicht zugeordnete Adresse
@@ -140,6 +145,11 @@ void unterprogramm(unsigned char *input){
 	
 }
 
+/*
+			asm volatile 	("ldr r0, =0x500020\t\n"
+							"str r0, [r0]\t\n"
+							: : : "r0");
+*/
 
 
 
