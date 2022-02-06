@@ -92,25 +92,40 @@ void unterprogramm(unsigned char *input){
 			break;
 		case 'd':
 			//lesender Zugriff auf Kernel-Daten
-			syscall_put_char('p');
+			asm volatile 	("ldr r0, =0x300000\t\n"
+							"ldr r0, [r0]\t\n"
+							: : : "r0");
 			break;
 		case 'k':
 			//lesender Zugriff auf Kernel-Code
+			asm volatile 	("ldr r0, =0x100000\t\n"
+							"ldr r0, [r0]\t\n"
+							: : : "r0");
 			break;
 		case 'K':
 			//lesender Zugriff auf Kernel-Stack
+			asm volatile 	("ldr r0, =0x3FFFF8\t\n"
+							"ldr r0, [r0]\t\n"
+							: : : "r0");
 			break;
 		case 'g':
 			//lesender Zugriff auf Peripherie-Gerät, z.B. UART
+			asm volatile 	("ldr r0, =0x3f201000\t\n"
+							"ldr r0, [r0]\t\n"
+							: : : "r0");
 			break;
 		case 'c':
 			//schreibender Zugriff auf eigenen Code
+			
 			break;
 		case 's':
 			//Stack-Overflow
 			break;
 		case 'u':
 			//lesender Zugriff auf nicht zugeordnete Adresse
+			asm volatile 	("ldr r0, =0x5a00000\t\n"
+							"ldr r0, [r0]\t\n"
+							: : : "r0");
 			break;
 		case 'x':
 			//Sprung auf eigene Daten oder Stack
