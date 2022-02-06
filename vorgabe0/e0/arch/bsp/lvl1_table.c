@@ -58,7 +58,7 @@ L2:
 
 
 static unsigned int lvl1_table[4096] __attribute__((aligned(0x4000)));
-static unsigned int lvl2_tables[32][256] __attribute__((aligned(0x4000)));
+static unsigned int lvl2_tables[32][256] __attribute__((aligned(0x400)));
 
 unsigned int set_bits_lvl1(unsigned int temp, unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int xn_bit, unsigned int pxn_bit, unsigned int sec_bit){
 
