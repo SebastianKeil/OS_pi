@@ -114,7 +114,9 @@ void unterprogramm(unsigned char *input){
 			break;
 
 		case 'c':			//schreibender Zugriff auf eigenen Code
-			
+			asm volatile 	("ldr r0, =0x500020\t\n"
+							"str r0, [r0]\t\n"
+							: : : "r0");
 			break;
 
 		case 's':			//Stack-Overflow
@@ -128,7 +130,7 @@ void unterprogramm(unsigned char *input){
 			break;
 
 		case 'x':			//Sprung auf eigene Daten oder Stack
-			
+			asm volatile 	("ldr pc, =0x700000");
 			break;
 		default:
 			print_answer(input);
