@@ -23,13 +23,13 @@ int define_mode(unsigned int spsr){
 //MRC p15, 0, <Rt>, c6, c0, 2 ; Read Instruction Fault Address Register
 unsigned int get_ifar(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,r0,c6,c0,2":"=r"(value):);
+	asm volatile ("mrc p15,0,%0, c6,c0,2":"=r"(value):);
 	return value;
 }	
 //MRC p15, 0, <Rt>, c5, c0, 1 ; Read Instruction Fault Status Register
 unsigned int get_ifsr(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,r0,c5,c0,1":"=r"(value):);
+	asm volatile ("mrc p15,0,%0, c5,c0,1":"=r"(value):);
 	return value;
 }
 
@@ -144,12 +144,12 @@ void print_ifsr_status(unsigned int ifsr){
 
 unsigned int get_dfar(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,r0,c6,c0,0":"=r"(value):);
+	asm volatile ("mrc p15,0,%0, c6,c0,0":"=r"(value):);
 	return value;
 }
 unsigned int get_dfsr(){
 	unsigned int value;
-	asm volatile ("mrc p15,0,r0, c5, c0, 0":"=r"(value):);
+	asm volatile ("mrc p15,0,%0, c5, c0, 0":"=r"(value):);
 	return value;
 }
 void print_dfsr_status(unsigned int dfsr){
@@ -340,14 +340,15 @@ void print_reg_dump(unsigned int regs[], unsigned int modus){
 		unsigned int dfsr = get_dfsr();
 		unsigned int read = ((dfsr) & (1 << DFSR_RW_BIT));
 		if (read) {
-			kprintf("lesend ");
+			kprintf("schreibend ");			
 		} else {
-		kprintf("schreibend ");
+			kprintf("lesend ");
+		}
 		kprintf("auf Adresse: 0x%08x\n", dfar);
 		kprintf("Fehler: ");
 		print_dfsr_status(dfsr);
 		kprintf("\n");
-		}
+		
 	break;
 	// 5 unused
 	case 6:
