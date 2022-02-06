@@ -112,12 +112,9 @@ void initialize_mmu(){
 			
 		//HARDWARE		//Sys L/S 	Usr 	XN	
 		else if(i > 1007 && i < 1012){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
-		
-		//HIER IST NOCH EIN FEHLER
+
 		//FAULT			//Sys 		Usr 	
-		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);
-		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1);
-	}				 	
+		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);}				 	
 
 		//Vollzugriff
 		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
