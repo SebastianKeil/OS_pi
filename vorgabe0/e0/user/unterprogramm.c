@@ -25,9 +25,9 @@ void print_answer(unsigned char *input){
 }
 
 void print_answer_uppercase(unsigned char *input){
-	for(int i = 0; i < 5; i++){
+	for(int i = 0; i < 3; i++){
 		syscall_put_char(*input);
-		sleep(BUSY_WAIT_COUNTER*20);
+		sleep(BUSY_WAIT_COUNTER);
 		
 	}
 	//syscall_put_char(LINEFEED);
