@@ -40,7 +40,7 @@ void start_kernel(){
 	enable_interrupts_uart();
 
 	enable_interrupts_timer();
-	set_timing(500000); //TIMER_INTERVAL 1000000 // 500000 schnell // 50000 schnellste
+	set_timing(1000000); //TIMER_INTERVAL 1000000 // 500000 schnell // 50000 schnellste
 	
 	init_thread_admin();
 	

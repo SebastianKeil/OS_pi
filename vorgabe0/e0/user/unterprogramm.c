@@ -61,20 +61,38 @@ void unterprogramm(unsigned char *input){
 	u: lesender Zugriff auf nicht zugeordnete Adresse.
 	x: Sprung auf eigene Daten oder Stack.
 	*/
-	
+
+	//check if correct char
+	unsigned int debug_char = 1;
+	if(debug_char){
+		syscall_put_char(character);
+		syscall_put_char(' ');
+		syscall_put_char('w');
+		syscall_put_char('a');
+		syscall_put_char('s');
+		syscall_put_char(' ');
+		syscall_put_char('e');
+		syscall_put_char('n');
+		syscall_put_char('t');
+		syscall_put_char('e');
+		syscall_put_char('r');
+		syscall_put_char('e');
+		syscall_put_char('d');
+	}
 	switch(character){
 		case 'n':
 			//lesender Zugriff auf Null-Pointer
-			kprintf("going to read from NULL");
-			unsigned int dummy = *(unsigned int*) 0x0;
+			asm volatile 	("ldr r0, =0x0\t\n"
+							"ldr r0, [r0]\t\n"
+							: : : "r0");
 			break;
 		case 'p':
 			//Sprung auf Null-Pointer
-			syscall_put_char('p');
-			asm voltile ("ldr pc, =0x0");
+			asm volatile ("ldr pc, =0x0");
 			break;
 		case 'd':
 			//lesender Zugriff auf Kernel-Daten
+			syscall_put_char('p');
 			break;
 		case 'k':
 			//lesender Zugriff auf Kernel-Code
