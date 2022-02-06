@@ -30,7 +30,7 @@ void print_answer_uppercase(unsigned char *input){
 		sleep(BUSY_WAIT_COUNTER*20);
 		
 	}
-	syscall_put_char(LINEFEED);
+	//syscall_put_char(LINEFEED);
 	return;
 }
 
