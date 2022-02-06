@@ -44,11 +44,8 @@ void unterprogramm(unsigned char *input){
 		print_answer_uppercase(input);
 		syscall_kill_thread();	
 		return;
-	}else{
-		print_answer(input);
-		syscall_kill_thread();
 	}
-	
+
 	/*
 	n: lesender Zugriff auf Null-Pointer.
 	p: Sprung auf Null-Pointer.
@@ -116,7 +113,7 @@ void unterprogramm(unsigned char *input){
 			break;
 		case 'c':
 			//schreibender Zugriff auf eigenen Code
-			
+
 			break;
 		case 's':
 			//Stack-Overflow
