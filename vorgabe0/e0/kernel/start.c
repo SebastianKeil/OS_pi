@@ -32,7 +32,7 @@ void start_kernel(){
 	kprintf("*****************************************************\n\n");
 	
 	/* KERNEL SETUP */
-	print_register_dump = 0;
+	//print_register_dump = 0;
 	
 	disable_uart_fifo();
 	set_uart_receive_interrupt();

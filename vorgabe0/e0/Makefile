@@ -78,7 +78,8 @@ kernel/idle_thread.c \
 arch/bsp/lvl1_table.c \
 
 # Hier separate user files hinzufügen
-USRC = user/main.c \
+USRC = \
+user/main.c \
 user/masterprogramm.c \
 user/unterprogramm.c \
 user/user_lib/user_syscalls.c \

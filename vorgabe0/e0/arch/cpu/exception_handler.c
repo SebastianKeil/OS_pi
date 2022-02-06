@@ -172,12 +172,13 @@ unsigned int uart_pending;
 unsigned char uart_data;
 
 void irq(unsigned int regs[]){
-	if(print_register_dump){
-		print_reg_dump(regs, IRQ);
-	}
+	// if(print_register_dump){
+	// 	print_reg_dump(regs, IRQ);
+	// }
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
 		uart_data = uart_read();
+		check_interrupts();
 		//kprintf("irq: \n\t[%c] was pressed, check if any threads are waiting\n", uart_data);
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_waiting_threads(regs);

@@ -68,7 +68,7 @@ void unterprogramm(unsigned char *input){
 	*/
 
 	//check if correct char
-	unsigned int debug_char = 1;
+	unsigned int debug_char = 0;
 	if(debug_char){
 		syscall_put_char(character);
 		syscall_put_char(' ');
