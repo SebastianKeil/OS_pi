@@ -11,7 +11,7 @@ syscall_create_thread()				->	asm volatile("svc #44");
 syscall_sleep_thread()				->	asm volatile("svc #45");
 */
 
-struct thread_create_context{
+struct thread_create_context{ 
 	unsigned char* data;
 	unsigned int count;
 	void (*programm)(unsigned char*);
@@ -29,7 +29,7 @@ void syscall_put_char(unsigned char c){
 
 unsigned char syscall_get_char(void){
 
-	received_char =  ();
+	received_char = syscall_get_char_asm();
 	return received_char;
 }
 

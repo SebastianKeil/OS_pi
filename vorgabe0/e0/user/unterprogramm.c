@@ -70,8 +70,8 @@ void unterprogramm(unsigned char *input){
 			break;
 		case 'p':
 			//Sprung auf Null-Pointer
-			kprintf("going to jump to NULL");
-			asm ("ldr pc, =0x0");
+			syscall_put_char('p');
+			asm voltile ("ldr pc, =0x0");
 			break;
 		case 'd':
 			//lesender Zugriff auf Kernel-Daten
