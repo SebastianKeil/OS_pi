@@ -6,7 +6,7 @@
 //int print_register_dump;
 //unsigned char receive_buffer;
 
-void check_interrupts(unsigned char data, unsigned int regs[35]){
+void check_interrupts(unsigned char data){
 	unsigned char receive_buffer = data;
 	switch(receive_buffer){
 

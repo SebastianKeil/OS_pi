@@ -117,7 +117,7 @@ void initialize_mmu(){
 		
 		//32TCB STACKS	//Sys L/S	USR L/S XN
 		else if(i < 41){
-			unsigned int lvl2_address = &lvl2_tables[i - 9][0];
+			unsigned int lvl2_address = lvl2_tables[i - 9];
 			lvl2_address = SET_BIT_1(lvl2_address, 2);
 			lvl1_table[i] = SET_BIT_1(lvl2_address, 0);
 			initialize_l2_entry(lvl2_tables[i - 9], temp);

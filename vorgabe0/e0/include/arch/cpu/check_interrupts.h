@@ -4,6 +4,6 @@
 //int print_register_dump;
 //unsigned char receive_buffer;
 
-void check_for_interrupts(char, unsigned int regs[]);
+void check_interrupts(unsigned char);
 
 #endif

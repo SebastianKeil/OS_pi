@@ -71,7 +71,6 @@ void software_interrupt(unsigned int regs[35]){
 	if(define_mode(regs[17]) == USER_MODE){
 	
 		unsigned int sleep_time;
-		unsigned char received_char;
 		unsigned char char_send;
 		struct _thread_create_context *_thread_create_context_ptr;
 		
@@ -178,7 +177,7 @@ void irq(unsigned int regs[]){
 	get_pending_status(&sys_timer_pending, &uart_pending);
 	if(uart_pending){
 		uart_data = uart_read();
-		check_interrupts();
+		check_interrupts(uart_data);
 		//kprintf("irq: \n\t[%c] was pressed, check if any threads are waiting\n", uart_data);
 		buffer_push(uart_data, &uart_input_buffer);
 		check_for_waiting_threads(regs);
