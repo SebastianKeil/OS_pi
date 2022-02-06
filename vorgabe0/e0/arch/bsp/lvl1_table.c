@@ -83,9 +83,9 @@ unsigned int set_bits_lvl2(unsigned int temp, unsigned int ap_0, unsigned int ap
 	return temp;
 }
 
-void set_l2(unsigned int lvl2_table[256]){
+void initialize_l2_entry(unsigned int lvl2_table[256], unsigned int temp){
 	for(int i = 0; i < 256; i++){
-		unsigned int temp = 1024 * 4 * i;
+		temp += 1024 * 4 * i;
 		lvl2_table[i] = set_bits_lvl2(temp, 1, 1, 0, 1, 1);
 		if(i == 255){lvl2_table[i] = set_bits_lvl2(temp, 0, 0, 0, 0, 1);}
 	}
@@ -120,7 +120,7 @@ void initialize_mmu(){
 			unsigned int lvl2_address = &lvl2_tables[i - 9][0];
 			lvl2_address = SET_BIT_1(lvl2_address, 2);
 			lvl1_table[i] = SET_BIT_1(lvl2_address, 0);
-			set_l2(lvl2_tables[i - 9]);
+			initialize_l2_entry(lvl2_tables[i - 9], temp);
 		}
 			
 		//HARDWARE		//Sys L/S 	Usr 	XN	

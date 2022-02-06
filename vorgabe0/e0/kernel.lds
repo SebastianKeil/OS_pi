@@ -48,16 +48,18 @@ SECTIONS
 	build/user/user_lib/*(.rodata .rodata.*)
 	}
 
-	. = 0x000700000;
+	. = 0x00700000;
+	.user_bss :{ 
+	build/user/*(.bss .bss.*)
+	build/user/user_lib/*(.bss .bss.*)
+	}
+
+	. = 0x000800000;
 	.user_data :{ 
 	build/user/*(.data .data.*)
 	build/user/user_lib/*(.data .data.*)
 	}
 
-	. = 0x00800000;
-	.user_bss :{ 
-	build/user/*(.bss .bss.*)
-	build/user/user_lib/*(.bss .bss.*)
-	}
+	
 }
 
