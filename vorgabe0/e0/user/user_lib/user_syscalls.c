@@ -2,6 +2,7 @@
 
 extern unsigned char syscall_get_char_asm(void); 
 extern void syscall_sleep_thread_asm(void); 
+extern void syscall_create_thread_asm(void); 
 
 /*
 syscall_put_char()					->	asm volatile("svc #42");		
