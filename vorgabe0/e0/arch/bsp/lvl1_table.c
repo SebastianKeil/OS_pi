@@ -6,7 +6,7 @@
 #define NG_BIT 17//0
 #define S_BIT 16//0
 #define XN_BIT 4//nur lvl1
-#define XN_BIT_LVL2
+#define XN_LVL2_BIT 0
 #define C_BIT 3 //0
 #define B_BIT 2 //0
 #define SEC_BIT 1
@@ -14,7 +14,10 @@
 #define AP0_BIT 10
 #define AP1_BIT 11
 #define AP2_BIT 15
-#define TEX_BIT 14 //anfang 0
+#define AP0_LVL2_BIT 4
+#define AP1_LVL2_BIT 5
+#define AP2_LVL2_BIT 9
+#define SMALL_PAGE_BIT 1
 
 /* 	Aufbau MMU:
 
@@ -64,7 +67,7 @@ void set_guard_pages(){
 	}
 }
 
-unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int xn_bit, unsigned int pxn_bit, unsigned int sec_bit){
+unsigned int set_bits_lvl1(unsigned int temp, unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int xn_bit, unsigned int pxn_bit, unsigned int sec_bit){
 
 	temp = (ap_0 == 0) ? temp : SET_BIT_1(temp, AP0_BIT);
 	temp = (ap_1 == 0) ? temp : SET_BIT_1(temp, AP1_BIT);
@@ -75,13 +78,18 @@ unsigned int set_bits(unsigned int temp, unsigned int ap_0, unsigned int ap_1, u
 
 	return temp;
 }
-1000000000
-1000000000
 
-unsigned int set_l2(unsigned int temp){
-	
+unsigned int set_bits_lvl2(unsigned int temp, unsigned int ap_0, unsigned int ap_1, unsigned int ap_2, unsigned int small_page_bit, unsigned int xn_bit){
+
+	temp = (ap_0 == 0) ? temp : SET_BIT_1(temp, AP0_LVL2_BIT);
+	temp = (ap_1 == 0) ? temp : SET_BIT_1(temp, AP1_LVL2_BIT);
+	temp = (ap_2 == 0) ? temp : SET_BIT_1(temp, AP2_LVL2_BIT);
+	temp = (small_page_bit == 0) ? temp : SET_BIT_1(temp, SMALL_PAGE_BIT);
+	temp = (xn_bit == 0) ? temp : SET_BIT_1(temp, XN_LVL2_BIT);
+
 	return temp;
 }
+
 
 void initialize_mmu(){
 
@@ -90,21 +98,21 @@ void initialize_mmu(){
 		unsigned int temp = 1024 * 1024 * i;
 		
 		//FAULT .INIT	//Sys 		Usr 		
-		if(i < 1){lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);}
+		if(i < 1){lvl1_table[i] = set_bits_lvl1(temp, 0, 0, 0, 0, 0, 0);}
 		//TEXT 			//Sys L 	Usr 
-		else if(i < 2){lvl1_table[i] = set_bits(temp, 1, 0, 1, 0, 0, 1);}	
+		else if(i < 2){lvl1_table[i] = set_bits_lvl1(temp, 1, 0, 1, 0, 0, 1);}	
 		//RODATA 		//Sys L   	Usr 	XN
-		else if(i < 3){lvl1_table[i] = set_bits(temp, 1, 0, 1, 1, 0, 1);}
+		else if(i < 3){lvl1_table[i] = set_bits_lvl1(temp, 1, 0, 1, 1, 0, 1);}
 		//DATA			//Sys L/S 	Usr 	XN
-		else if(i < 4){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
+		else if(i < 4){lvl1_table[i] = set_bits_lvl1(temp, 1, 0, 0, 1, 0, 1);}
 		//BSS			//Sys L/S 	Usr 	XN
-		else if(i < 5){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
+		else if(i < 5){lvl1_table[i] = set_bits_lvl1(temp, 1, 0, 0, 1, 0, 1);}
 		//USR_TEXT 		//Sys L   	Usr L 	pXN
-		else if(i < 6){lvl1_table[i] = set_bits(temp, 1, 1, 1, 0, 1, 1);}
+		else if(i < 6){lvl1_table[i] = set_bits_lvl1(temp, 1, 1, 1, 0, 1, 1);}
 		//USR_RODATA	//Sys L   	Usr L 	XN
-		else if(i < 7){lvl1_table[i] = set_bits(temp, 1, 1, 1, 1, 0, 1);}	
+		else if(i < 7){lvl1_table[i] = set_bits_lvl1(temp, 1, 1, 1, 1, 0, 1);}	
 		//USR_DATA/BSS 	//Sys L/S 	USR L/S XN
-		else if(i < 9){lvl1_table[i] = set_bits(temp, 1, 1, 0, 1, 0, 1);}
+		else if(i < 9){lvl1_table[i] = set_bits_lvl1(temp, 1, 1, 0, 1, 0, 1);}
 		
 		//32TCB STACKS	//Sys L/S	USR L/S XN
 		else if(i < 41){
@@ -114,13 +122,13 @@ void initialize_mmu(){
 		}
 			
 		//HARDWARE		//Sys L/S 	Usr 	XN	
-		else if(i > 1007 && i < 1012){lvl1_table[i] = set_bits(temp, 1, 0, 0, 1, 0, 1);}
+		else if(i > 1007 && i < 1012){lvl1_table[i] = set_bits_lvl1(temp, 1, 0, 0, 1, 0, 1);}
 
 		//FAULT			//Sys 		Usr 	
-		else{lvl1_table[i] = set_bits(temp, 0, 0, 0, 0, 0, 0);}				 	
+		else{lvl1_table[i] = set_bits_lvl1(temp, 0, 0, 0, 0, 0, 0);}				 	
 
 		//Vollzugriff
-		//lvl1_table[i] = set_bits(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
+		//lvl1_table[i] = set_bits_lvl1(temp, 1, 1, 0, 0, 0, 1); 	 //Sys L/S 	USR L/S 
 	}
 	return;
 }
