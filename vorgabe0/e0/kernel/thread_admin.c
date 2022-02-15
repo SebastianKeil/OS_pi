@@ -37,7 +37,7 @@ struct tcb{
 	unsigned int sp;
 	unsigned int cpsr;
 	unsigned int registers[13];
-	
+	unsigned int process_id;
 	//DEBUG
 	unsigned char data;
 };
@@ -45,6 +45,7 @@ struct tcb{
 struct tcb tcbs[THREAD_COUNT];
 struct tcb *free_tcb; //first free tcb slot
 unsigned int used_tcbs;
+unsigned int process_slots[8][4];
 /*
 
 struct list_elem{
@@ -150,6 +151,12 @@ void init_all_tcbs(){
 		tcbs[i].in_use = 0;
 	}
 	
+	for (int j = 0; j < 8; j++){
+		for (int k = 0; k < 4; k++){
+			process_slots[j][k] = 0;
+		}
+	}
+
 	free_tcb = &tcbs[0];
 	used_tcbs = 0;
 }
@@ -267,6 +274,41 @@ void check_for_waiting_threads(unsigned int regs[35]){
 //_/_/_/_/ THREAD ADMINISTRATION /_/_/_/_/_/
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
+int find_free_process_id(){
+	for (int i = 0; i < 8; i++){
+		unsigned int free = 0;
+		for (int j = 0; j < 4; j++){
+			free |= process_slots[i][j];
+		}
+		if (!free){
+			return i;
+		}
+	}
+	return -1;
+}
+
+unsigned int push_to_process_slot(unsigned int process_id){
+	for(int i = 0; i < 4; i++){
+		if(process_slots[process_id][i] == 0){
+			process_slots[process_id][i] = 1;
+			return 0;
+		}
+	}
+	kprintf("\nseems like there was no room for more threads... this shouldnt happen\n");
+	return 1;
+}
+
+unsigned int pull_from_process_slot(unsigned int process_id){
+	for(int i = 3; i > -1; i--){
+		if(process_slots[process_id][i] == 1){
+			process_slots[process_id][i] = 0;
+			return 0;
+		}
+	}
+	kprintf("\nseems like there were no threads in this process... this shouldnt happen\n");
+	return 2;
+}
+
 int find_free_tcb(){
 	for(int i = 0; i < THREAD_COUNT; i++){
 		if(tcbs[i].in_use == 0){
@@ -288,10 +330,11 @@ void decrease_sp(unsigned int* _sp, unsigned int size){
 	}
 }
 
-unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*)){
+unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*), unsigned int process_id){
 
 	free_tcb->pc = (unsigned int) unterprogramm;
 	free_tcb->cpsr = USER_MODE;
+	free_tcb->process_id = process_id;
 	
 	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
 	decrease_sp(&free_tcb->sp, (count * sizeof(unsigned char*)));
@@ -348,15 +391,46 @@ void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){
 
 void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*), unsigned int irq_regs[]){
 
-	//kprintf("create_thread: \n\tgoing to create_thread with %c\n", *data);
-	
+	int process_id = find_free_process_id();
+		if(process_id == -1){
+		kprintf("can't create thread! Already 8 processes running..\n");
+		return;
+	}
+	unsigned int flag = push_to_process_slot(process_id);
+	if(flag != 0){
+		kprintf("can't create thread! Already 4 threads under process_id running..\n");
+		return;
+	}
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
-		return;}
-	//DEBUG
-	//print_ready_queue();
+		return;
+	}
+		
+	unsigned int thread_id = fill_tcb(data, count, unterprogramm, (unsigned int)process_id);
+	push_tcb_to_ready_queue(thread_id, irq_regs);
+	used_tcbs ++;
+	find_free_tcb();
 	
-	unsigned int thread_id = fill_tcb(data, count, unterprogramm);
+	//DEBUG
+	//kprintf("waiting_queue: %i \nready_queue: %i \nready->curr: thread[%i]\n", waiting_queue->count, ready_queue->count, ready_queue->curr->context->id);	
+	print_ready_queue();
+	print_waiting_queue();
+}
+
+void u_fork(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*), unsigned int irq_regs[], unsigned int process_id){
+
+	if(!find_free_tcb()){
+		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
+		return;
+	}
+	unsigned int flag = push_to_process_slot(process_id);
+	if(flag != 0){
+		kprintf("can't create thread! Already 4 threads under process_id running..\n");
+		return;
+	}
+
+	unsigned int thread_id = fill_tcb(data, count, unterprogramm, (unsigned int)process_id);
+	push_to_process_slot();
 	push_tcb_to_ready_queue(thread_id, irq_regs);
 	used_tcbs ++;
 	find_free_tcb();
@@ -384,11 +458,15 @@ unsigned int ready_threads_in_waiting(){
 }
 
 void kill_thread(unsigned int regs[]){
+	unsigned int flag = pull_from_process_slot(ready_queue->current->context->process_id);
+	if (flag != 0){
+		kprintf(" :( ");
+	}
 	//killing the only thread
 	if(ready_queue->count == 1){
 		ready_queue->curr->context->in_use = 0;
 		ready_queue->curr = 0x0;
-		
+
 		if(ready_threads_in_waiting()){
 			used_tcbs--;
 			ready_queue->count--;

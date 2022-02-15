@@ -12,6 +12,7 @@ struct tcb{
 	unsigned int sp;
 	unsigned int cpsr;
 	unsigned int registers[13];
+	unsigned int process_id;
 	
 	//DEBUG
 	unsigned char data;
