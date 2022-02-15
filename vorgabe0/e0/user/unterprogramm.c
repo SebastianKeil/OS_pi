@@ -114,7 +114,7 @@ void unterprogramm(unsigned char *input){
 	character = *input;
 	range = (unsigned int)character;
 	
-	//syscall_ufork(&prepare_print_info);
+	syscall_ufork(&prepare_print_info);
 	prepare_print_info();
 }
 
