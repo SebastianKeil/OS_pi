@@ -5,6 +5,7 @@
 void sleep(unsigned int ticks);
 void print_answer(unsigned char *input);
 void end_this_thread(void);
+void prepare_print_info(void);
 void unterprogramm(unsigned char *input);
 
 #endif

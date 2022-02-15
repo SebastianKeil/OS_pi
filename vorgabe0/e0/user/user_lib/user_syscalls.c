@@ -3,6 +3,8 @@
 extern unsigned char syscall_get_char_asm(void); 
 extern void syscall_sleep_thread_asm(void); 
 extern void syscall_create_thread_asm(void); 
+extern void syscall_ufork_asm(void); 
+
 
 /*
 syscall_put_char()					->	asm volatile("svc #42");		
@@ -47,6 +49,12 @@ void syscall_create_thread(unsigned char* data, unsigned int count, void (*progr
 
 	asm volatile	("mov r0, %0" : : "r" (&thread_create_context));
 	syscall_create_thread_asm();
+}
+
+void syscall_ufork(void (*programm)(void)){
+
+	asm volatile	("mov r0, %0" : : "r" (programm));
+	syscall_ufork_asm();
 }
 
 void syscall_sleep_thread(unsigned int length){

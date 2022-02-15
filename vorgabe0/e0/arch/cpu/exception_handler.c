@@ -127,6 +127,14 @@ void software_interrupt(unsigned int regs[35]){
 				}
 				wait_thread(sleep_time, regs);
 				break;
+			
+			case 420:
+				_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
+				kprintf("software_interrupt420: \n\nfork with\n");
+				
+				//ufork(_thread_create_context_ptr->unterprogramm, regs);
+				break;
+				
 		}
 	} else {
 		print_reg_dump(regs, SVC);

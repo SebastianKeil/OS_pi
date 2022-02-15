@@ -10,6 +10,8 @@
 
 unsigned char char_for_unterprogramm;
 unsigned int buffer_count;
+unsigned char character;
+unsigned int range;
 
 void sleep(unsigned int ticks){
 	for(volatile unsigned int i = 0; i < ticks; i++){}
@@ -34,10 +36,7 @@ void print_answer_uppercase(unsigned char *input){
 	return;
 }
 
-void unterprogramm(unsigned char *input){
-	unsigned char character = *input;
-	unsigned int range = (unsigned int)character;
-
+void prepare_print_info(){
 	if (range >= LOWER_BOUND_UPPER_CASE && range <= UPPER_BOUND_UPPER_CASE){
 		if(range == K_ASCII){
 			//lesender Zugriff auf Kernel-Stack
@@ -47,7 +46,7 @@ void unterprogramm(unsigned char *input){
 			syscall_kill_thread();	
 			return;
 		}
-		print_answer_uppercase(input);
+		print_answer_uppercase(&character);
 		syscall_kill_thread();	
 		return;
 	}
@@ -105,18 +104,19 @@ void unterprogramm(unsigned char *input){
 			asm volatile 	("ldr pc, =0x700000");
 			break;
 		default:
-			print_answer(input);
+			print_answer(&character);
 			syscall_kill_thread();
 			break;
 	}
-	
 }
 
-/*
-			asm volatile 	("ldr r0, =0x500020\t\n"
-							"str r0, [r0]\t\n"
-							: : : "r0");
-*/
+void unterprogramm(unsigned char *input){
+	character = *input;
+	range = (unsigned int)character;
+	
+	//syscall_ufork(&prepare_print_info);
+	prepare_print_info();
+}
 
 
 
