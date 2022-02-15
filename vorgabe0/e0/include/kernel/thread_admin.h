@@ -70,6 +70,7 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogra
 unsigned int fill_tcb_child_thread(void (unterprogramm)(void), unsigned int process_id);
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int regs[]);
 void create_thread(unsigned char* data, unsigned int count, void (*unterprogramm)(unsigned char*), unsigned int regs[]);
+void ufork(void (unterprogramm)(void), unsigned int irq_regs[]);
 unsigned int ready_threads_in_waiting();
 void kill_thread(unsigned int regs[]);
 void wait_thread(unsigned int sleep_time, unsigned int regs[]);

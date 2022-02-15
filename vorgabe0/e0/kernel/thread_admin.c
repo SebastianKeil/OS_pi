@@ -430,7 +430,7 @@ void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)
 	print_waiting_queue();
 }
 
-void u_fork(void (unterprogramm)(void), unsigned int irq_regs[]){
+void ufork(void (unterprogramm)(void), unsigned int irq_regs[]){
 	unsigned int process_id = ready_queue->curr->context->process_id;
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);

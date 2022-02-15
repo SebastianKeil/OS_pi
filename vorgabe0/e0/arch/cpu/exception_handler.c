@@ -44,6 +44,8 @@ struct _thread_create_context{
 	void (*unterprogramm)(unsigned char*);
 };
 
+void (*child_thread)(void);
+
 unsigned int get_imm(unsigned int instruction, unsigned int bit_mask){
 	unsigned int svc_imm = instruction & bit_mask;
 	return svc_imm;
@@ -129,10 +131,10 @@ void software_interrupt(unsigned int regs[35]){
 				break;
 			
 			case 420:
-				_thread_create_context_ptr = (struct _thread_create_context*) regs[22];
-				kprintf("software_interrupt420: \n\nfork with\n");
+				child_thread = (void *) regs[22];
+				kprintf("software_interrupt420: \n\tfork\n");
 				
-				//ufork(_thread_create_context_ptr->unterprogramm, regs);
+				ufork(child_thread, regs);
 				break;
 				
 		}
