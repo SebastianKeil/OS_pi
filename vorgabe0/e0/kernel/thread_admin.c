@@ -349,6 +349,19 @@ unsigned int fill_tcb(unsigned char* data, unsigned int count, void (unterprogra
 	return free_tcb->id;
 }
 
+//for child threads
+unsigned int fill_tcb(void (unterprogramm)(void), unsigned int process_id){
+
+	free_tcb->pc = (unsigned int) unterprogramm;
+	free_tcb->cpsr = USER_MODE;
+	free_tcb->process_id = process_id;
+	
+	free_tcb->sp = USER_STACK_BASE + (free_tcb->id * USER_STACK_SIZE);
+	
+	free_tcb->in_use = 1;
+	return free_tcb->id;
+}
+
 
 void push_tcb_to_ready_queue(unsigned int thread_id, unsigned int irq_regs[]){	
 	//no threads active
@@ -417,20 +430,19 @@ void create_thread(unsigned char* data, unsigned int count, void (unterprogramm)
 	print_waiting_queue();
 }
 
-void u_fork(unsigned char* data, unsigned int count, void (unterprogramm)(unsigned char*), unsigned int irq_regs[], unsigned int process_id){
+void u_fork(void (unterprogramm)(void), unsigned int irq_regs[]){
 
 	if(!find_free_tcb()){
 		kprintf("cant create thread! already %i threads running..\n", THREAD_COUNT);
 		return;
 	}
-	unsigned int flag = push_to_process_slot(process_id);
+	unsigned int flag = push_to_process_slot(ready_queue->current->context->process_id);
 	if(flag != 0){
 		kprintf("can't create thread! Already 4 threads under process_id running..\n");
 		return;
 	}
 
-	unsigned int thread_id = fill_tcb(data, count, unterprogramm, (unsigned int)process_id);
-	push_to_process_slot();
+	unsigned int thread_id = fill_tcb(unterprogramm, process_id);
 	push_tcb_to_ready_queue(thread_id, irq_regs);
 	used_tcbs ++;
 	find_free_tcb();
